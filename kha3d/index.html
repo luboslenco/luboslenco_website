@@ -32,14 +32,52 @@
 	  <h1>Home</h1>
 		<p>Following is a set of examples showing how to use modern, cross-platform 3D graphics API provided by <a href="https://github.com/KTXSoftware/Kha">Kha</a>.</p>
     <p>It is meant to be useful if you want to program truly portable 3D graphics in <a href="http://haxe.org">Haxe</a>, and also as a perfect starting point for learning 3D programming from scratch with a super clean API.</p>
-    <p>If you have never heard of this Haxe Kha thing, know this - it allows you to do 3D graphics in the most portable and simplistic way, while still being as close to metal as possible.</p>
+    <p>If you have never heard of this Haxe Kha thing, know this - it allows you to do 3D graphics in the most portable and simplistic way, while still being as close to metal as possible. You can learn more <a href="http://tech.ktxsoftware.com/kha/">here</a>.</p>
     <p>We will be closely following excellent <a href="http://opengl-tutorial.org">opengl-tutorial.org</a> for theory parts, but a clean Kha implementation is built for every tutorial. Let's get started!</p>
 	</section>
 
   <section id="opening-a-window">
     <h1>1.Opening a window</h1>
-    <p></p>
-  </section>
+
+    <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-1-opening-a-window/">Reference</a>)</p>
+    
+    <p>The reference tutorial is not really needed here since Kha handles this stuff for us really well. Let's see how to setup Kha and get a blank screen to show up on screen.</p>
+    
+    <p>To use Kha we need <a href="http://git-scm.com">git</a> and <a href="https://nodejs.org">node</a>(0.12.0+). Afterwards, open a terminal/command line in some directory(preferably empty to keep it clean) and simply do 'git clone --recursive https://github.com/KTXSoftware/Empty' to get empty project.</p>
+
+    <p>Go to 'Sources' directory and open 'Empty.hx'. We will add a rendering function that just clears the screen.</p>
+    <pre>
+package;
+
+import kha.Game;
+import kha.Framebuffer;
+import kha.Color;
+
+class Empty extends Game {
+
+    public function new() {
+        super("Empty", false);
+    }
+
+    override public function render(frame:Framebuffer) {
+        // A graphics object which lets us perform 3D operations
+        var g = frame.g4;
+
+        // Begin rendering
+        g.begin();
+
+        // Clear screen to black
+        g.clear(Color.Black);
+
+        // End rendering
+        g.end();
+    }
+}
+    </pre>
+
+    <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
+    <p>Now on to building our project. Open terminal/command line in project folder(where project.kha resides). With Kha you can target pretty much every platform out there, but for simplicity let's do HTML5 build. Type 'node Kha/make -t html5' to build and 'node Kha/make --server' to start local server. Open '127.0.0.1:8080' in your browser and black screen will <a href="http://luboslenco.com/kha3d/build/01">show up</a>!</p>
+    </section>
 
   <section id="the-first-triangle">
     <h1>2.The first triangle</h1>
@@ -76,7 +114,7 @@
     <p></p>
   </section>
 
-	<footer><a href="http://twitter.com/luboslenco">@luboslenco</a></footer>
+	<footer><a href="http://twitter.com/luboslenco">@luboslenco</a> | <a href="https://github.com/luboslenco/kha3d_examples">Contribute</a></footer>
   </article>
 
   <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
