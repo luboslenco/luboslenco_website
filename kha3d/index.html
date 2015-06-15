@@ -166,12 +166,12 @@ indexBuffer.unlock();
     <p>Moving to render() function, draw triangle on screen!</p>
 
     <p><pre><code class="hx">
+// Bind shader program we want to draw with
+g.setProgram(program);
+    
 // Bind data we want to draw
 g.setVertexBuffer(vertexBuffer);
 g.setIndexBuffer(indexBuffer);
-
-// Bind shader program we want to draw with
-g.setProgram(program);
 
 // Draw!
 g.drawIndexedVertices();
