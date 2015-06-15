@@ -8,6 +8,10 @@
   <link rel="stylesheet" href="css/index.css">
   <script type="text/javascript" src="http://use.typekit.net/vsp8met.js"></script>
   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+  <link rel="stylesheet" href="http://luboslenco.com/hlsj/styles/agate.css">
+  <script src="http://luboslenco.com/hlsj/highlight.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
 <body>
 
@@ -41,12 +45,12 @@
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-1-opening-a-window/">Reference</a>)</p>
     
-    <p>The reference tutorial is not really needed here since Kha handles this stuff for us really well. Let's see how to setup Kha and get a blank screen to show up on screen.</p>
+    <p>The reference tutorial is not really needed here since Kha handles this stuff for us perfectly. Let's see how to setup Kha and get a blank screen to show up.</p>
     
     <p>To use Kha we need <a href="http://git-scm.com">git</a> and <a href="https://nodejs.org">node</a>(0.12.0+). Afterwards, open a terminal/command line in some directory(preferably empty to keep it clean) and simply do 'git clone --recursive https://github.com/KTXSoftware/Empty' to get empty project.</p>
 
     <p>Go to 'Sources' directory and open 'Empty.hx'. We will add a rendering function that just clears the screen.</p>
-    <pre>
+    <pre><code class="haxe">
 package;
 
 import kha.Game;
@@ -73,7 +77,7 @@ class Empty extends Game {
         g.end();
     }
 }
-    </pre>
+    </code></pre>
 
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
     <p>Now on to building our project. Open terminal/command line in project folder(where project.kha resides). With Kha you can target pretty much every platform out there, but for simplicity let's do HTML5 build. Type 'node Kha/make -t html5' to build and 'node Kha/make --server' to start local server. Open '127.0.0.1:8080' in your browser and black screen will <a href="http://luboslenco.com/kha3d/build/01">show up</a>!</p>
@@ -81,7 +85,123 @@ class Empty extends Game {
 
   <section id="the-first-triangle">
     <h1>2.The first triangle</h1>
-    <p></p>
+    
+    <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-2-the-first-triangle/">Reference</a>)</p>
+    
+    <p>Here comes the most exciting moment of your life - drawing a triangle! The first thing we need to do is define triangle data and a shader program.</p>
+
+    <pre>
+// An array of 3 vectors representing 3 vertices to form a triangle
+static var vertices:Array<Float> = [
+   -1.0, -1.0, 0.0, // Bottom-left
+    1.0, -1.0, 0.0, // Bottom-right
+    0.0,  1.0, 0.0  // Top
+];
+// Indices for our triangle, these will point to vertices above
+static var indices:Array<Int> = [
+  0, // Bottom-left
+  1, // Bottom-right
+  2  // Top
+];
+
+var vertexBuffer:VertexBuffer;
+var indexBuffer:IndexBuffer;
+var program:Program;
+    </pre>
+
+    <p>Proceed to link shader program with vertex and fragment shaders that we load.</p>
+
+    <pre>
+// Define vertex structure
+var structure = new VertexStructure();
+    structure.add("pos", VertexData.Float3);
+    // Save length - we only store position in vertices for now
+    // Eventually there will be texture coords, normals,...
+    var structureLength = 3;
+
+// Load shaders - these are located in 'Sources/Shaders' directory
+// and Kha includes them automatically
+var fragmentShader = new FragmentShader(Loader.the.getShader("simple.frag"));
+var vertexShader = new VertexShader(Loader.the.getShader("simple.vert"));
+
+// Link program with fragment and vertex shaders we loaded
+program = new Program();
+program.setFragmentShader(fragmentShader);
+program.setVertexShader(vertexShader);
+program.link(structure);
+    </pre>
+
+    <p>Create vertex and index buffers from triangle data we defined.</p>
+
+    <pre>
+// Create vertex buffer
+vertexBuffer = new VertexBuffer(
+  Std.int(vertices.length / structureLength), // Vertex count - 9 / 3 = 3
+  structure, // Vertex structure
+  Usage.StaticUsage // Vertex data will stay the same
+);
+
+// Copy vertices to vertex buffer
+var vbData = vertexBuffer.lock();
+for (i in 0...vbData.length) {
+  vbData[i] = vertices[i];
+}
+vertexBuffer.unlock();
+
+// Create index buffer
+indexBuffer = new IndexBuffer(
+  indices.length, // 3 indices for our triangle
+  Usage.StaticUsage // Index data will stay the same
+);
+
+// Copy indices to index buffer
+var iData = indexBuffer.lock();
+for (i in 0...iData.length) {
+  iData[i] = indices[i];
+}
+indexBuffer.unlock();
+    </pre>
+
+    <p>Finally, draw triangle on screen!</p>
+
+    <pre>
+// Bind data we want to draw
+g.setVertexBuffer(vertexBuffer);
+g.setIndexBuffer(indexBuffer);
+
+// Bind shader program we want to draw with
+g.setProgram(program);
+
+// Draw!
+g.drawIndexedVertices();
+    </pre>
+
+    <p>The vertex shader.</p>
+
+    <pre>
+// Input vertex data, different for all executions of this shader
+attribute vec3 pos;
+
+void kore() {
+  // Just output position
+  gl_Position = vec4(pos, 1.0);
+}
+    </pre>
+
+    <p>The fragment shader.</p>
+
+    <pre>
+void kore() {
+  // Just output red color
+  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+    </pre>
+
+    <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
+
+    <p>Build and run project as mentioned in tutorial 1, and you will be presented with <a href="http://luboslenco.com/kha3d/build/02">this</a>!</p>
+
+    <p><img src="images/tutorial02.png" width="50%"/></p>
   </section>
 
   <section id="matrices">
