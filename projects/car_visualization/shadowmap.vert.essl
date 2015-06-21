@@ -1,0 +1,19 @@
+#version 100
+precision mediump float;
+uniform mat4 dbMVP;
+attribute vec3 vertexPosition;
+varying vec4 position;
+attribute vec2 texPosition;
+attribute vec3 normalPosition;
+attribute vec4 vertexColor;
+
+
+void main()
+{
+	gl_Position = (dbMVP * vec4(vertexPosition[0], vertexPosition[1], vertexPosition[2], 1.0));
+	position = gl_Position;
+	// Branch to 6
+	// Label 6
+	return;
+}
+
