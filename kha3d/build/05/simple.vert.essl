@@ -1,0 +1,17 @@
+#version 100
+precision mediump float;
+uniform mat4 MVP;
+attribute vec3 pos;
+varying vec2 UV;
+attribute vec2 vertexUV;
+
+
+void main()
+{
+	gl_Position = (MVP * vec4(pos[0], pos[1], pos[2], 1.0));
+	UV = vertexUV;
+	// Branch to 6
+	// Label 6
+	return;
+}
+
