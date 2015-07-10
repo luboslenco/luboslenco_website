@@ -137,7 +137,7 @@ program.link(structure);
     <p><pre><code class="hx">
 // Create vertex buffer
 vertexBuffer = new VertexBuffer(
-  Std.int(vertices.length / structureLength), // Vertex count - 9 / 3 = 3
+  Std.int(vertices.length / 3), // Vertex count - 3 floats per vertex
   structure, // Vertex structure
   Usage.StaticUsage // Vertex data will stay the same
 );
@@ -177,7 +177,7 @@ g.setIndexBuffer(indexBuffer);
 g.drawIndexedVertices();
     </code></pre></p>
 
-    <p>The vertex shader.</p>
+    <p>For shaders, Kha uses GLSL syntax. Shaders are automatically converted based on target system using a tool called <a href="https://github.com/KTXSoftware/krafix">Krafix</a>, meaning we do not have to worry about rewriting them. The vertex shader.</p>
 
     <p><pre><code class="glsl">
 // Input vertex data, different for all executions of this shader
@@ -209,6 +209,71 @@ void kore() {
     <h1>3.Matrices</h1>
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/">Reference</a>)</p>
+
+    <p>This is where the reference tutorial comes in handy. As it points out, this is the most important part if you are just starting out with 3D programming.</p>
+
+    <p><pre><code class="hx">
+// Get a handle for our "MVP" uniform
+mvpID = program.getConstantLocation("MVP");
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Projection matrix: 45° Field of View, 4:3 ratio, display range : 0.1 unit - 100 units
+var projection = Matrix4.perspectiveProjection(45.0, 4.0 / 3.0, 0.1, 100.0);
+// Or, for an ortho camera
+//var projection = Matrix4.orthogonalProjection(-10.0, 10.0, -10.0, 10.0, 0.0, 100.0); // In world coordinates
+
+// Camera matrix
+var view = Matrix4.lookAt(new Vector3(4, 3, 3), // Camera is at (4, 3, 3), in World Space
+              new Vector3(0, 0, 0), // and looks at the origin
+              new Vector3(0, 1, 0) // Head is up (set to (0, -1, 0) to look upside-down)
+);
+
+// Model matrix: an identity matrix (model will be at the origin)
+var model = Matrix4.identity();
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Our ModelViewProjection: multiplication of our 3 matrices
+// Remember, matrix multiplication is the other way around
+mvp = Matrix4.identity();
+mvp = mvp.multmat(projection);
+mvp = mvp.multmat(view);
+mvp = mvp.multmat(model);
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Send our transformation to the currently bound shader, in the "MVP" uniform
+g.setMatrix(mvpID, mvp);
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Input vertex data, different for all executions of this shader
+attribute vec3 pos;
+
+// Values that stay constant for the whole mesh
+uniform mat4 MVP;
+
+void kore() {
+  // Output position of the vertex, in clip space : MVP * position
+  gl_Position = MVP * vec4(pos, 1.0);
+}
+    </code></pre></p>
+
+    <p><pre><code class="json">
+{
+  "format": 2,
+  "game": {
+    "name": "Empty",
+    "width": 640,
+    "height": 480,
+    "antiAliasingSamples": 2
+  },
+  "assets": [],
+  "rooms": []
+}
+    </code></pre></p>
+
 
 
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
