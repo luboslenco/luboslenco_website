@@ -303,7 +303,7 @@ static var vertices:Array&lt;Float&gt; = [
 ];
 // Array of colors for each cube vertex
 static var colors:Array&lt;Float&gt; = [
-    0.583, 0.771, 0.014,   0.609, 0.115, 0.436,   0.327, 0.483, 0.844,
+  0.583, 0.771, 0.014,   0.609, 0.115, 0.436,   0.327, 0.483, 0.844,
   0.822, 0.569, 0.201,   0.435, 0.602, 0.223,   0.310, 0.747, 0.185,
   0.597, 0.770, 0.761,   0.559, 0.436, 0.730,   0.359, 0.583, 0.152,
   0.483, 0.596, 0.789,   0.559, 0.861, 0.639,   0.195, 0.548, 0.859,
@@ -408,8 +408,6 @@ void kore() {
     </code></pre></p>
 
 
-
-
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
 
     <p><a href="http://luboslenco.com/kha3d/build/04">this</a></p>
@@ -417,10 +415,151 @@ void kore() {
     <p><img src="images/tutorial04.png" width="50%"/></p>
   </section>
 
+
+
+
+
   <section id="a-textured-cube">
     <h1>5.A textured cube</h1>
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-5-a-textured-cube/">Reference</a>)</p>
+
+    <p><pre><code class="json">
+{
+  "format": 2,
+  "game": {
+    "name": "Empty",
+    "width": 640,
+    "height": 480,
+    "antiAliasingSamples": 2
+  },
+  "assets": [
+    {
+      "file": "uvtemplate.png",
+      "name": "uvtemplate",
+      "type": "image"
+    }
+  ],
+  "rooms": [
+    {
+      "assets": [
+        "uvtemplate"
+      ],
+      "name": "room0",
+      "neighbours": [],
+      "parent": null
+    }
+  ]
+}
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Array of texture coords for each cube vertex
+static var uvs:Array&lt;Float&gt; = [
+  0.000059, 0.000004,   0.000103, 0.336048,   0.335973, 0.335903, 
+  1.000023, 0.000013,   0.667979, 0.335851,   0.999958, 0.336064, 
+  0.667979, 0.335851,   0.336024, 0.671877,   0.667969, 0.671889, 
+  1.000023, 0.000013,   0.668104, 0.000013,   0.667979, 0.335851, 
+  0.000059, 0.000004,   0.335973, 0.335903,   0.336098, 0.000071, 
+  0.667979, 0.335851,   0.335973, 0.335903,   0.336024, 0.671877, 
+  1.000004, 0.671847,   0.999958, 0.336064,   0.667979, 0.335851, 
+  0.668104, 0.000013,   0.335973, 0.335903,   0.667979, 0.335851, 
+  0.335973, 0.335903,   0.668104, 0.000013,   0.336098, 0.000071, 
+  0.000103, 0.336048,   0.000004, 0.671870,   0.336024, 0.671877, 
+  0.000103, 0.336048,   0.336024, 0.671877,   0.335973, 0.335903, 
+  0.667969, 0.671889,   1.000004, 0.671847,   0.667979, 0.335851
+];
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+override public function init() {
+  Configuration.setScreen(new LoadingScreen());
+
+  // Load room with our texture
+  Loader.the.loadRoom("room0", loadingFinished);
+}
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Define vertex structure
+var structure = new VertexStructure();
+structure.add("pos", VertexData.Float3);
+structure.add("uv", VertexData.Float2);
+// Save length - we store position and uv data
+var structureLength = 5;
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Get a handle for texture sample
+textureID = program.getTextureUnit("myTextureSampler");
+
+// Texture
+image = Loader.the.getImage("uvtemplate");
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Copy vertices and uvs to vertex buffer
+var vbData = vertexBuffer.lock();
+for (i in 0...Std.int(vbData.length / structureLength)) {
+  vbData[i * structureLength] = vertices[i * 3];
+  vbData[i * structureLength + 1] = vertices[i * 3 + 1];
+  vbData[i * structureLength + 2] = vertices[i * 3 + 2];
+  vbData[i * structureLength + 3] = uvs[i * 2];
+  vbData[i * structureLength + 4] = uvs[i * 2 + 1];
+}
+vertexBuffer.unlock();
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+Configuration.setScreen(this);
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Set texture
+g.setTexture(textureID, image);
+    </code></pre></p>
+
+    <p><pre><code class="glsl">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+// Input vertex data, different for all executions of this shader
+attribute vec3 pos;
+attribute vec2 uv;
+
+// Output data: will be interpolated for each fragment.
+varying vec2 vUV;
+
+// Values that stay constant for the whole mesh
+uniform mat4 MVP;
+
+void kore() {
+  // Output position of the vertex, in clip space: MVP * position
+  gl_Position = MVP * vec4(pos, 1.0);
+
+  // UV of the vertex. No special space for this one.
+  vUV = uv;
+}
+    </code></pre></p>
+
+    <p><pre><code class="glsl">
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+// Interpolated values from the vertex shaders
+varying vec2 vUV;
+
+// Values that stay constant for the whole mesh.
+uniform sampler2D myTextureSampler;
+
+void kore() {
+
+  // Output color = color of the texture at the specified UV
+  gl_FragColor = texture2D(myTextureSampler, vUV);
+}
+    </code></pre></p>
 
 
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
@@ -429,6 +568,9 @@ void kore() {
 
     <p><img src="images/tutorial05.png" width="50%"/></p>
   </section>
+
+
+
 
   <section id="keyboard-and-mouse">
     <h1>6.Keyboard and mouse</h1>
