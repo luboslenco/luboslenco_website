@@ -224,7 +224,7 @@ var projection = Matrix4.perspectiveProjection(45.0, 4.0 / 3.0, 0.1, 100.0);
 // Camera matrix
 var view = Matrix4.lookAt(new Vector3(4, 3, 3), // Position in World Space
               new Vector3(0, 0, 0), // and looks at the origin
-              new Vector3(0, 1, 0) // Head is up (set to (0, -1, 0) to look upside-down)
+              new Vector3(0, 1, 0) // Head is up
 );
 
 // Model matrix: an identity matrix (model will be at the origin)
@@ -273,7 +273,6 @@ void kore() {
     </code></pre></p>
 
 
-
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
 
     <p><a href="http://luboslenco.com/kha3d/build/03">this</a></p>
@@ -285,6 +284,76 @@ void kore() {
     <h1>4.A colored cube</h1>
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-4-a-colored-cube/">Reference</a>)</p>
+
+    <p><pre><code class="hx">
+    // An array of vertices to form a cube
+  static var vertices:Array<Float> = [
+      -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0,  -1.0, 1.0, 1.0,
+     1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0, 1.0,-1.0,
+     1.0,-1.0, 1.0,  -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,
+     1.0, 1.0,-1.0,   1.0,-1.0,-1.0,  -1.0,-1.0,-1.0,
+    -1.0,-1.0,-1.0,  -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,
+     1.0,-1.0, 1.0,  -1.0,-1.0, 1.0,  -1.0,-1.0,-1.0,
+    -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0,
+     1.0, 1.0, 1.0,   1.0,-1.0,-1.0,   1.0, 1.0,-1.0,
+     1.0,-1.0,-1.0,   1.0, 1.0, 1.0,   1.0,-1.0, 1.0,
+     1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,
+     1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0, 1.0, 1.0,
+     1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  1.0,-1.0, 1.0
+  ];
+  // Array of colors for each cube vertex
+  static var colors:Array<Float> = [
+      0.583, 0.771, 0.014,  0.609, 0.115, 0.436,  0.327, 0.483, 0.844,
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Define vertex structure
+var structure = new VertexStructure();
+structure.add("pos", VertexData.Float3);
+structure.add("col", VertexData.Float3);
+// Save length - we store position and color data
+var structureLength = 6;
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Copy vertices and colors to vertex buffer
+var vbData = vertexBuffer.lock();
+for (i in 0...Std.int(vbData.length / structureLength)) {
+  vbData[i * structureLength] = vertices[i * 3];
+  vbData[i * structureLength + 1] = vertices[i * 3 + 1];
+  vbData[i * structureLength + 2] = vertices[i * 3 + 2];
+  vbData[i * structureLength + 3] = colors[i * 3];
+  vbData[i * structureLength + 4] = colors[i * 3 + 1];
+  vbData[i * structureLength + 5] = colors[i * 3 + 2];
+}
+vertexBuffer.unlock();
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// A 'trick' to create indices for a non-indexed vertex data
+var indices:Array<Int> = [];
+for (i in 0...Std.int(vertices.length / 3)) {
+  indices.push(i);
+}
+
+// Create index buffer
+indexBuffer = new IndexBuffer(
+  indices.length, // Number of indices for our cube
+  Usage.StaticUsage // Index data will stay the same
+);
+
+// Copy indices to index buffer
+var iData = indexBuffer.lock();
+for (i in 0...iData.length) {
+  iData[i] = indices[i];
+}
+indexBuffer.unlock();
+    </code></pre></p>
+
+    <p><pre><code class="hx">
+// Set depth mode
+g.setDepthMode(true, CompareMode.Less);
+    </code></pre></p>
 
 
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
