@@ -679,7 +679,7 @@ void kore() {
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-6-keyboard-and-mouse/">Reference</a>)</p>
 
-    Let's build a controllable camera so we can move in our 3D world. We need mouse to look around and arrow keys to move.
+    Let's build a controllable camera so we can move around in our 3D world. We need mouse to look and arrow keys to move.
 
     <p><pre><code class="hx">
 // Add mouse and keyboard listeners
@@ -932,10 +932,12 @@ indexBuffer.unlock();
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-8-basic-shading/">Reference</a>)</p>
 
-    
+    <p>If you have reached this point, you are getting a pretty solid ground for programming more advanced 3D stuff. This is the last essential tutorial. We will implement a shading technique into shaders. Let's use suzanne model for this, along with new texture. Don't forget to update project.kha and include it.</p>
 
     <p><img src="images/suzanne/uvmap.png" width="25%"/></p>
     <p><a href="images/suzanne/suzanne.obj">suzanne.obj</a></p>
+
+    <p>Store additional constant locations for shaders.</p>
 
     <p><pre><code class="hx">
 viewMatrixID = program.getConstantLocation("V");
@@ -943,9 +945,13 @@ modelMatrixID = program.getConstantLocation("M");
 lightID = program.getConstantLocation("lightPos");
     </code></pre></p>
 
+    <p>Load suzanne model instead.</p>
+
     <p><pre><code class="hx">
 var obj = new ObjLoader(Loader.the.getBlob("suzanne").toString());
     </code></pre></p>
+
+    <p>Set shader uniforms.</p>
 
     <p><pre><code class="hx">
 g.setMatrix(modelMatrixID, model);
@@ -954,6 +960,8 @@ g.setMatrix(viewMatrixID, view);
 // Set light position to (4, 4, 4)
 g.setFloat3(lightID, 4, 4, 4);
     </code></pre></p>
+
+    <p>Now that everything is prepared, we can extend the shaders. Vertex shader follows.</p>
 
     <p><pre><code class="glsl">
 #ifdef GL_ES
@@ -1001,6 +1009,8 @@ void kore() {
   vUV = uv;
 }
     </code></pre></p>
+
+    <p>Fragment shader.</p>
 
     <p><pre><code class="glsl">
 #ifdef GL_ES
@@ -1062,14 +1072,15 @@ void kore() {
     // Diffuse: "color" of the object
     materialDiffuseColor * lightColor * lightPower * cosTheta / (distance * distance) +
     // Specular: reflective highlight, like a mirror
-    materialSpecularColor * lightColor * lightPower * pow(cosAlpha, 5.0) / (distance * distance)
+    materialSpecularColor * lightColor * lightPower *
+    pow(cosAlpha, 5.0) / (distance * distance)
   ), 1.0);
 }
     </code></pre></p>
     
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
     
-    <p><a href="http://luboslenco.com/kha3d/build/08">this</a></p>
+    <p>The result looks <a href="http://luboslenco.com/kha3d/build/08">great</a>! Congratulations - you already posses a knownledge to create something really cool. And if you do, make sure to show us at <a href="http://forum.ktxsoftware.com">forums</a> or #kha irc channel at irc.ktxsoftware.com.</p>
 
     <p><img src="images/tutorial08.png" width="50%"/></p>
   </section>
