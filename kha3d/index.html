@@ -236,10 +236,14 @@ void kore() {
 
     <p>This is where the reference tutorial comes in handy. As it points out, this is the most important part if you are just starting out with 3D programming.</p>
 
+    <p>Now let's look at code. We will need to pass a model-view-projection matrix to our shader. To do this, we need to get the constant location.</p>
+
     <p><pre><code class="hx">
 // Get a handle for our "MVP" uniform
 mvpID = program.getConstantLocation("MVP");
     </code></pre></p>
+
+    <p>Create projection, view and model matrices.</p>
 
     <p><pre><code class="hx">
 // Projection matrix: 45° Field of View, 4:3 ratio, 0.1-100 display range
@@ -255,6 +259,8 @@ var view = Matrix4.lookAt(new Vector3(4, 3, 3), // Position in World Space
 var model = Matrix4.identity();
     </code></pre></p>
 
+    <p>A final mvp matrix that will be passed to shader.</p>
+
     <p><pre><code class="hx">
 // Our ModelViewProjection: multiplication of our 3 matrices
 // Remember, matrix multiplication is the other way around
@@ -264,12 +270,16 @@ mvp = mvp.multmat(view);
 mvp = mvp.multmat(model);
     </code></pre></p>
 
+    <p>Moving on to render function, set mvp matrix using the constant location we stored.</p>
+
     <p><pre><code class="hx">
 // Send our transformation to the currently bound shader, in the "MVP" uniform
 g.setMatrix(mvpID, mvp);
     </code></pre></p>
 
-    <p><pre><code class="hx">
+    <p>The vertex shader now includes MVP matrix.</p>
+
+    <p><pre><code class="glsl">
 // Input vertex data, different for all executions of this shader
 attribute vec3 pos;
 
@@ -281,6 +291,8 @@ void kore() {
   gl_Position = MVP * vec4(pos, 1.0);
 }
     </code></pre></p>
+
+    <p>If you run the project now, you would see that triangle lines are jagged. We can solve this by enabling anti-aliasing in project.kha.</p>
 
     <p><pre><code class="json">
 {
@@ -299,7 +311,7 @@ void kore() {
 
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
 
-    <p><a href="http://luboslenco.com/kha3d/build/03">this</a></p>
+    <p>Here is the final <a href="http://luboslenco.com/kha3d/build/03">output</a>!</p>
 
     <p><img src="images/tutorial03.png" width="50%"/></p>
   </section>
@@ -861,6 +873,8 @@ indexBuffer.unlock();
   <section id="basic-shading">
     <h1>8.Basic shading</h1>
 
+    <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-8-basic-shading/">Reference</a>)</p>
+
     <p><img src="images/suzanne/uvmap.png" width="25%"/></p>
     <p><a href="images/suzanne/suzanne.obj">suzanne.obj</a></p>
 
@@ -993,9 +1007,6 @@ void kore() {
   ), 1.0);
 }
     </code></pre></p>
-
-    <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-8-basic-shading/">Reference</a>)</p>
-
     
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
     
