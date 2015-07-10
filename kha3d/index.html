@@ -218,13 +218,11 @@ mvpID = program.getConstantLocation("MVP");
     </code></pre></p>
 
     <p><pre><code class="hx">
-// Projection matrix: 45° Field of View, 4:3 ratio, display range : 0.1 unit - 100 units
+// Projection matrix: 45° Field of View, 4:3 ratio, 0.1-100 display range
 var projection = Matrix4.perspectiveProjection(45.0, 4.0 / 3.0, 0.1, 100.0);
-// Or, for an ortho camera
-//var projection = Matrix4.orthogonalProjection(-10.0, 10.0, -10.0, 10.0, 0.0, 100.0); // In world coordinates
 
 // Camera matrix
-var view = Matrix4.lookAt(new Vector3(4, 3, 3), // Camera is at (4, 3, 3), in World Space
+var view = Matrix4.lookAt(new Vector3(4, 3, 3), // Position in World Space
               new Vector3(0, 0, 0), // and looks at the origin
               new Vector3(0, 1, 0) // Head is up (set to (0, -1, 0) to look upside-down)
 );
