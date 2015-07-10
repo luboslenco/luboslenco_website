@@ -151,7 +151,7 @@ Empty.prototype = $extend(kha_Game.prototype,{
 		this.program.link(structure);
 		this.matrixID = this.program.getConstantLocation("MVP");
 		this.projection = kha_math_Matrix4.perspectiveProjection(45.0,1.33333333333333326,0.1,100.0);
-		this.view = kha_math_Matrix4.lookAt(new kha_math_Vector3(4,3,-3),new kha_math_Vector3(0,0,0),new kha_math_Vector3(0,1,0));
+		this.view = kha_math_Matrix4.lookAt(new kha_math_Vector3(4,3,3),new kha_math_Vector3(0,0,0),new kha_math_Vector3(0,1,0));
 		this.model = new kha_math_Matrix4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 		this.mvp = new kha_math_Matrix4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 		this.mvp = this.mvp.multmat(this.projection);
@@ -199,7 +199,7 @@ Empty.prototype = $extend(kha_Game.prototype,{
 		var g = frame.get_g4();
 		g.begin();
 		g.setDepthMode(true,kha_graphics4_CompareMode.Less);
-		g.setCullMode(kha_graphics4_CullMode.Clockwise);
+		g.setCullMode(kha_graphics4_CullMode.CounterClockwise);
 		g.clear(kha__$Color_Color_$Impl_$.fromFloats(0.0,0.0,0.3),1.0);
 		g.setVertexBuffer(this.vertexBuffer);
 		g.setIndexBuffer(this.indexBuffer);
@@ -233,7 +233,7 @@ Empty.prototype = $extend(kha_Game.prototype,{
 		var deltaTime = kha_Scheduler.time() - this.last;
 		this.last = kha_Scheduler.time();
 		if(this.looking) {
-			this.horizontalAngle += this.mouseSpeed * this.dxpos;
+			this.horizontalAngle += this.mouseSpeed * this.dxpos * -1;
 			this.verticalAngle += this.mouseSpeed * this.dypos * -1;
 		}
 		var direction = new kha_math_Vector3(Math.cos(this.verticalAngle) * Math.sin(this.horizontalAngle),Math.sin(this.verticalAngle),Math.cos(this.verticalAngle) * Math.cos(this.horizontalAngle));
@@ -248,11 +248,11 @@ Empty.prototype = $extend(kha_Game.prototype,{
 			this.position = this.position.add(v1);
 		}
 		if(this.strafeRight) {
-			var v2 = right.mult(deltaTime * this.speed * -1);
+			var v2 = right.mult(deltaTime * this.speed);
 			this.position = this.position.add(v2);
 		}
 		if(this.strafeLeft) {
-			var v3 = right.mult(deltaTime * this.speed);
+			var v3 = right.mult(deltaTime * this.speed * -1);
 			this.position = this.position.add(v3);
 		}
 		var look = this.position.add(direction);
@@ -10820,17 +10820,52 @@ kha_math_Matrix4.orthogonalProjection = function(left,right,bottom,top,zn,zf) {
 	return new kha_math_Matrix4(2 / (right - left),0,0,tx,0,2 / (top - bottom),0,ty,0,0,-2 / (zf - zn),tz,0,0,0,1);
 };
 kha_math_Matrix4.perspectiveProjection = function(fovY,aspect,zn,zf) {
-	var uh = Math.cos(fovY / 2) / Math.sin(fovY / 2);
-	var uw = uh / aspect;
-	return new kha_math_Matrix4(uw,0,0,0,0,uh,0,0,0,0,(zf + zn) / (zf - zn),-(2 * zf * zn / (zf - zn)),0,0,1,0);
+	return kha_math_Matrix4.makePerspective(fovY,aspect,zn,zf);
+};
+kha_math_Matrix4.makePerspective = function(fov,aspect,near,far) {
+	var ymax = near * Math.tan(Math.PI / 180 * (fov * 0.5));
+	var ymin = -ymax;
+	var xmin = ymin * aspect;
+	var xmax = ymax * aspect;
+	var x = 2 * near / (xmax - xmin);
+	var y = 2 * near / (ymax - ymin);
+	var a = (xmax + xmin) / (xmax - xmin);
+	var b = (ymax + ymin) / (ymax - ymin);
+	var c = -(far + near) / (far - near);
+	var d = -2 * far * near / (far - near);
+	return new kha_math_Matrix4(x,0,a,0,0,y,b,0,0,0,c,d,0,0,-1,0);
 };
 kha_math_Matrix4.lookAt = function(eye,at,up) {
-	var zaxis = at.sub(eye);
-	zaxis.normalize();
-	var xaxis = up.cross(zaxis);
-	xaxis.normalize();
-	var yaxis = zaxis.cross(xaxis);
-	return new kha_math_Matrix4(xaxis.x,xaxis.y,xaxis.z,-xaxis.dot(eye),yaxis.x,yaxis.y,yaxis.z,-yaxis.dot(eye),zaxis.x,zaxis.y,zaxis.z,-zaxis.dot(eye),0,0,0,1);
+	var e0 = eye.x;
+	var e1 = eye.y;
+	var e2 = eye.z;
+	var u0;
+	if(up == null) u0 = 0; else u0 = up.x;
+	var u1;
+	if(up == null) u1 = 1; else u1 = up.y;
+	var u2;
+	if(up == null) u2 = 0; else u2 = up.z;
+	var f0 = at.x - e0;
+	var f1 = at.y - e1;
+	var f2 = at.z - e2;
+	var n = 1 / Math.sqrt(f0 * f0 + f1 * f1 + f2 * f2);
+	f0 *= n;
+	f1 *= n;
+	f2 *= n;
+	var s0 = f1 * u2 - f2 * u1;
+	var s1 = f2 * u0 - f0 * u2;
+	var s2 = f0 * u1 - f1 * u0;
+	n = 1 / Math.sqrt(s0 * s0 + s1 * s1 + s2 * s2);
+	s0 *= n;
+	s1 *= n;
+	s2 *= n;
+	u0 = s1 * f2 - s2 * f1;
+	u1 = s2 * f0 - s0 * f2;
+	u2 = s0 * f1 - s1 * f0;
+	var d0 = -e0 * s0 - e1 * s1 - e2 * s2;
+	var d1 = -e0 * u0 - e1 * u1 - e2 * u2;
+	var d2 = e0 * f0 + e1 * f1 + e2 * f2;
+	return new kha_math_Matrix4(s0,s1,s2,d0,u0,u1,u2,d1,-f0,-f1,-f2,d2,0,0,0,1);
 };
 kha_math_Matrix4.prototype = {
 	add: function(m) {

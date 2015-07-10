@@ -114,6 +114,17 @@ kha_Game.prototype = {
 	,__class__: kha_Game
 };
 var Empty = function() {
+	this.last = 0.0;
+	this.strafeRight = false;
+	this.strafeLeft = false;
+	this.moveBackward = false;
+	this.moveForward = false;
+	this.looking = false;
+	this.mouseSpeed = 0.005;
+	this.speed = 3.0;
+	this.verticalAngle = 0.0;
+	this.horizontalAngle = 3.14;
+	this.position = new kha_math_Vector3(0,0,5);
 	kha_Game.call(this,"Empty",false);
 };
 $hxClasses["Empty"] = Empty;
@@ -125,10 +136,14 @@ Empty.prototype = $extend(kha_Game.prototype,{
 		kha_Loader.the.loadRoom("room0",$bind(this,this.loadingFinished));
 	}
 	,loadingFinished: function() {
+		kha_input_Mouse.get().notify($bind(this,this.downListener),$bind(this,this.upListener),$bind(this,this.moveListener),null);
+		kha_input_Keyboard.get().notify($bind(this,this.onDown),$bind(this,this.onUp));
+		this.last = kha_Scheduler.time();
 		var structure = new kha_graphics4_VertexStructure();
 		structure.add("pos",kha_graphics4_VertexData.Float3);
 		structure.add("uv",kha_graphics4_VertexData.Float2);
-		var structureLength = 5;
+		structure.add("nor",kha_graphics4_VertexData.Float3);
+		var structureLength = 8;
 		var fragmentShader = new kha_graphics4_FragmentShader(kha_Loader.the.getShader("simple.frag"));
 		var vertexShader = new kha_graphics4_VertexShader(kha_Loader.the.getShader("simple.vert"));
 		this.program = new kha_graphics4_Program();
@@ -136,50 +151,48 @@ Empty.prototype = $extend(kha_Game.prototype,{
 		this.program.setVertexShader(vertexShader);
 		this.program.link(structure);
 		this.matrixID = this.program.getConstantLocation("MVP");
-		var projection = kha_math_Matrix4.perspectiveProjection(45.0,1.33333333333333326,0.1,100.0);
-		var view = kha_math_Matrix4.lookAt(new kha_math_Vector3(4,3,3),new kha_math_Vector3(0,0,0),new kha_math_Vector3(0,1,0));
-		var model = new kha_math_Matrix4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+		this.projection = kha_math_Matrix4.perspectiveProjection(45.0,1.33333333333333326,0.1,100.0);
+		this.view = kha_math_Matrix4.lookAt(new kha_math_Vector3(4,3,3),new kha_math_Vector3(0,0,0),new kha_math_Vector3(0,1,0));
+		this.model = new kha_math_Matrix4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 		this.mvp = new kha_math_Matrix4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-		this.mvp = this.mvp.multmat(projection);
-		this.mvp = this.mvp.multmat(view);
-		this.mvp = this.mvp.multmat(model);
-		this.vertexBuffer = new kha_graphics4_VertexBuffer(Empty.vertices.length / 3 | 0,structure,kha_graphics4_Usage.StaticUsage);
+		this.mvp = this.mvp.multmat(this.projection);
+		this.mvp = this.mvp.multmat(this.view);
+		this.mvp = this.mvp.multmat(this.model);
+		var obj = new ObjLoader(kha_Loader.the.getBlob("cube").toString());
+		var data = obj.data;
+		var indices = obj.indices;
+		this.vertexBuffer = new kha_graphics4_VertexBuffer(data.length / structureLength | 0,structure,kha_graphics4_Usage.StaticUsage);
 		var vbData = this.vertexBuffer.lock();
 		var _g1 = 0;
-		var _g = vbData.length / structureLength | 0;
+		var _g = vbData.length;
 		while(_g1 < _g) {
 			var i = _g1++;
-			vbData[i * structureLength] = Empty.vertices[i * 3];
-			vbData[i * structureLength + 1] = Empty.vertices[i * 3 + 1];
-			vbData[i * structureLength + 2] = Empty.vertices[i * 3 + 2];
-			vbData[i * structureLength + 3] = Empty.uvs[i * 2];
-			vbData[i * structureLength + 4] = Empty.uvs[i * 2 + 1];
+			vbData[i] = data[i];
 		}
 		this.vertexBuffer.unlock();
-		var indices = [];
-		var _g11 = 0;
-		var _g2 = Empty.vertices.length / 3 | 0;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			indices.push(i1);
-		}
 		this.indexBuffer = new kha_graphics4_IndexBuffer(indices.length,kha_graphics4_Usage.StaticUsage);
 		var iData = this.indexBuffer.lock();
-		var _g12 = 0;
-		var _g3 = iData.length;
-		while(_g12 < _g3) {
-			var i2 = _g12++;
-			iData[i2] = indices[i2];
+		var _g11 = 0;
+		var _g2 = iData.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			iData[i1] = indices[i1];
 		}
 		this.indexBuffer.unlock();
 		this.tu = this.program.getTextureUnit("myTextureSampler");
-		this.image = kha_Loader.the.getImage("uvtemplate");
+		this.image = kha_Loader.the.getImage("uvmap");
 		kha_Configuration.setScreen(this);
 	}
 	,render: function(frame) {
+		this.computeMatricesFromInputs();
+		this.mvp = new kha_math_Matrix4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+		this.mvp = this.mvp.multmat(this.projection);
+		this.mvp = this.mvp.multmat(this.view);
+		this.mvp = this.mvp.multmat(this.model);
 		var g = frame.get_g4();
 		g.begin();
 		g.setDepthMode(true,kha_graphics4_CompareMode.Less);
+		g.setCullMode(kha_graphics4_CullMode.CounterClockwise);
 		g.clear(kha__$Color_Color_$Impl_$.fromFloats(0.0,0.0,0.3),1.0);
 		g.setVertexBuffer(this.vertexBuffer);
 		g.setIndexBuffer(this.indexBuffer);
@@ -188,6 +201,57 @@ Empty.prototype = $extend(kha_Game.prototype,{
 		g.setTexture(this.tu,this.image);
 		g.drawIndexedVertices();
 		g.end();
+	}
+	,downListener: function(button,x,y) {
+		this.looking = true;
+	}
+	,upListener: function(button,x,y) {
+		this.looking = false;
+	}
+	,moveListener: function(x,y) {
+		if(this.xpos != 0) {
+			this.dxpos = x - this.xpos;
+			this.dypos = y - this.ypos;
+		}
+		this.xpos = x;
+		this.ypos = y;
+	}
+	,onDown: function(key,$char) {
+		if(key == kha_Key.UP) this.moveForward = true; else if(key == kha_Key.DOWN) this.moveBackward = true; else if(key == kha_Key.LEFT) this.strafeLeft = true; else if(key == kha_Key.RIGHT) this.strafeRight = true;
+	}
+	,onUp: function(key,$char) {
+		if(key == kha_Key.UP) this.moveForward = false; else if(key == kha_Key.DOWN) this.moveBackward = false; else if(key == kha_Key.LEFT) this.strafeLeft = false; else if(key == kha_Key.RIGHT) this.strafeRight = false;
+	}
+	,computeMatricesFromInputs: function() {
+		var deltaTime = kha_Scheduler.time() - this.last;
+		this.last = kha_Scheduler.time();
+		if(this.looking) {
+			this.horizontalAngle += this.mouseSpeed * this.dxpos * -1;
+			this.verticalAngle += this.mouseSpeed * this.dypos * -1;
+		}
+		var direction = new kha_math_Vector3(Math.cos(this.verticalAngle) * Math.sin(this.horizontalAngle),Math.sin(this.verticalAngle),Math.cos(this.verticalAngle) * Math.cos(this.horizontalAngle));
+		var right = new kha_math_Vector3(Math.sin(this.horizontalAngle - 1.57),0,Math.cos(this.horizontalAngle - 1.57));
+		var up = right.cross(direction);
+		if(this.moveForward) {
+			var v = direction.mult(deltaTime * this.speed);
+			this.position = this.position.add(v);
+		}
+		if(this.moveBackward) {
+			var v1 = direction.mult(deltaTime * this.speed * -1);
+			this.position = this.position.add(v1);
+		}
+		if(this.strafeRight) {
+			var v2 = right.mult(deltaTime * this.speed);
+			this.position = this.position.add(v2);
+		}
+		if(this.strafeLeft) {
+			var v3 = right.mult(deltaTime * this.speed * -1);
+			this.position = this.position.add(v3);
+		}
+		var look = this.position.add(direction);
+		this.view = kha_math_Matrix4.lookAt(this.position,look,up);
+		this.dxpos = 0;
+		this.dypos = 0;
 	}
 	,__class__: Empty
 });
@@ -333,6 +397,129 @@ Main.main = function() {
 	starter.start(new Empty());
 };
 Math.__name__ = ["Math"];
+var ObjLoader = function(objData) {
+	var vertices = [];
+	var uvs = [];
+	var normals = [];
+	var vertexIndices = [];
+	var uvIndices = [];
+	var normalIndices = [];
+	var tempVertices = [];
+	var tempUVs = [];
+	var tempNormals = [];
+	var lines = objData.split("\n");
+	var _g1 = 0;
+	var _g = lines.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var words = lines[i].split(" ");
+		if(words[0] == "v") {
+			var vector = [];
+			vector.push(parseFloat(words[1]));
+			vector.push(parseFloat(words[2]));
+			vector.push(parseFloat(words[3]));
+			tempVertices.push(vector);
+		} else if(words[0] == "vt") {
+			var vector1 = [];
+			vector1.push(parseFloat(words[1]));
+			vector1.push(parseFloat(words[2]));
+			tempUVs.push(vector1);
+		} else if(words[0] == "vn") {
+			var vector2 = [];
+			vector2.push(parseFloat(words[1]));
+			vector2.push(parseFloat(words[2]));
+			vector2.push(parseFloat(words[3]));
+			tempNormals.push(vector2);
+		} else if(words[0] == "f") {
+			var sec1 = words[1].split("/");
+			var sec2 = words[2].split("/");
+			var sec3 = words[3].split("/");
+			vertexIndices.push(Std["int"](parseFloat(sec1[0])));
+			vertexIndices.push(Std["int"](parseFloat(sec2[0])));
+			vertexIndices.push(Std["int"](parseFloat(sec3[0])));
+			uvIndices.push(Std["int"](parseFloat(sec1[1])));
+			uvIndices.push(Std["int"](parseFloat(sec2[1])));
+			uvIndices.push(Std["int"](parseFloat(sec3[1])));
+			normalIndices.push(Std["int"](parseFloat(sec1[2])));
+			normalIndices.push(Std["int"](parseFloat(sec2[2])));
+			normalIndices.push(Std["int"](parseFloat(sec3[2])));
+		}
+	}
+	var _g11 = 0;
+	var _g2 = vertexIndices.length;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		var vertex = tempVertices[vertexIndices[i1] - 1];
+		var uv = tempUVs[uvIndices[i1] - 1];
+		var normal = tempNormals[normalIndices[i1] - 1];
+		vertices.push(vertex[0]);
+		vertices.push(vertex[1]);
+		vertices.push(vertex[2]);
+		uvs.push(uv[0]);
+		uvs.push(uv[1]);
+		normals.push(normal[0]);
+		normals.push(normal[1]);
+		normals.push(normal[2]);
+	}
+	this.build(vertices,uvs,normals);
+	this.data = [];
+	var _g12 = 0;
+	var _g3 = vertices.length / 3 | 0;
+	while(_g12 < _g3) {
+		var i2 = _g12++;
+		this.data.push(ObjLoader.indexedVertices[i2 * 3]);
+		this.data.push(ObjLoader.indexedVertices[i2 * 3 + 1]);
+		this.data.push(ObjLoader.indexedVertices[i2 * 3 + 2]);
+		this.data.push(ObjLoader.indexedUVs[i2 * 2]);
+		this.data.push(1 - ObjLoader.indexedUVs[i2 * 2 + 1]);
+		this.data.push(ObjLoader.indexedNormals[i2 * 3]);
+		this.data.push(ObjLoader.indexedNormals[i2 * 3 + 1]);
+		this.data.push(ObjLoader.indexedNormals[i2 * 3 + 2]);
+	}
+};
+$hxClasses["ObjLoader"] = ObjLoader;
+ObjLoader.__name__ = ["ObjLoader"];
+ObjLoader.prototype = {
+	build: function(_vertices,_uvs,_normals) {
+		ObjLoader.indexedVertices = [];
+		ObjLoader.indexedUVs = [];
+		ObjLoader.indexedNormals = [];
+		this.indices = [];
+		var _g1 = 0;
+		var _g = _vertices.length / 3 | 0;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var found = this.getSimilarVertexIndex(_vertices[i * 3],_vertices[i * 3 + 1],_vertices[i * 3 + 2],_uvs[i * 2],_uvs[i * 2 + 1],_normals[i * 3],_normals[i * 3 + 1],_normals[i * 3 + 2]);
+			if(found) this.indices.push(ObjLoader.index); else {
+				ObjLoader.indexedVertices.push(_vertices[i * 3]);
+				ObjLoader.indexedVertices.push(_vertices[i * 3 + 1]);
+				ObjLoader.indexedVertices.push(_vertices[i * 3 + 2]);
+				ObjLoader.indexedUVs.push(_uvs[i * 2]);
+				ObjLoader.indexedUVs.push(_uvs[i * 2 + 1]);
+				ObjLoader.indexedNormals.push(_normals[i * 3]);
+				ObjLoader.indexedNormals.push(_normals[i * 3 + 1]);
+				ObjLoader.indexedNormals.push(_normals[i * 3 + 2]);
+				this.indices.push((ObjLoader.indexedVertices.length / 3 | 0) - 1);
+			}
+		}
+	}
+	,isNear: function(v1,v2) {
+		return Math.abs(v1 - v2) < 0.01;
+	}
+	,getSimilarVertexIndex: function(vertexX,vertexY,vertexZ,uvX,uvY,normalX,normalY,normalZ) {
+		var _g1 = 0;
+		var _g = ObjLoader.indexedVertices.length / 3 | 0;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(this.isNear(vertexX,ObjLoader.indexedVertices[i * 3]) && this.isNear(vertexY,ObjLoader.indexedVertices[i * 3 + 1]) && this.isNear(vertexZ,ObjLoader.indexedVertices[i * 3 + 2]) && this.isNear(uvX,ObjLoader.indexedUVs[i * 2]) && this.isNear(uvY,ObjLoader.indexedUVs[i * 2 + 1]) && this.isNear(normalX,ObjLoader.indexedNormals[i * 3]) && this.isNear(normalY,ObjLoader.indexedNormals[i * 3 + 1]) && this.isNear(normalZ,ObjLoader.indexedNormals[i * 3 + 2])) {
+				ObjLoader.index = i;
+				return true;
+			}
+		}
+		return false;
+	}
+	,__class__: ObjLoader
+};
 var Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
 Reflect.__name__ = ["Reflect"];
@@ -11023,8 +11210,6 @@ var DataView = (Function("return typeof DataView != 'undefined' ? DataView : nul
 var Float32Array = (Function("return typeof Float32Array != 'undefined' ? Float32Array : null"))() || js_html_compat_Float32Array._new;
 var Uint8Array = (Function("return typeof Uint8Array != 'undefined' ? Uint8Array : null"))() || js_html_compat_Uint8Array._new;
 kha_Game.FPS = 60;
-Empty.vertices = [-1.0,-1.0,-1.0,-1.0,-1.0,1.0,-1.0,1.0,1.0,1.0,1.0,-1.0,-1.0,-1.0,-1.0,-1.0,1.0,-1.0,1.0,-1.0,1.0,-1.0,-1.0,-1.0,1.0,-1.0,-1.0,1.0,1.0,-1.0,1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,1.0,1.0,-1.0,1.0,-1.0,1.0,-1.0,1.0,-1.0,-1.0,1.0,-1.0,-1.0,-1.0,-1.0,1.0,1.0,-1.0,-1.0,1.0,1.0,-1.0,1.0,1.0,1.0,1.0,1.0,-1.0,-1.0,1.0,1.0,-1.0,1.0,-1.0,-1.0,1.0,1.0,1.0,1.0,-1.0,1.0,1.0,1.0,1.0,1.0,1.0,-1.0,-1.0,1.0,-1.0,1.0,1.0,1.0,-1.0,1.0,-1.0,-1.0,1.0,1.0,1.0,1.0,1.0,-1.0,1.0,1.0,1.0,-1.0,1.0];
-Empty.uvs = [0.000059,0.000004,0.000103,0.336048,0.335973,0.335903,1.000023,0.000013,0.667979,0.335851,0.999958,0.336064,0.667979,0.335851,0.336024,0.671877,0.667969,0.671889,1.000023,0.000013,0.668104,0.000013,0.667979,0.335851,0.000059,0.000004,0.335973,0.335903,0.336098,0.000071,0.667979,0.335851,0.335973,0.335903,0.336024,0.671877,1.000004,0.671847,0.999958,0.336064,0.667979,0.335851,0.668104,0.000013,0.335973,0.335903,0.667979,0.335851,0.335973,0.335903,0.668104,0.000013,0.336098,0.000071,0.000103,0.336048,0.000004,0.671870,0.336024,0.671877,0.000103,0.336048,0.336024,0.671877,0.335973,0.335903,0.667969,0.671889,1.000004,0.671847,0.667979,0.335851];
 haxe_Serializer.USE_CACHE = false;
 haxe_Serializer.USE_ENUM_INDEX = false;
 haxe_Serializer.BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%:";

@@ -1,0 +1,33 @@
+#version 100
+precision mediump float;
+uniform mat4 MVP;
+attribute vec3 pos;
+varying vec3 Position_worldspace;
+uniform mat4 M;
+uniform mat4 V;
+varying vec3 EyeDirection_cameraspace;
+uniform vec3 lightPos;
+varying vec3 LightDirection_cameraspace;
+varying vec3 Normal_cameraspace;
+attribute vec3 nor;
+varying vec2 UV;
+attribute vec2 vertexUV;
+
+
+void main()
+{
+	vec3 vertexPosition_cameraspace;
+	vec3 LightPosition_cameraspace;
+	gl_Position = (MVP * vec4(pos[0], pos[1], pos[2], 1.0));
+	Position_worldspace = vec3((M * vec4(pos[0], pos[1], pos[2], 1.0))[0], (M * vec4(pos[0], pos[1], pos[2], 1.0))[1], (M * vec4(pos[0], pos[1], pos[2], 1.0))[2]);
+	vertexPosition_cameraspace = vec3(((V * M) * vec4(pos[0], pos[1], pos[2], 1.0))[0], ((V * M) * vec4(pos[0], pos[1], pos[2], 1.0))[1], ((V * M) * vec4(pos[0], pos[1], pos[2], 1.0))[2]);
+	EyeDirection_cameraspace = (vec3(0.0, 0.0, 0.0) - vertexPosition_cameraspace);
+	LightPosition_cameraspace = vec3((V * vec4(lightPos[0], lightPos[1], lightPos[2], 1.0))[0], (V * vec4(lightPos[0], lightPos[1], lightPos[2], 1.0))[1], (V * vec4(lightPos[0], lightPos[1], lightPos[2], 1.0))[2]);
+	LightDirection_cameraspace = (LightPosition_cameraspace + EyeDirection_cameraspace);
+	Normal_cameraspace = vec3(((V * M) * vec4(nor[0], nor[1], nor[2], 0.0))[0], ((V * M) * vec4(nor[0], nor[1], nor[2], 0.0))[1], ((V * M) * vec4(nor[0], nor[1], nor[2], 0.0))[2]);
+	UV = vertexUV;
+	// Branch to 6
+	// Label 6
+	return;
+}
+
