@@ -367,7 +367,7 @@ static var colors:Array&lt;Float&gt; = [
 ];
     </code></pre></p>
 
-    <p>Since we also want to pack colors with our vertices, we need to adjust our vertex structure.</p>
+    <p>Since we also want to pack colors with vertices, we need to adjust vertex structure.</p>
 
     <p><pre><code class="hx">
 // Define vertex structure
@@ -495,7 +495,7 @@ void kore() {
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-5-a-textured-cube/">Reference</a>)</p>
 
-    <p>It is time to use texturing! Get the image below which we will use instead of cube colors. Save it into 'Assets' folder in root folder of your project.</p>
+    <p>It is time to use texturing! Get the image below which will be used instead of cube colors. Save it into 'Assets' folder in root folder of your project.</p>
 
     <p><img src="images/uvtemplate.png" width="25%"/></p>
 
@@ -550,7 +550,7 @@ static var uvs:Array&lt;Float&gt; = [
 ];
     </code></pre></p>
 
-    <p>We need to load image before it is available. Rename our current init function to loadingFinished and use the one below. This will load all assets specified in 'room0'.</p>
+    <p>We need to load image before it is available. Rename our current init function to loadingFinished and use the init function below. This will load all assets specified in 'room0'.</p>
 
     <p><pre><code class="hx">
 override public function init() {
@@ -561,7 +561,7 @@ override public function init() {
 }
     </code></pre></p>
 
-    <p>Change vertex structure again to use UVs instead of colors.</p>
+    <p>Switching to loadingFinished, change vertex structure again to use UVs instead of colors.</p>
 
     <p><pre><code class="hx">
 // Define vertex structure
@@ -603,7 +603,7 @@ vertexBuffer.unlock();
 Configuration.setScreen(this);
     </code></pre></p>
 
-    <p>On to render function, set texture in similar manner as mvp matrix.</p>
+    <p>On to render function, set texture in similar manner to mvp matrix.</p>
 
     <p><pre><code class="hx">
 // Set texture
@@ -659,7 +659,7 @@ void kore() {
 
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
 
-    <p>Check out final <a href="http://luboslenco.com/kha3d/build/05">outpit</a>.</p>
+    <p>Check out final <a href="http://luboslenco.com/kha3d/build/05">output</a>.</p>
 
     <p><img src="images/tutorial05.png" width="50%"/></p>
   </section>
@@ -679,6 +679,8 @@ void kore() {
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-6-keyboard-and-mouse/">Reference</a>)</p>
 
+    Let's build a controllable camera so we can move in our 3D world. We need mouse to look around and arrow keys to move.
+
     <p><pre><code class="hx">
 // Add mouse and keyboard listeners
 Mouse.get().notify(onMouseDown, onMouseUp, onMouseMove, null);
@@ -687,6 +689,8 @@ Keyboard.get().notify(onKeyDown, onKeyUp);
 // Used to calculate delta time
 lastTime = Scheduler.time();
     </code></pre></p> 
+
+    <p>Mouse and keyboard event handlers. Nothing fancy to see here.</p>
 
     <p><pre><code class="hx">
 function onMouseDown(button:Int, x:Int, y:Int) {
@@ -720,6 +724,8 @@ function onKeyUp(key:Key, char:String) {
 }
     </code></pre></p>
 
+    <p>For the first time we will use update function to calculate our matrices based on input every frame.</p>
+
     <p><pre><code class="hx">
 override public function update() {
   // Compute time difference between current and last frame
@@ -732,7 +738,7 @@ override public function update() {
     verticalAngle += mouseSpeed * mouseDeltaY * -1;
   }
 
-  // Direction : Spherical coordinates to Cartesian coordinates conversion
+  // Direction: Spherical coordinates to Cartesian coordinates conversion
   var direction = new Vector3(
     Math.cos(verticalAngle) * Math.sin(horizontalAngle),
     Math.sin(verticalAngle),
@@ -787,6 +793,8 @@ override public function update() {
 }
     </code></pre></p>
 
+    <p>To enable culling, set it up in render function.</p>
+
     <p><pre><code class="hx">
 // Set culling
 g.setCullMode(CullMode.CounterClockwise);
@@ -795,7 +803,7 @@ g.setCullMode(CullMode.CounterClockwise);
     
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
 
-    <p><a href="http://luboslenco.com/kha3d/build/06">this</a></p>
+    <p>And <a href="http://luboslenco.com/kha3d/build/06">here</a> it is! Enjoy flying around our little cube.</p>
 
     <p><img src="images/tutorial06.png" width="50%"/></p>
   </section>
@@ -809,10 +817,16 @@ g.setCullMode(CullMode.CounterClockwise);
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/">Reference</a>)</p>
 
+    <p>Wouldn't it be cool to extend our scene with models created in 3D authoring tools? Save the following file, which parses geometry from simple obj format, into 'Sources' folder.</p>
+
     <p><a href="https://github.com/luboslenco/kha3d_examples/blob/master/tutorial07/Sources/ObjLoader.hx">ObjLoader.hx</a></p>
+
+    <p>Remove the vertex and uv data from source and save the following resources into 'Assets'.</p>
 
     <p><img src="images/cube/uvmap.png" width="25%"/></p>
     <p><a href="images/cube/cube.obj">cube.obj</a></p>
+
+    <p>Include cube model and it's texture in project.kha.</p>
 
     <p><pre><code class="json">
 {
@@ -849,6 +863,8 @@ g.setCullMode(CullMode.CounterClockwise);
 }
     </code></pre></p>
 
+    <p>Although we will not use normals in shaders yet, ObjLoader parses it for us. Let's reflect vertex structure to match that.</p>
+
     <p><pre><code class="hx">
 // Define vertex structure
 var structure = new VertexStructure();
@@ -858,6 +874,8 @@ structure.add("nor", VertexData.Float3);
 // Save length - we store position, uv and normal data
 var structureLength = 8;
     </code></pre></p>
+
+    <p>Pass cube model data to ObjLoader. Retrieve vertex data and indices and copy them into respective buffers.</p>
 
     <p><pre><code class="hx">
 // Parse .obj file
@@ -895,7 +913,7 @@ indexBuffer.unlock();
 
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
 
-    <p><a href="http://luboslenco.com/kha3d/build/07">this</a></p>
+    <p>That was pretty <a href="http://luboslenco.com/kha3d/build/07">simple</a>! Feel free to tinker with ObjLoader and possibly include parsers for other formats.</p>
 
     <p><img src="images/tutorial07.png" width="50%"/></p>
   </section>
@@ -913,6 +931,8 @@ indexBuffer.unlock();
     <h1>8.Basic shading</h1>
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-8-basic-shading/">Reference</a>)</p>
+
+    
 
     <p><img src="images/suzanne/uvmap.png" width="25%"/></p>
     <p><a href="images/suzanne/suzanne.obj">suzanne.obj</a></p>
