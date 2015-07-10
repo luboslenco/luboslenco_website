@@ -177,7 +177,7 @@ g.setIndexBuffer(indexBuffer);
 g.drawIndexedVertices();
     </code></pre></p>
 
-    <p>For shaders, Kha uses GLSL syntax. Shaders are automatically converted based on target system using a tool called <a href="https://github.com/KTXSoftware/krafix">Krafix</a>, meaning we do not have to worry about rewriting them. The vertex shader.</p>
+    <p>For shaders, Kha uses GLSL syntax. Shaders are automatically cross-compiled based on target system using a tool called <a href="https://github.com/KTXSoftware/krafix">Krafix</a>, meaning we do not have to worry about rewriting them. The vertex shader.</p>
 
     <p><pre><code class="glsl">
 // Input vertex data, different for all executions of this shader
@@ -301,6 +301,7 @@ static var vertices:Array&lt;Float&gt; = [
    1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0, 1.0, 1.0,
    1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,   1.0,-1.0, 1.0
 ];
+
 // Array of colors for each cube vertex
 static var colors:Array&lt;Float&gt; = [
   0.583, 0.771, 0.014,   0.609, 0.115, 0.436,   0.327, 0.483, 0.844,
@@ -423,6 +424,9 @@ void kore() {
     <h1>5.A textured cube</h1>
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-5-a-textured-cube/">Reference</a>)</p>
+
+    <p><img src="images/uvtemplate.png" width="50%"/></p>
+    <p><a href="images/cube.obj">cube.obj</a></p>
 
     <p><pre><code class="json">
 {
