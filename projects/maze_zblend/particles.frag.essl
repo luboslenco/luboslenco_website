@@ -1,0 +1,17 @@
+uniform sampler2D tex;
+uniform bool texturing;
+varying mediump vec2 texCoord;
+varying mediump vec4 color;
+void kore(){
+if (texturing)
+{
+(gl_FragColor = texture2D(tex, texCoord));
+}
+else
+{
+(gl_FragColor = vec4(color.xyz, 1.0));
+}
+}
+void main(){
+kore();
+}

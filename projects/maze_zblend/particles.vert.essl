@@ -1,0 +1,20 @@
+attribute highp vec3 vertexPosition;
+attribute highp vec2 texPosition;
+attribute highp vec3 normalPosition;
+attribute highp vec4 vertexColor;
+uniform highp mat4 mvpMatrix;
+uniform highp vec3 billboardCenterWorld;
+uniform highp vec3 billboardSize;
+uniform highp vec3 camRightWorld;
+uniform highp vec3 camUpWorld;
+varying highp vec2 texCoord;
+varying highp vec4 color;
+void kore(){
+highp vec3 vertexPosWorld = ((billboardCenterWorld + ((camRightWorld * vertexPosition.x) * billboardSize.x)) + ((camUpWorld * vertexPosition.y) * billboardSize.y));
+(gl_Position = (mvpMatrix * vec4(vertexPosWorld, 1.0)));
+(color = vertexColor);
+(texCoord = texPosition);
+}
+void main(){
+kore();
+}

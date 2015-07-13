@@ -1,0 +1,8 @@
+varying mediump vec4 position;
+void kore(){
+mediump float normalizedDistance = (position.z / position.w);
+(gl_FragColor = vec4(normalizedDistance, normalizedDistance, normalizedDistance, 1.0));
+}
+void main(){
+kore();
+}
