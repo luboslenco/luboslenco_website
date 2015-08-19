@@ -1,7 +1,7 @@
 body {
   background-color: #ffffff;
-  font: 300 1.05em/1.58 helvetica;
-  color: #282828;
+  font: 300 0.975em/1.58 helvetica;
+  color: #181818;
 }
 
 h1 {
@@ -93,26 +93,11 @@ footer {
   z-index: 7;
   width: 15%;
   font-size: 1em;
-}
-
-.primary-nav-bg {
-  position: fixed;
-  top: 0px;
-  left: 0%;
-  z-index: 0;
-  width: 22%;
-  height: 100%;
-  background-color: #00c4ff
+  color: rgb(141, 141, 141);
 }
 
 .primary-nav a {
   display: block;
-  color: rgb(255, 255, 255);
-}
-
-.primary-nav a:hover {
-  display: block;
-  color: #3d3e3d;
 }
 
 .wip {
@@ -229,10 +214,6 @@ code {
     margin-top: 85px;
     margin-left: 17%;
     font-size: 1.2em;
-  }
-
-  .primary-nav-bg {
-    width: 3%;
   }
 
   .primary-nav.is-visible {
