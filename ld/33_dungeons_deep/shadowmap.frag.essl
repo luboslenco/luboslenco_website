@@ -1,8 +1,16 @@
-varying mediump vec4 position;
-void kore(){
-mediump float normalizedDistance = (position.z / position.w);
-(gl_FragColor = vec4(normalizedDistance, normalizedDistance, normalizedDistance, 1.0));
+#version 100
+precision mediump float;
+// Unknown execution mode
+varying vec4 position;
+
+
+void main()
+{
+	float normalizedDistance;
+	normalizedDistance = (position[2] / position[3]);
+	gl_FragColor = vec4(normalizedDistance, normalizedDistance, normalizedDistance, 1.0);
+	// Branch to 6
+	// Label 6
+	return;
 }
-void main(){
-kore();
-}
+

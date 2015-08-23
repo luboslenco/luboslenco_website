@@ -1,11 +1,21 @@
+#version 100
+precision mediump float;
+// Unknown execution mode
 uniform sampler2D tex;
-varying mediump vec2 texCoord;
-varying mediump vec3 norm;
-void kore(){
-(gl_FragColor = texture2D(tex, texCoord));
-if ((gl_FragColor.w <= 0.5))
-discard;
+varying vec2 texCoord;
+varying vec3 norm;
+
+
+void main()
+{
+	gl_FragColor = texture2D(tex, texCoord);
+	// Merge 27 0
+	if ((gl_FragColor[3] <= 0.5)) // true: 26 false: 27
+	{ // Label 26
+		discard;
+	} // Label 27
+	// Branch to 6
+	// Label 6
+	return;
 }
-void main(){
-kore();
-}
+

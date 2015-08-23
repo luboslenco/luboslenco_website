@@ -1,27 +1,34 @@
-attribute highp vec3 pos;
-attribute highp vec2 tex;
-attribute highp vec3 nor;
-attribute highp vec4 col;
-uniform highp mat4 M;
-uniform highp mat4 V;
-uniform highp mat4 P;
-uniform highp mat4 dbMVP;
-uniform highp vec4 color;
-uniform highp vec4 diffuse_color;
-varying highp vec3 position;
-varying highp vec2 texCoord;
-varying highp vec3 normal;
-varying highp vec4 lPos;
-varying highp vec4 matcolor;
-void kore(){
-highp vec4 mpos = (M * vec4(pos.x, pos.y, pos.z, 1.0));
-(gl_Position = ((P * V) * mpos));
-(position = (mpos.xyz / mpos.w));
-(texCoord = tex);
-(normal = normalize((M * vec4(nor, 0.0)).xyz));
-(lPos = (dbMVP * vec4(pos.x, pos.y, pos.z, 1.0)));
-(matcolor = ((diffuse_color * col) * color));
+#version 100
+precision mediump float;
+uniform mat4 M;
+attribute vec3 pos;
+uniform mat4 P;
+uniform mat4 V;
+varying vec3 position;
+varying vec2 texCoord;
+attribute vec2 tex;
+varying vec3 normal;
+attribute vec3 nor;
+varying vec4 lPos;
+uniform mat4 dbMVP;
+varying vec4 matcolor;
+uniform vec4 diffuse_color;
+attribute vec4 col;
+uniform vec4 color;
+
+
+void main()
+{
+	vec4 mpos;
+	mpos = (M * vec4(pos[0], pos[1], pos[2], 1.0));
+	gl_Position = ((P * V) * mpos);
+	position = (vec3(mpos[0], mpos[1], mpos[2]) / vec3(mpos[3], mpos[3], mpos[3]));
+	texCoord = tex;
+	normal = normalize(vec3((M * vec4(nor[0], nor[1], nor[2], 0.0))[0], (M * vec4(nor[0], nor[1], nor[2], 0.0))[1], (M * vec4(nor[0], nor[1], nor[2], 0.0))[2]));
+	lPos = (dbMVP * vec4(pos[0], pos[1], pos[2], 1.0));
+	matcolor = ((diffuse_color * col) * color);
+	// Branch to 6
+	// Label 6
+	return;
 }
-void main(){
-kore();
-}
+

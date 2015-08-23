@@ -1,20 +1,30 @@
-uniform sampler2D tex;
-uniform sampler2D shadowMap;
+#version 100
+precision mediump float;
+// Unknown execution mode
 uniform bool texturing;
-varying mediump vec2 texCoord;
-varying mediump vec4 color;
-varying mediump vec4 shadowCoord;
-varying mediump vec4 viewSpacePos;
-void kore(){
-if (texturing)
+uniform sampler2D tex;
+varying vec2 texCoord;
+varying vec4 color;
+uniform sampler2D shadowMap;
+varying vec4 shadowCoord;
+varying vec4 viewSpacePos;
+
+
+void main()
 {
-(gl_FragColor = texture2D(tex, texCoord));
+	// Merge 12 0
+	if (texturing) // true: 11 false: 27
+	{ // Label 11
+		gl_FragColor = texture2D(tex, texCoord);
+		// Branch to 12
+	}
+	else
+	{ // Label 27
+		gl_FragColor = color;
+		// Branch to 12
+	} // Label 12
+	// Branch to 6
+	// Label 6
+	return;
 }
-else
-{
-(gl_FragColor = color);
-}
-}
-void main(){
-kore();
-}
+

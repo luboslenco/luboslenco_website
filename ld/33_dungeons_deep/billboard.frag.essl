@@ -1,17 +1,27 @@
-uniform sampler2D stex;
+#version 100
+precision mediump float;
+// Unknown execution mode
 uniform bool texturing;
-varying mediump vec2 texCoord;
-varying mediump vec4 color;
-void kore(){
-if (texturing)
+uniform sampler2D stex;
+varying vec2 texCoord;
+varying vec4 color;
+
+
+void main()
 {
-(gl_FragColor = texture2D(stex, texCoord));
+	// Merge 12 0
+	if (texturing) // true: 11 false: 27
+	{ // Label 11
+		gl_FragColor = texture2D(stex, texCoord);
+		// Branch to 12
+	}
+	else
+	{ // Label 27
+		gl_FragColor = vec4(vec3(color[0], color[1], color[2])[0], vec3(color[0], color[1], color[2])[1], vec3(color[0], color[1], color[2])[2], 1.0);
+		// Branch to 12
+	} // Label 12
+	// Branch to 6
+	// Label 6
+	return;
 }
-else
-{
-(gl_FragColor = vec4(color.xyz, 1.0));
-}
-}
-void main(){
-kore();
-}
+

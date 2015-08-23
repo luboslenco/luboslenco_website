@@ -1,20 +1,27 @@
-attribute highp vec3 vertexPosition;
-attribute highp vec2 texPosition;
-attribute highp vec3 normalPosition;
-attribute highp vec4 vertexColor;
-uniform highp mat4 mvpMatrix;
-uniform highp vec3 billboardCenterWorld;
-uniform highp vec3 billboardSize;
-uniform highp vec3 camRightWorld;
-uniform highp vec3 camUpWorld;
-varying highp vec2 texCoord;
-varying highp vec4 color;
-void kore(){
-highp vec3 vertexPosWorld = ((billboardCenterWorld + ((camRightWorld * vertexPosition.x) * billboardSize.x)) + ((camUpWorld * vertexPosition.y) * billboardSize.y));
-(gl_Position = (mvpMatrix * vec4(vertexPosWorld, 1.0)));
-(color = vertexColor);
-(texCoord = texPosition);
+#version 100
+precision mediump float;
+uniform vec3 billboardCenterWorld;
+uniform vec3 camRightWorld;
+attribute vec3 vertexPosition;
+uniform vec3 billboardSize;
+uniform vec3 camUpWorld;
+uniform mat4 mvpMatrix;
+varying vec4 color;
+attribute vec4 vertexColor;
+varying vec2 texCoord;
+attribute vec2 texPosition;
+attribute vec3 normalPosition;
+
+
+void main()
+{
+	vec3 vertexPosWorld;
+	vertexPosWorld = ((billboardCenterWorld + ((camRightWorld * vertexPosition[0]) * billboardSize[0])) + ((camUpWorld * vertexPosition[1]) * billboardSize[1]));
+	gl_Position = (mvpMatrix * vec4(vertexPosWorld[0], vertexPosWorld[1], vertexPosWorld[2], 1.0));
+	color = vertexColor;
+	texCoord = texPosition;
+	// Branch to 6
+	// Label 6
+	return;
 }
-void main(){
-kore();
-}
+

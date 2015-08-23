@@ -1,14 +1,20 @@
-attribute highp vec3 vertexPosition;
-attribute highp vec2 texPosition;
-attribute highp vec3 normalPosition;
-uniform highp mat4 mvpMatrix;
-varying highp vec2 texCoord;
-varying highp vec3 norm;
-void kore(){
-(gl_Position = (mvpMatrix * vec4(vertexPosition, 1.0)));
-(norm = normalPosition);
-(texCoord = texPosition);
+#version 100
+precision mediump float;
+uniform mat4 mvpMatrix;
+attribute vec3 vertexPosition;
+varying vec3 norm;
+attribute vec3 normalPosition;
+varying vec2 texCoord;
+attribute vec2 texPosition;
+
+
+void main()
+{
+	gl_Position = (mvpMatrix * vec4(vertexPosition[0], vertexPosition[1], vertexPosition[2], 1.0));
+	norm = normalPosition;
+	texCoord = texPosition;
+	// Branch to 6
+	// Label 6
+	return;
 }
-void main(){
-kore();
-}
+
