@@ -1,0 +1,20 @@
+uniform sampler2D tex;
+uniform sampler2D shadowMap;
+uniform bool texturing;
+varying mediump vec2 texCoord;
+varying mediump vec4 color;
+varying mediump vec4 shadowCoord;
+varying mediump vec4 viewSpacePos;
+void kore(){
+if (texturing)
+{
+(gl_FragColor = texture2D(tex, texCoord));
+}
+else
+{
+(gl_FragColor = color);
+}
+}
+void main(){
+kore();
+}

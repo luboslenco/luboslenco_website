@@ -1,0 +1,250 @@
+{
+	"rooms": [
+		{
+			"parent": null,
+			"neighbours": [],
+			"name": "room1",
+			"assets": [
+				"intro_metadata",
+				"floor_metadata",
+				"ui_metadata",
+				"intro_atlas",
+				"floor_atlas",
+				"ui_atlas",
+				"die",
+				"step",
+				"lever",
+				"music",
+				"gameData",
+				"Scene"
+			]
+		}
+	],
+	"libraries": [
+		"lue",
+		"zui",
+		"haxebullet",
+		"dependencies"
+	],
+	"game": {
+		"width": 1136,
+		"antiAliasingSamples": 2,
+		"name": "Empty",
+		"height": 640
+	},
+	"assets": [
+		{
+			"type": "blob",
+			"name": "intro_metadata",
+			"files": [
+				"intro_metadata.json"
+			]
+		},
+		{
+			"type": "blob",
+			"name": "floor_metadata",
+			"files": [
+				"floor_metadata.json"
+			]
+		},
+		{
+			"type": "blob",
+			"name": "ui_metadata",
+			"files": [
+				"ui_metadata.json"
+			]
+		},
+		{
+			"type": "image",
+			"name": "intro_atlas",
+			"original_width": 1024,
+			"original_height": 512,
+			"files": [
+				"intro_atlas.png"
+			]
+		},
+		{
+			"type": "image",
+			"name": "floor_atlas",
+			"original_width": 1024,
+			"original_height": 2048,
+			"files": [
+				"floor_atlas.png"
+			]
+		},
+		{
+			"type": "image",
+			"name": "ui_atlas",
+			"original_width": 256,
+			"original_height": 256,
+			"files": [
+				"ui_atlas.png"
+			]
+		},
+		{
+			"type": "sound",
+			"name": "die",
+			"files": [
+				"die.ogg"
+			]
+		},
+		{
+			"type": "sound",
+			"name": "step",
+			"files": [
+				"step.ogg"
+			]
+		},
+		{
+			"type": "sound",
+			"name": "lever",
+			"files": [
+				"lever.ogg"
+			]
+		},
+		{
+			"type": "music",
+			"name": "music",
+			"files": [
+				"music.ogg"
+			]
+		},
+		{
+			"type": "blob",
+			"name": "gameData",
+			"files": [
+				"gameData.json"
+			]
+		},
+		{
+			"type": "blob",
+			"name": "Scene",
+			"files": [
+				"Scene.json"
+			]
+		}
+	],
+	"format": 3,
+	"shaders": [
+		{
+			"files": [
+				"painter-colored.frag.essl"
+			],
+			"name": "painter-colored.frag"
+		},
+		{
+			"files": [
+				"painter-colored.vert.essl"
+			],
+			"name": "painter-colored.vert"
+		},
+		{
+			"files": [
+				"painter-image.frag.essl"
+			],
+			"name": "painter-image.frag"
+		},
+		{
+			"files": [
+				"painter-image.vert.essl"
+			],
+			"name": "painter-image.vert"
+		},
+		{
+			"files": [
+				"painter-text.frag.essl"
+			],
+			"name": "painter-text.frag"
+		},
+		{
+			"files": [
+				"painter-text.vert.essl"
+			],
+			"name": "painter-text.vert"
+		},
+		{
+			"files": [
+				"painter-video.frag.essl"
+			],
+			"name": "painter-video.frag"
+		},
+		{
+			"files": [
+				"painter-video.vert.essl"
+			],
+			"name": "painter-video.vert"
+		},
+		{
+			"files": [
+				"billboard.frag.essl"
+			],
+			"name": "billboard.frag"
+		},
+		{
+			"files": [
+				"billboard.vert.essl"
+			],
+			"name": "billboard.vert"
+		},
+		{
+			"files": [
+				"default.frag.essl"
+			],
+			"name": "default.frag"
+		},
+		{
+			"files": [
+				"default.vert.essl"
+			],
+			"name": "default.vert"
+		},
+		{
+			"files": [
+				"mesh.frag.essl"
+			],
+			"name": "mesh.frag"
+		},
+		{
+			"files": [
+				"mesh.vert.essl"
+			],
+			"name": "mesh.vert"
+		},
+		{
+			"files": [
+				"particles.frag.essl"
+			],
+			"name": "particles.frag"
+		},
+		{
+			"files": [
+				"particles.vert.essl"
+			],
+			"name": "particles.vert"
+		},
+		{
+			"files": [
+				"shadowmap.frag.essl"
+			],
+			"name": "shadowmap.frag"
+		},
+		{
+			"files": [
+				"shadowmap.vert.essl"
+			],
+			"name": "shadowmap.vert"
+		},
+		{
+			"files": [
+				"skinnedmesh.frag.essl"
+			],
+			"name": "skinnedmesh.frag"
+		},
+		{
+			"files": [
+				"skinnedmesh.vert.essl"
+			],
+			"name": "skinnedmesh.vert"
+		}
+	]
+}

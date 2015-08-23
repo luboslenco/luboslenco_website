@@ -1,0 +1,13 @@
+attribute highp vec3 vertexPosition;
+attribute highp vec2 texPosition;
+attribute highp vec3 normalPosition;
+attribute highp vec4 vertexColor;
+uniform highp mat4 dbMVP;
+varying highp vec4 position;
+void kore(){
+(gl_Position = (dbMVP * vec4(vertexPosition, 1.0)));
+(position = gl_Position);
+}
+void main(){
+kore();
+}

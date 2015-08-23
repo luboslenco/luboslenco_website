@@ -1,0 +1,94 @@
+uniform sampler2D stex;
+uniform bool texturing;
+uniform bool lighting;
+uniform sampler2D shadowMap;
+uniform bool receiveShadow;
+uniform mediump vec3 light;
+uniform mediump vec3 eye;
+uniform mediump float roughness;
+uniform mediump vec3 surface_color;
+varying mediump vec3 position;
+varying mediump vec2 texCoord;
+varying mediump vec3 normal;
+varying mediump vec4 lPos;
+varying mediump vec4 matcolor;
+mediump float shadowSimple(in mediump vec4 lPos){
+mediump vec4 lPosH = (lPos / lPos.w);
+(lPosH.x = ((lPosH.x / 2.0) + 0.5));
+(lPosH.y = (1.0 - ((lPosH.y / -2.0) + 0.5)));
+mediump vec4 packedZValue = texture2D(shadowMap, lPosH.xy);
+mediump float distanceFromLight = packedZValue.x;
+mediump float bias = -0.0049999999;
+return float((distanceFromLight > (lPosH.z - bias)));
+}
+mediump vec2 LightingFuncGGX_FV(in mediump float dotLH, in mediump float roughness){
+mediump float alpha = (roughness * roughness);
+mediump float F_a, F_b;
+mediump float dotLH5 = pow((1.0 - dotLH), 5.0);
+(F_a = 1.0);
+(F_b = dotLH5);
+mediump float vis;
+mediump float k = (alpha / 2.0);
+mediump float k2 = (k * k);
+mediump float invK2 = (1.0 - k2);
+(vis = inversesqrt((((dotLH * dotLH) * invK2) + k2)));
+return vec2((F_a * vis), (F_b * vis));
+}
+mediump float LightingFuncGGX_D(in mediump float dotNH, in mediump float roughness){
+mediump float alpha = (roughness * roughness);
+mediump float alphaSqr = (alpha * alpha);
+mediump float pi = 3.1415901;
+mediump float denom = (((dotNH * dotNH) * (alphaSqr - 1.0)) + 1.0);
+mediump float D = (alphaSqr / ((pi * denom) * denom));
+return D;
+}
+mediump float LightingFuncGGX_OPT3(in mediump vec3 N, in mediump vec3 V, in mediump vec3 L, in mediump float roughness, in mediump float F0){
+mediump vec3 H = normalize((V + L));
+mediump float dotNL = clamp(dot(N, L), 0.0, 1.0);
+mediump float dotLH = clamp(dot(L, H), 0.0, 1.0);
+mediump float dotNH = clamp(dot(N, H), 0.0, 1.0);
+mediump float D = LightingFuncGGX_D(dotNH, roughness);
+mediump vec2 FV_helper = LightingFuncGGX_FV(dotLH, roughness);
+mediump float FV = ((F0 * FV_helper.x) + ((1.0 - F0) * FV_helper.y));
+mediump float specular = ((dotNL * D) * FV);
+return specular;
+}
+void kore(){
+mediump float visibility = 1.0;
+if ((receiveShadow && (lPos.w > 0.0)))
+{
+(visibility = 1.0);
+}
+mediump vec4 outcolor;
+if (lighting)
+{
+mediump float specular = 0.1;
+mediump vec3 n = normalize(normal);
+mediump vec3 l = (light - position);
+(l = normalize(l));
+mediump vec3 v = (eye - position);
+(v = normalize(v));
+mediump float dotNL = clamp(dot(n, l), 0.0, 1.0);
+mediump float spec = LightingFuncGGX_OPT3(n, v, l, roughness, specular);
+if ((spec < 0.0))
+(spec = 0.0);
+mediump vec3 t = pow(matcolor.xyz, vec3(2.2, 2.2, 2.2));
+mediump vec3 rgb = (((surface_color * 0.2) + spec) + (t * dotNL));
+(outcolor = vec4(pow((rgb * visibility), vec3(0.45454544, 0.45454544, 0.45454544)), 1.0));
+}
+else
+{
+(outcolor = matcolor);
+}
+if (texturing)
+{
+(gl_FragColor = vec4(((texture2D(stex, texCoord) * outcolor) * visibility)));
+}
+else
+{
+(gl_FragColor = vec4((outcolor.xyz * visibility), 1.0));
+}
+}
+void main(){
+kore();
+}
