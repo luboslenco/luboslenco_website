@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1.0">
-  <title>Kha3D</title>
+  <title>Kha 3D Tutorials</title>
   <link rel="stylesheet" href="css/standardize.css">
   <link rel="stylesheet" href="css/index.css">
   <script type="text/javascript" src="http://use.typekit.net/vsp8met.js"></script>
@@ -36,14 +36,13 @@
 
 
 
-
-
 	<section id="home">
-	  <h1>Home</h1>
+		<h1>Home</h1>
 		<p>Following is a set of examples showing how to use modern, cross-platform 3D graphics API provided by <a href="https://github.com/KTXSoftware/Kha">Kha</a>.</p>
-    <p>It is meant to be useful if you want to program truly portable 3D graphics in <a href="http://haxe.org">Haxe</a>, and also as a perfect starting point for learning 3D programming from scratch with a super clean API.</p>
-    <p>If you have never heard of this Haxe Kha thing, know this - it allows you to do 3D graphics in the most portable and simplistic way, while still being as close to metal as possible. You can learn more <a href="http://tech.ktxsoftware.com/kha/">here</a>.</p>
-    <p>We will be closely following excellent <a href="http://opengl-tutorial.org">opengl-tutorial.org</a> for theory parts, but a clean Kha implementation is built for every tutorial. Let's get started!</p>
+	    <p>It is meant to be useful if you want to program truly portable 3D graphics in <a href="http://haxe.org">Haxe</a>, and also as a perfect starting point for learning 3D programming from scratch with a super clean API.</p>
+	    <p>If you have never heard of this Haxe Kha thing, know this - it allows you to do 3D graphics in the most portable and simplistic way, while still being as close to metal as possible. You can learn more <a href="http://tech.ktxsoftware.com/kha/">here</a>.</p>
+	    <p>We will be closely following excellent <a href="http://opengl-tutorial.org">opengl-tutorial.org</a> for theory parts, but a clean Kha implementation is built for every tutorial. Let's get started!</p>
+	    <p>Note: You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
 	</section>
 
 
@@ -59,7 +58,13 @@
     
     <p>The reference tutorial is not really needed here since Kha handles this stuff for us perfectly. Let's see how to setup Kha and get a blank screen to show up.</p>
     
-    <p>To use Kha we need <a href="http://git-scm.com">git</a> and <a href="https://nodejs.org">node</a>(0.12.0+). Afterwards, open a terminal/command line (preferably in empty directory to keep things clean) and simply do 'git clone --recursive https://github.com/KTXSoftware/Empty' to get empty project.</p>
+    <p>To use Kha we need <a href="http://git-scm.com">git</a> and <a href="https://nodejs.org">node</a>(0.12.0+). Afterwards, open a terminal/command line (preferably in empty directory to keep things clean) and simply do</p>
+
+    <p><pre><code>
+    git clone --recursive https://github.com/KTXSoftware/Empty
+    </code></pre></p>
+
+    <p>to get empty project.</p>
 
     <p>Go to 'Sources' directory and open 'Empty.hx'. We will add a rendering function that just clears the screen.</p>
     <p><pre><code class="hx">
@@ -220,7 +225,7 @@ void kore() {
 
     <p>Build and run project as mentioned in tutorial 1, and you will be presented with <a href="http://luboslenco.com/kha3d/build/02">this</a>!</p>
 
-    <p><img src="images/tutorial02.png" width="50%"/></p>
+    <p><a href="http://luboslenco.com/kha3d/build/02"><img src="images/tutorial02.png" width="50%"/></a></p>
   </section>
 
 
@@ -313,7 +318,7 @@ void kore() {
 
     <p>That's it! Here is the final <a href="http://luboslenco.com/kha3d/build/03">output</a>.</p>
 
-    <p><img src="images/tutorial03.png" width="50%"/></p>
+    <p><a href="http://luboslenco.com/kha3d/build/03"><img src="images/tutorial03.png" width="50%"/></a></p>
   </section>
 
 
@@ -476,7 +481,7 @@ void kore() {
 
     <p>Check out final <a href="http://luboslenco.com/kha3d/build/04">output</a>.</p>
 
-    <p><img src="images/tutorial04.png" width="50%"/></p>
+    <p><a href="http://luboslenco.com/kha3d/build/04"><img src="images/tutorial04.png" width="50%"/></a></p>
   </section>
 
 
@@ -661,7 +666,7 @@ void kore() {
 
     <p>Check out final <a href="http://luboslenco.com/kha3d/build/05">output</a>.</p>
 
-    <p><img src="images/tutorial05.png" width="50%"/></p>
+    <p><a href="http://luboslenco.com/kha3d/build/05"><img src="images/tutorial05.png" width="50%"/></a></p>
   </section>
 
 
@@ -805,7 +810,7 @@ g.setCullMode(CullMode.CounterClockwise);
 
     <p>And <a href="http://luboslenco.com/kha3d/build/06">here</a> it is! Enjoy flying around our little cube.</p>
 
-    <p><img src="images/tutorial06.png" width="50%"/></p>
+    <p><a href="http://luboslenco.com/kha3d/build/06"><img src="images/tutorial06.png" width="50%"/></a></p>
   </section>
 
 
@@ -915,7 +920,7 @@ indexBuffer.unlock();
 
     <p>That was pretty <a href="http://luboslenco.com/kha3d/build/07">simple</a>! Feel free to tinker with ObjLoader and possibly include parsers for other formats.</p>
 
-    <p><img src="images/tutorial07.png" width="50%"/></p>
+    <p><a href="http://luboslenco.com/kha3d/build/07"><img src="images/tutorial07.png" width="50%"/></a></p>
   </section>
 
 
@@ -1082,7 +1087,7 @@ void kore() {
     
     <p>The result looks <a href="http://luboslenco.com/kha3d/build/08">fabulous</a>! Congratulations - you now posses a knownledge to create something really cool. And if you do, make sure to show us at <a href="http://forum.ktxsoftware.com">forums</a> or #kha irc channel at irc.ktxsoftware.com.</p>
 
-    <p><img src="images/tutorial08.png" width="50%"/></p>
+    <p><a href="http://luboslenco.com/kha3d/build/08"><img src="images/tutorial08.png" width="50%"/></a></p>
   </section>
 
 	<footer><a href="http://twitter.com/luboslenco">@luboslenco</a> | <a href="https://github.com/luboslenco/kha3d_examples">Contribute</a></footer>
