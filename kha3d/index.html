@@ -178,7 +178,7 @@ vertexBuffer = new VertexBuffer(
 // Copy vertices to vertex buffer
 var vbData = vertexBuffer.lock();
 for (i in 0...vbData.length) {
-  vbData[i] = vertices[i];
+  vbData.set(i, vertices[i]);
 }
 vertexBuffer.unlock();
 
@@ -311,7 +311,7 @@ void kore() {
 
     <p><pre><code class="json">
 {
-  "format": 2,
+  "format": 3,
   "game": {
     "name": "Empty",
     "width": 640,
@@ -399,12 +399,12 @@ var structureLength = 6;
 // Copy vertices and colors to vertex buffer
 var vbData = vertexBuffer.lock();
 for (i in 0...Std.int(vbData.length / structureLength)) {
-  vbData[i * structureLength] = vertices[i * 3];
-  vbData[i * structureLength + 1] = vertices[i * 3 + 1];
-  vbData[i * structureLength + 2] = vertices[i * 3 + 2];
-  vbData[i * structureLength + 3] = colors[i * 3];
-  vbData[i * structureLength + 4] = colors[i * 3 + 1];
-  vbData[i * structureLength + 5] = colors[i * 3 + 2];
+  vbData.set(i * structureLength, vertices[i * 3]);
+  vbData.set(i * structureLength + 1, vertices[i * 3 + 1]);
+  vbData.set(i * structureLength + 2, vertices[i * 3 + 2]);
+  vbData.set(i * structureLength + 3, colors[i * 3]);
+  vbData.set(i * structureLength + 4, colors[i * 3 + 1]);
+  vbData.set(i * structureLength + 5, colors[i * 3 + 2]);
 }
 vertexBuffer.unlock();
     </code></pre></p>
@@ -518,7 +518,7 @@ void kore() {
 
     <p><pre><code class="json">
 {
-  "format": 2,
+  "format": 3,
   "game": {
     "name": "Empty",
     "width": 640,
@@ -603,11 +603,11 @@ image = Loader.the.getImage("uvtemplate");
 // Copy vertices and uvs to vertex buffer
 var vbData = vertexBuffer.lock();
 for (i in 0...Std.int(vbData.length / structureLength)) {
-  vbData[i * structureLength] = vertices[i * 3];
-  vbData[i * structureLength + 1] = vertices[i * 3 + 1];
-  vbData[i * structureLength + 2] = vertices[i * 3 + 2];
-  vbData[i * structureLength + 3] = uvs[i * 2];
-  vbData[i * structureLength + 4] = uvs[i * 2 + 1];
+  vbData.set(i * structureLength, vertices[i * 3]);
+  vbData.set(i * structureLength + 1, vertices[i * 3 + 1]);
+  vbData.set(i * structureLength + 2, vertices[i * 3 + 2]);
+  vbData.set(i * structureLength + 3, uvs[i * 2]);
+  vbData.set(i * structureLength + 4, uvs[i * 2 + 1]);
 }
 vertexBuffer.unlock();
     </code></pre></p>
@@ -716,7 +716,7 @@ function onMouseUp(button:Int, x:Int, y:Int) {
   isMouseDown = false;
 }
 
-function onMouseMove(x:Int, y:Int) {
+function onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int) {
   mouseDeltaX = x - mouseX;
   mouseDeltaY = y - mouseY;
 
@@ -845,7 +845,7 @@ g.setCullMode(CullMode.CounterClockwise);
 
     <p><pre><code class="json">
 {
-  "format": 2,
+  "format": 3,
   "game": {
     "name": "Empty",
     "width": 640,
