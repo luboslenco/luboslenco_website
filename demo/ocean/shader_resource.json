@@ -1,0 +1,22 @@
+{
+    "shader_resources": [
+        {
+            "id": "model",
+            "contexts": [
+                {
+                    "id": "waterpass",
+                    "vertex_shader": "water.vert",
+                    "fragment_shader": "water.frag",
+                    "constants" : [
+                        {
+                            "id": "globalTime",
+                            "type": "float",
+                            "link": "_time"
+                        }
+                    ],
+                    "texture_units": []
+                }
+            ]
+        }
+    ]
+}
