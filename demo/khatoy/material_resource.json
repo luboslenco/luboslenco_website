@@ -1,0 +1,16 @@
+{
+    "material_resources": [
+        {
+            "id": "material1",
+            "shader": "shader_resource/model",
+            "cast_shadow": true,
+            "contexts": [
+            	{
+                    "id": "pixelpass",
+                    "bind_constants": [],
+                    "bind_textures": []
+                }
+            ]
+        }
+    ]
+}

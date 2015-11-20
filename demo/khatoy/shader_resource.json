@@ -1,0 +1,22 @@
+{
+    "shader_resources": [
+        {
+            "id": "model",
+            "contexts": [
+                {
+                    "id": "pixelpass",
+                    "vertex_shader": "khatoy.vert",
+                    "fragment_shader": "khatoy.frag",
+                    "constants" : [
+                        {
+                            "id": "globalTime",
+                            "type": "float",
+                            "link": "_time"
+                        }
+                    ],
+                    "texture_units": []
+                }
+            ]
+        }
+    ]
+}

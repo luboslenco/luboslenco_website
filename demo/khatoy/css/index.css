@@ -1,0 +1,16 @@
+body {
+  background-color: rgb(25, 25, 25);
+}
+
+#editor1 {
+    position: absolute;
+    width: 500px;
+    height: 480px;
+}
+
+#button_run {
+    position: absolute;
+    width: 80px;
+    height: 30px;
+    top: 520px;
+}
