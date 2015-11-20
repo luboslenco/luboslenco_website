@@ -1,0 +1,23 @@
+#version 100
+precision mediump float;
+uniform mat4 M;
+attribute vec3 pos;
+uniform mat4 P;
+uniform mat4 V;
+varying vec3 position;
+varying vec3 normal;
+attribute vec3 nor;
+
+
+void main()
+{
+	vec4 mPos;
+	mPos = (M * vec4(pos[0], pos[1], pos[2], 1.0));
+	gl_Position = ((P * V) * mPos);
+	position = (vec3(mPos[0], mPos[1], mPos[2]) / vec3(mPos[3], mPos[3], mPos[3]));
+	normal = normalize(vec3((M * vec4(nor[0], nor[1], nor[2], 0.0))[0], (M * vec4(nor[0], nor[1], nor[2], 0.0))[1], (M * vec4(nor[0], nor[1], nor[2], 0.0))[2]));
+	// Branch to 6
+	// Label 6
+	return;
+}
+

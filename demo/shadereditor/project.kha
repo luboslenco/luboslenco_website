@@ -1,0 +1,133 @@
+{
+	"assets": [
+		{
+			"name": "pipeline_resource",
+			"type": "blob",
+			"files": [
+				"pipeline_resource.json"
+			]
+		},
+		{
+			"name": "camera_resource",
+			"type": "blob",
+			"files": [
+				"camera_resource.json"
+			]
+		},
+		{
+			"name": "light_resource",
+			"type": "blob",
+			"files": [
+				"light_resource.json"
+			]
+		},
+		{
+			"name": "monkey_resource",
+			"type": "blob",
+			"files": [
+				"monkey_resource.json"
+			]
+		},
+		{
+			"name": "material_resource",
+			"type": "blob",
+			"files": [
+				"material_resource.json"
+			]
+		},
+		{
+			"name": "shader_resource",
+			"type": "blob",
+			"files": [
+				"shader_resource.json"
+			]
+		}
+	],
+	"format": 3,
+	"game": {
+		"antiAliasingSamples": 16,
+		"height": 480,
+		"name": "basic_render",
+		"width": 640
+	},
+	"libraries": [
+		"lue"
+	],
+	"rooms": [
+		{
+			"assets": [
+				"pipeline_resource",
+				"camera_resource",
+				"light_resource",
+				"monkey_resource",
+				"material_resource",
+				"shader_resource"
+			],
+			"name": "room1",
+			"neighbours": [],
+			"parent": null
+		}
+	],
+	"shaders": [
+		{
+			"files": [
+				"model.frag.essl"
+			],
+			"name": "model.frag"
+		},
+		{
+			"files": [
+				"model.vert.essl"
+			],
+			"name": "model.vert"
+		},
+		{
+			"files": [
+				"painter-colored.frag.essl"
+			],
+			"name": "painter-colored.frag"
+		},
+		{
+			"files": [
+				"painter-colored.vert.essl"
+			],
+			"name": "painter-colored.vert"
+		},
+		{
+			"files": [
+				"painter-image.frag.essl"
+			],
+			"name": "painter-image.frag"
+		},
+		{
+			"files": [
+				"painter-image.vert.essl"
+			],
+			"name": "painter-image.vert"
+		},
+		{
+			"files": [
+				"painter-text.frag.essl"
+			],
+			"name": "painter-text.frag"
+		},
+		{
+			"files": [
+				"painter-text.vert.essl"
+			],
+			"name": "painter-text.vert"
+		},
+		{
+			"files": [
+				"painter-video.frag.essl"
+			],
+			"name": "painter-video.frag"
+		},
+		{
+			"files": [
+				"painter-video.vert.essl"
+			],
+			"name": "painter-video.vert"
+		}
+	]
+}

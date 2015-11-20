@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>Shader Editor</title>
+	<link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+	<div id="editor1">some text</div>
+	<div id="editor2">some text 2</div>
+	<script src="src/theme-monokai.js" type="text/javascript" charset="utf-8"></script>
+	 <script src="src/mode-glsl.js" type="text/javascript" charset="utf-8"></script>
+    <script src="src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var editor1 = ace.edit("editor1");
+        var editor2 = ace.edit("editor2");
+        editor1.setTheme("ace/theme/monokai");
+        editor2.setTheme("ace/theme/monokai");
+
+        var GLSLMode = ace.require("ace/mode/glsl").Mode;
+    	editor1.session.setMode(new GLSLMode());
+    	editor2.session.setMode(new GLSLMode());
+    </script>
+
+    <button id="button_run" type="button">Run</button>
+
+	<p align="right">
+		<canvas id="khanvas" width="640" height="480" style="outline: none;"></canvas>
+	</p>
+	<script src="kha.js"></script>
+</body>
+</html>
