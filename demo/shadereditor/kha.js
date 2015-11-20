@@ -14373,7 +14373,7 @@ lue_node_CameraNode.prototype = $extend(lue_node_Node.prototype,{
 			q = q.inverse(q);
 		}
 		q.multiply(this.transform.rot,q);
-		this.V = lue_math_Mat4.lookAt(new lue_math_Vec3(0,0,0),new lue_math_Vec3(0,1,0),new lue_math_Vec3(0,0,1));
+		this.V = lue_math_Mat4.lookAt(new lue_math_Vec3(0,0,0),new lue_math_Vec3(0,-1,0),new lue_math_Vec3(0,0,1));
 		this.V.multiply(q.toMatrix(),this.V);
 		var trans = new lue_math_Mat4();
 		trans.translate(-this.transform.matrix._41,-this.transform.matrix._42,-this.transform.matrix._43);
@@ -15807,7 +15807,7 @@ lue_trait_Trait.prototype = {
 	,__class__: lue_trait_Trait
 };
 var luegame_NodeRotator = function() {
-	this.rotZ = 0;
+	this.rotZ = 3.1415;
 	lue_trait_Trait.call(this);
 	this.requestUpdate($bind(this,this.update));
 };
@@ -15829,7 +15829,7 @@ var luegame_Game = function() {
 	var model = lue_Eg.addModelNode(modelRes,[materialRes]);
 	lue_Eg.addNodeTrait(model,new luegame_NodeRotator());
 	this.cam = lue_Eg.addCameraNode(camRes);
-	lue_Eg.setNodeTransform(this.cam,0,-3,0,0,0,0);
+	lue_Eg.setNodeTransform(this.cam,0,3,0,0,0,0);
 	var light = lue_Eg.addLightNode(lightRes);
 	lue_Eg.setNodeTransform(light,5,-10,20);
 	lue_App.requestRender($bind(this,this.render));

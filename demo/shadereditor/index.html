@@ -8,6 +8,8 @@
 <body>
 
 	<div id="editor1">// Vertex Shader
+precision highp float;
+
 attribute vec3 pos;
 attribute vec3 nor;
 
@@ -19,28 +21,31 @@ varying vec3 position;
 varying vec3 normal;
 
 void main() {
-	vec4 mPos;
-	mPos = (M * vec4(pos, 1.0));
-	gl_Position = ((P * V) * mPos);
-	position = mPos.xyz / mPos.w;
+	gl_Position = P * V * M * vec4(pos, 1.0);
+	position = gl_Position.xyz;
 	normal = normalize((M * vec4(nor, 0.0)).xyz);
 }
 	</div>
 	
 	<div id="editor2">// Fragment Shader
 precision mediump float;
+
 varying vec3 normal;
 varying vec3 position;
 
 void main() {
-	gl_FragColor = vec4(normal, 1.0);
+	float r = (sin(normal.x) + 1.0) / 2.0;
+    float g = (cos(position.y) + 1.0) / 2.0;
+    float b = (sin(position.z) + 1.0) / 2.0;
+	gl_FragColor = vec4(r, g, b, 1.0);
 }
 </div>
 	
-	<script src="src/theme-monokai.js" type="text/javascript" charset="utf-8"></script>
-	 <script src="src/mode-glsl.js" type="text/javascript" charset="utf-8"></script>
-    <script src="src/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="theme-monokai.js" type="text/javascript" charset="utf-8"></script>
+	<script src="mode-glsl.js" type="text/javascript" charset="utf-8"></script>
     <script>
+
         var editor1 = ace.edit("editor1");
         var editor2 = ace.edit("editor2");
         editor1.setTheme("ace/theme/monokai");
