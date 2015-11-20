@@ -1,15 +1,8 @@
-#version 100
-// Unknown execution mode
 precision mediump float;
 varying vec3 normal;
 varying vec3 position;
 
-
-void main()
-{
-	gl_FragColor = vec4(normal[0], normal[1], normal[2], 1.0);
-	// Branch to 6
-	// Label 6
-	return;
+void main() {
+	gl_FragColor = vec4(normal, 1.0);
 }
 

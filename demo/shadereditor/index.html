@@ -7,8 +7,36 @@
 </head>
 <body>
 
-	<div id="editor1">some text</div>
-	<div id="editor2">some text 2</div>
+	<div id="editor1">// Vertex Shader
+attribute vec3 pos;
+attribute vec3 nor;
+
+uniform mat4 M;
+uniform mat4 P;
+uniform mat4 V;
+
+varying vec3 position;
+varying vec3 normal;
+
+void main() {
+	vec4 mPos;
+	mPos = (M * vec4(pos, 1.0));
+	gl_Position = ((P * V) * mPos);
+	position = mPos.xyz / mPos.w;
+	normal = normalize((M * vec4(nor, 0.0)).xyz);
+}
+	</div>
+	
+	<div id="editor2">// Fragment Shader
+precision mediump float;
+varying vec3 normal;
+varying vec3 position;
+
+void main() {
+	gl_FragColor = vec4(normal, 1.0);
+}
+</div>
+	
 	<script src="src/theme-monokai.js" type="text/javascript" charset="utf-8"></script>
 	 <script src="src/mode-glsl.js" type="text/javascript" charset="utf-8"></script>
     <script src="src/ace.js" type="text/javascript" charset="utf-8"></script>
@@ -21,9 +49,13 @@
         var GLSLMode = ace.require("ace/mode/glsl").Mode;
     	editor1.session.setMode(new GLSLMode());
     	editor2.session.setMode(new GLSLMode());
+
+    	function setShaders() {
+    		Main.setShaders(editor1.getValue(), editor2.getValue());
+    	}
     </script>
 
-    <button id="button_run" type="button">Run</button>
+    <button id="button_run" onclick="setShaders()" type="button">Run</button>
 
 	<p align="right">
 		<canvas id="khanvas" width="640" height="480" style="outline: none;"></canvas>

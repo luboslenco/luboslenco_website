@@ -160,12 +160,15 @@ _$List_ListIterator.prototype = {
 	}
 	,__class__: _$List_ListIterator
 };
-var Main = function() { };
+var Main = $hx_exports.Main = function() { };
 $hxClasses["Main"] = Main;
 Main.__name__ = ["Main"];
 Main.main = function() {
 	var starter = new kha_Starter();
 	starter.start(new lue_App("room1",luegame_Game));
+};
+Main.setShaders = function(vs,fs) {
+	lue_resource_ShaderContext.inst.relink(vs,fs);
 };
 Math.__name__ = ["Math"];
 var Reflect = function() { };
@@ -9635,6 +9638,9 @@ kha_graphics4_Program.prototype = {
 	,setFragmentShader: function(fragmentShader) {
 		this.fragmentShader = fragmentShader;
 	}
+	,relink: function() {
+		this.linkWithStructures(this.singleStructureArray);
+	}
 	,link: function(structure) {
 		this.singleStructureArray[0] = structure;
 		this.linkWithStructures(this.singleStructureArray);
@@ -15518,6 +15524,7 @@ lue_resource_ShaderResource.prototype = $extend(lue_resource_Resource.prototype,
 var lue_resource_ShaderContext = function(resource) {
 	this.textureUnits = [];
 	this.constants = [];
+	lue_resource_ShaderContext.inst = this;
 	this.resource = resource;
 	var fragmentShader = new kha_graphics4_FragmentShader(kha_Loader.the.getShader(resource.fragment_shader));
 	var vertexShader = new kha_graphics4_VertexShader(kha_Loader.the.getShader(resource.vertex_shader));
@@ -15543,7 +15550,35 @@ var lue_resource_ShaderContext = function(resource) {
 $hxClasses["lue.resource.ShaderContext"] = lue_resource_ShaderContext;
 lue_resource_ShaderContext.__name__ = ["lue","resource","ShaderContext"];
 lue_resource_ShaderContext.prototype = {
-	link: function() {
+	relink: function(vs,fs) {
+		var vshader = this.program.vertexShader;
+		var fshader = this.program.fragmentShader;
+		vshader.source = vs;
+		vshader.shader = null;
+		fshader.source = fs;
+		fshader.shader = null;
+		this.program = new kha_graphics4_Program();
+		this.program.setVertexShader(vshader);
+		this.program.setFragmentShader(fshader);
+		this.link();
+		this.constants = [];
+		var _g = 0;
+		var _g1 = this.resource.constants;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			this.addConstant(c.id);
+		}
+		this.textureUnits = [];
+		var _g2 = 0;
+		var _g11 = this.resource.texture_units;
+		while(_g2 < _g11.length) {
+			var tu = _g11[_g2];
+			++_g2;
+			this.addTexture(tu.id);
+		}
+	}
+	,link: function() {
 		this.program.link(lue_resource_ShaderResource.getDefaultStructure());
 	}
 	,addConstant: function(s) {
