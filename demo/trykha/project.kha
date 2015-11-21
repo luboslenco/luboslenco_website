@@ -1,0 +1,72 @@
+{
+	"assets": [],
+	"format": 3,
+	"game": {
+		"antiAliasingSamples": 0,
+		"height": 480,
+		"name": "TryKha",
+		"width": 640
+	},
+	"libraries": [
+		"lue",
+		"hscript"
+	],
+	"rooms": [
+		{
+			"assets": [],
+			"name": "room1",
+			"neighbours": [],
+			"parent": null
+		}
+	],
+	"shaders": [
+		{
+			"files": [
+				"painter-colored.frag.essl"
+			],
+			"name": "painter-colored.frag"
+		},
+		{
+			"files": [
+				"painter-colored.vert.essl"
+			],
+			"name": "painter-colored.vert"
+		},
+		{
+			"files": [
+				"painter-image.frag.essl"
+			],
+			"name": "painter-image.frag"
+		},
+		{
+			"files": [
+				"painter-image.vert.essl"
+			],
+			"name": "painter-image.vert"
+		},
+		{
+			"files": [
+				"painter-text.frag.essl"
+			],
+			"name": "painter-text.frag"
+		},
+		{
+			"files": [
+				"painter-text.vert.essl"
+			],
+			"name": "painter-text.vert"
+		},
+		{
+			"files": [
+				"painter-video.frag.essl"
+			],
+			"name": "painter-video.frag"
+		},
+		{
+			"files": [
+				"painter-video.vert.essl"
+			],
+			"name": "painter-video.vert"
+		}
+	]
+}

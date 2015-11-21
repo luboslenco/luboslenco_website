@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>TryKha</title>
+	<link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+	<div id="editor1">var size = 100;
+var x = 0;
+var y = 0;
+
+function update() {
+    x = Math.sin(Scheduler.time()) * 150 + (320 - size / 2);
+    y = Math.cos(Scheduler.time()) * 150 + (240 - size / 2);
+}
+
+function render(g) {
+    g.begin(true, 0xff222222);
+    
+    g.color = 0xffff4444;
+    g.fillRect(Std.int(x), Std.int(y), size, size);
+    
+    g.end();
+}
+
+// Helper functions
+App.requestUpdate(update);
+App.requestRender2D(render);
+	</div>
+	
+	<script src="ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="theme-monokai.js" type="text/javascript" charset="utf-8"></script>
+	<script src="mode-haxe.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+
+        var editor1 = ace.edit("editor1");
+        editor1.setTheme("ace/theme/monokai");
+
+        var HaxeMode = ace.require("ace/mode/haxe").Mode;
+    	editor1.session.setMode(new HaxeMode());
+
+    	function setShader() {
+    		Main.setScript(editor1.getValue());
+    	}
+    </script>
+
+    <button id="button_run" onclick="setShader()" type="button">Run</button>
+
+	<p align="right">
+		<canvas id="khanvas" width="640" height="480" style="outline: none;"></canvas>
+	</p>
+	<script src="kha.js"></script>
+</body>
+</html>
