@@ -16,7 +16,8 @@ function update() {
     y = Math.cos(Scheduler.time()) * 150 + (240 - size / 2);
 }
 
-function render(g) {
+function render(frame) {
+    g = frame.g2;
     g.begin(true, 0xff222222);
     
     g.color = 0xffff4444;
@@ -25,9 +26,9 @@ function render(g) {
     g.end();
 }
 
-// Helper functions
-App.requestUpdate(update);
-App.requestRender2D(render);
+System.notifyOnRender(render);
+Scheduler.addTimeTask(update, 0, 1 / 60);
+
 	</div>
 	
 	<script src="ace.js" type="text/javascript" charset="utf-8"></script>

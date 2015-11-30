@@ -28,7 +28,6 @@ EReg.prototype = {
 	,__class__: EReg
 };
 var Empty = function() {
-	kha_Assets.loadEverything($bind(this,this.loadingFinished));
 };
 $hxClasses["Empty"] = Empty;
 Empty.__name__ = true;
@@ -865,8 +864,6 @@ Main.main = function() {
 };
 Main.init = function() {
 	var game = new Empty();
-	kha_System.notifyOnRender($bind(game,game.render));
-	kha_Scheduler.addTimeTask($bind(game,game.update),0,0.0166666666666666664);
 };
 Main.setScript = function(s) {
 	new Script(s);
