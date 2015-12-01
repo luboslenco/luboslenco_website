@@ -68,17 +68,14 @@
     <p><pre><code class="hx">
 package;
 
-import kha.Game;
 import kha.Framebuffer;
 import kha.Color;
 
 class Empty extends Game {
 
-    public function new() {
-        super("Empty");
-    }
+    public function new() {}
 
-    override public function render(frame:Framebuffer) {
+    public function render(frame:Framebuffer) {
         // A graphics object which lets us perform 3D operations
         var g = frame.g4;
 
@@ -95,7 +92,7 @@ class Empty extends Game {
     </code></pre></p>
 
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
-    <p>Now on to building our project. Open terminal/command line in project folder(where project.kha resides). With Kha you can target pretty much every platform out there, but for simplicity let's do HTML5 build. To build, type</p>
+    <p>Now on to building our project. Open terminal/command line in project folder(where khafile.js resides). With Kha you can target pretty much every platform out there, but for simplicity let's do HTML5 build. To build, type</p>
 
     <p><pre><code>
     node Kha/make -t html5
@@ -121,7 +118,7 @@ class Empty extends Game {
     
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-2-the-first-triangle/">Reference</a>)</p>
     
-    <p>Here comes the most exciting moment of your life - drawing a triangle! The first thing we need to do is define triangle data and a shader program.</p>
+    <p>Here comes the most exciting moment of your life - drawing a triangle! The first thing we need to do is define triangle data and a pipeline state.</p>
 
     <p><pre><code class="hx">
 // An array of 3 vectors representing 3 vertices to form a triangle
@@ -139,10 +136,10 @@ static var indices:Array&lt;Int&gt; = [
 
 var vertexBuffer:VertexBuffer;
 var indexBuffer:IndexBuffer;
-var program:Program;
+var pipeline:PipelineState;
     </code></pre></p>
 
-    <p>Proceed to load shaders and link shader program in init() function.</p>
+    <p>Proceed to compile pipeline state using shaders we specify in new().</p>
 
     <p><pre><code class="hx">
 // Define vertex structure
@@ -153,16 +150,14 @@ structure.add("pos", VertexData.Float3);
 // Eventually there will be texture coords, normals,...
 var structureLength = 3;
 
-// Load shaders - these are located in 'Sources/Shaders' directory
+// Compile pipeline state
+// Shaders are located in 'Sources/Shaders' directory
 // and Kha includes them automatically
-var fragmentShader = new FragmentShader(Loader.the.getShader("simple.frag"));
-var vertexShader = new VertexShader(Loader.the.getShader("simple.vert"));
-
-// Link program with fragment and vertex shaders we loaded
-program = new Program();
-program.setFragmentShader(fragmentShader);
-program.setVertexShader(vertexShader);
-program.link(structure);
+pipeline = new PipelineState();
+pipeline.inputLayout = [structure];
+pipeline.fragmentShader = Shaders.simple_frag;
+pipeline.vertexShader = Shaders.simple_vert;
+pipeline.compile();
     </code></pre></p>
 
     <p>Create vertex and index buffers from triangle data we defined.</p>
@@ -199,8 +194,8 @@ indexBuffer.unlock();
     <p>Moving to render() function, draw triangle on screen!</p>
 
     <p><pre><code class="hx">
-// Bind shader program we want to draw with
-g.setProgram(program);
+// Bind state we want to draw with
+g.setPipeline(pipeline);
     
 // Bind data we want to draw
 g.setVertexBuffer(vertexBuffer);
@@ -210,7 +205,7 @@ g.setIndexBuffer(indexBuffer);
 g.drawIndexedVertices();
     </code></pre></p>
 
-    <p>For shaders, Kha uses GLSL syntax. Shaders are automatically cross-compiled based on target system using a tool called <a href="https://github.com/KTXSoftware/krafix">Krafix</a>, meaning we do not have to worry about rewriting them. The vertex shader.</p>
+    <p>For shaders, Kha uses GLSL syntax. Shaders are automatically cross-compiled based on target system using a tool called <a href="https://github.com/KTXSoftware/krafix">Krafix</a>, meaning we do not have to worry about rewriting them.<br/>The vertex shader.</p>
 
     <p><pre><code class="glsl">
 // Input vertex data, different for all executions of this shader
@@ -255,7 +250,7 @@ void kore() {
 
     <p><pre><code class="hx">
 // Get a handle for our "MVP" uniform
-mvpID = program.getConstantLocation("MVP");
+mvpID = pipeline.getConstantLocation("MVP");
     </code></pre></p>
 
     <p>Create projection, view and model matrices.</p>
@@ -307,20 +302,10 @@ void kore() {
 }
     </code></pre></p>
 
-    <p>If you run the project now, you would see that triangle lines are jagged. We can solve this by enabling anti-aliasing in project.kha.</p>
+    <p>If you run the project now, you would see that triangle lines are jagged. We can solve this by enabling anti-aliasing using System class.</p>
 
     <p><pre><code class="json">
-{
-  "format": 3,
-  "game": {
-    "name": "Empty",
-    "width": 640,
-    "height": 480,
-    "antiAliasingSamples": 2
-  },
-  "assets": [],
-  "rooms": []
-}
+TODO
     </code></pre></p>
 
 
@@ -393,6 +378,14 @@ structure.add("col", VertexData.Float3);
 var structureLength = 6;
     </code></pre></p>
 
+    <p>We modify pipeline to enable depth-testing.</p>
+
+    <p><pre><code class="hx">
+// Set depth mode
+pipeline.depthWrite = true;
+pipeline.depthMode = CompareMode.Less;
+    </code></pre></p>
+
     <p>Now copy all the data into vertex buffer. For each vertex, we pack x,y,z position and r,g,b color.</p>
 
     <p><pre><code class="hx">
@@ -435,9 +428,6 @@ indexBuffer.unlock();
     <p>Notice we also need to adjust clear function to have proper depth-testing.</p>
 
     <p><pre><code class="hx">
-// Set depth mode
-g.setDepthMode(true, CompareMode.Less);
-
 // Clear screen
 g.clear(Color.fromFloats(0.0, 0.0, 0.3), 1.0);
     </code></pre></p>
@@ -514,35 +504,16 @@ void kore() {
 
     <p><img src="images/uvtemplate.png" width="25%"/></p>
 
-    <p>To include image in project, add it into assets section in project.kha. Then create a room which contains this image.</p>
+    <p>To include image in project, we simple modify khafile to include all assets from 'Assets' folder.</p>
 
-    <p><pre><code class="json">
-{
-  "format": 3,
-  "game": {
-    "name": "Empty",
-    "width": 640,
-    "height": 480,
-    "antiAliasingSamples": 2
-  },
-  "assets": [
-    {
-      "file": "uvtemplate.png",
-      "name": "uvtemplate",
-      "type": "image"
-    }
-  ],
-  "rooms": [
-    {
-      "assets": [
-        "uvtemplate"
-      ],
-      "name": "room0",
-      "neighbours": [],
-      "parent": null
-    }
-  ]
-}
+    <p><pre><code class="hx">
+var project = new Project('Empty');
+
+project.addSources('Sources');
+project.addShaders('Sources/Shaders/**');
+project.addAssets('Assets/**');
+
+return project;
     </code></pre></p>
 
     <p>We will no longer be using cube colors, but we need texture coordinates for each vertex.</p>
@@ -565,14 +536,12 @@ static var uvs:Array&lt;Float&gt; = [
 ];
     </code></pre></p>
 
-    <p>We need to load image before it is available. Rename our current init function to loadingFinished and use the init function below. This will load all assets specified in 'room0'.</p>
+    <p>We need to load image before it is available. We simply do loadEverything() and wait for it to finish. This will load all assets specified in khafile.</p>
 
     <p><pre><code class="hx">
-override public function init() {
-  Configuration.setScreen(new LoadingScreen());
-
-  // Load room with our texture
-  Loader.the.loadRoom("room0", loadingFinished);
+public function new() {
+  // Load all assets defined in khafile.js
+  Assets.loadEverything(loadingFinished);
 }
     </code></pre></p>
 
@@ -591,10 +560,10 @@ var structureLength = 5;
 
     <p><pre><code class="hx">
 // Get a handle for texture sample
-textureID = program.getTextureUnit("myTextureSampler");
+textureID = pipeline.getTextureUnit("myTextureSampler");
 
 // Texture
-image = Loader.the.getImage("uvtemplate");
+image = Assets.images.uvtemplate;
     </code></pre></p>
 
     <p>Copy positions and uvs to vertex buffer.</p>
@@ -610,12 +579,6 @@ for (i in 0...Std.int(vbData.length / structureLength)) {
   vbData.set(i * structureLength + 4, uvs[i * 2 + 1]);
 }
 vertexBuffer.unlock();
-    </code></pre></p>
-
-    <p>When we are done initializing, set screen back to our game.</p>
-
-    <p><pre><code class="hx">
-Configuration.setScreen(this);
     </code></pre></p>
 
     <p>On to render function, set texture in similar manner to mvp matrix.</p>
@@ -739,10 +702,16 @@ function onKeyUp(key:Key, char:String) {
 }
     </code></pre></p>
 
-    <p>For the first time we will use update function to calculate our matrices based on input every frame.</p>
+    <p>For the first time we will use update function to calculate our matrices based on input every frame. Let's add a listener in Main.init().</p>
 
     <p><pre><code class="hx">
-override public function update() {
+Scheduler.addTimeTask(game.update, 0, 1 / 60);
+    </code></pre></p>
+
+    <p>On to implementation.</p>
+
+    <p><pre><code class="hx">
+public function update() {
   // Compute time difference between current and last frame
   var deltaTime = Scheduler.time() - lastTime;
   lastTime = Scheduler.time();
@@ -808,13 +777,12 @@ override public function update() {
 }
     </code></pre></p>
 
-    <p>To enable culling, set it up in render function.</p>
+    <p>One more thing - to enable culling, we adjust pipeline state.</p>
 
     <p><pre><code class="hx">
 // Set culling
-g.setCullMode(CullMode.CounterClockwise);
+pipeline.cullMode = CullMode.CounterClockwise;
     </code></pre></p>
-
     
     <p>You can access complete sources <a href="https://github.com/luboslenco/kha3d_examples">here</a>.</p>
 
@@ -841,43 +809,6 @@ g.setCullMode(CullMode.CounterClockwise);
     <p><img src="images/cube/uvmap.png" width="25%"/></p>
     <p><a href="images/cube/cube.obj">cube.obj</a></p>
 
-    <p>Include cube model and it's texture in project.kha.</p>
-
-    <p><pre><code class="json">
-{
-  "format": 3,
-  "game": {
-    "name": "Empty",
-    "width": 640,
-    "height": 480,
-    "antiAliasingSamples": 2
-  },
-  "assets": [
-    {
-      "file": "uvmap.png",
-      "name": "uvmap",
-      "type": "image"
-    },
-    {
-      "file": "cube.obj",
-      "name": "cube",
-      "type": "blob"
-    }
-  ],
-  "rooms": [
-    {
-      "assets": [
-        "uvmap",
-        "cube"
-      ],
-      "name": "room0",
-      "neighbours": [],
-      "parent": null
-    }
-  ]
-}
-    </code></pre></p>
-
     <p>Although we will not use normals in shaders yet, ObjLoader parses it for us. Let's reflect vertex structure to match that.</p>
 
     <p><pre><code class="hx">
@@ -894,7 +825,7 @@ var structureLength = 8;
 
     <p><pre><code class="hx">
 // Parse .obj file
-var obj = new ObjLoader(Loader.the.getBlob("cube").toString());
+var obj = new ObjLoader(Assets.blobs.cube.toString());
 var data = obj.data;
 var indices = obj.indices;
 
@@ -947,7 +878,7 @@ indexBuffer.unlock();
 
     <p>(<a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-8-basic-shading/">Reference</a>)</p>
 
-    <p>If you have reached this point, you are getting a pretty solid ground for programming more advanced 3D stuff. This is the last essential tutorial. We will implement a shading technique into shader programs. Let's use suzanne model for this, along with new texture. Don't forget to update project.kha and include it.</p>
+    <p>If you have reached this point, you are getting a pretty solid ground for programming more advanced 3D stuff. This is the last essential tutorial. We will implement a shading technique into shader programs. Let's use suzanne model for this, along with new texture. As usual, save them in 'Assets' folder.</p>
 
     <p><img src="images/suzanne/uvmap.png" width="25%"/></p>
     <p><a href="images/suzanne/suzanne.obj">suzanne.obj</a></p>
@@ -955,15 +886,15 @@ indexBuffer.unlock();
     <p>Store additional constant locations for shaders.</p>
 
     <p><pre><code class="hx">
-viewMatrixID = program.getConstantLocation("V");
-modelMatrixID = program.getConstantLocation("M");
-lightID = program.getConstantLocation("lightPos");
+viewMatrixID = pipeline.getConstantLocation("V");
+modelMatrixID = pipeline.getConstantLocation("M");
+lightID = pipeline.getConstantLocation("lightPos");
     </code></pre></p>
 
     <p>Load suzanne model instead.</p>
 
     <p><pre><code class="hx">
-var obj = new ObjLoader(Loader.the.getBlob("suzanne").toString());
+var obj = new ObjLoader(Assets.blobs.suzanne.toString());
     </code></pre></p>
 
     <p>Set shader uniforms.</p>
