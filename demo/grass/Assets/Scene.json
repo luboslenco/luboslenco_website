@@ -1,0 +1,221 @@
+{
+    "camera_resources": [
+        {
+            "clear_color": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "far_plane": 100.0,
+            "frustum_culling": false,
+            "id": "Camera",
+            "near_plane": 0.10000000149011612,
+            "pipeline": "pipeline_resource/blender_pipeline",
+            "type": "perspective"
+        }
+    ],
+    "geometry_resources": [],
+    "light_resources": [
+        {
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "id": "Lamp",
+            "type": "sun"
+        }
+    ],
+    "material_resources": [
+        {
+            "cast_shadow": true,
+            "contexts": [
+                {
+                    "bind_constants": [
+                        {
+                            "id": "diffuseColor",
+                            "vec4": [
+                                0.04858217388391495,
+                                1.0,
+                                0.04948880150914192,
+                                1.0
+                            ]
+                        },
+                        {
+                            "float": 0.0,
+                            "id": "roughness"
+                        },
+                        {
+                            "bool": false,
+                            "id": "lighting"
+                        },
+                        {
+                            "bool": false,
+                            "id": "receiveShadow"
+                        }
+                    ],
+                    "bind_textures": [],
+                    "id": "blender"
+                }
+            ],
+            "id": "GrassGreen",
+            "shader": "blender_resource/blender_Instancing"
+        },
+        {
+            "cast_shadow": true,
+            "contexts": [
+                {
+                    "bind_constants": [
+                        {
+                            "id": "diffuseColor",
+                            "vec4": [
+                                0.005508142523467541,
+                                0.057803306728601456,
+                                0.003683600341901183,
+                                1.0
+                            ]
+                        },
+                        {
+                            "float": 0.0,
+                            "id": "roughness"
+                        },
+                        {
+                            "bool": false,
+                            "id": "lighting"
+                        },
+                        {
+                            "bool": false,
+                            "id": "receiveShadow"
+                        }
+                    ],
+                    "bind_textures": [],
+                    "id": "blender"
+                }
+            ],
+            "id": "Material",
+            "shader": "blender_resource/blender"
+        }
+    ],
+    "nodes": [
+        {
+            "id": "Plane",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Plane/Plane",
+            "traits": [],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.01907387562096119,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Lamp",
+            "nodes": [],
+            "object_ref": "Lamp",
+            "traits": [],
+            "transform": {
+                "values": [
+                    0.7736664414405823,
+                    0.0,
+                    -0.6335931420326233,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.6335931420326233,
+                    0.0,
+                    0.7736664414405823,
+                    0.0,
+                    8.641807556152344,
+                    0.0,
+                    5.903861999511719,
+                    1.0
+                ]
+            },
+            "type": "light_node"
+        },
+        {
+            "id": "Camera",
+            "nodes": [],
+            "object_ref": "Camera",
+            "traits": [
+                {
+                    "class_name": "FlyCamera",
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.17364822328090668,
+                    0.9848077297210693,
+                    0.0,
+                    0.0,
+                    -0.9848077297210693,
+                    0.17364822328090668,
+                    0.0,
+                    1.2999999523162842,
+                    -8.21539306640625,
+                    1.9591954946517944,
+                    1.0
+                ]
+            },
+            "type": "camera_node"
+        },
+        {
+            "id": "Grass",
+            "material_refs": [
+                "GrassGreen"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Plane_024/Plane_024",
+            "traits": [],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.3444218635559082,
+                    0.2579543888568878,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        }
+    ]
+}

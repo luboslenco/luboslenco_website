@@ -1,0 +1,38 @@
+{
+    "pipeline_resources": [
+        {
+            "id": "blender_pipeline",
+            "render_targets": [
+                {
+                    "id": "shadowmap",
+                    "width": 1024,
+                    "height": 1024
+                }
+            ],
+            "stages": [
+                
+
+                {
+                    "command": "set_target",
+                    "params": [""]
+                },
+                {
+                    "command": "clear_target",
+                    "params": ["depth", "color"]
+                },
+                {
+                    "command": "draw_quad",
+                    "params": ["material_resource", "material1", "env_map"]
+                },
+                {
+                    "command": "bind_target",
+                    "params": ["shadowmap", "shadowMap"]
+                },
+                {
+                    "command": "draw_geometry",
+                    "params": ["blender"]
+                }
+            ]
+        }
+    ]
+}
