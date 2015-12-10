@@ -1,0 +1,28 @@
+{
+    "pipeline_resources": [
+        {
+            "id": "blender_pipeline",
+            "render_targets": [],
+            "stages": [
+                
+
+                {
+                    "command": "set_target",
+                    "params": [""]
+                },
+                {
+                    "command": "clear_target",
+                    "params": ["depth", "color"]
+                },
+                {
+                    "command": "draw_quad",
+                    "params": ["material_resource", "material1", "env_map"]
+                },
+                {
+                    "command": "draw_geometry",
+                    "params": ["blender"]
+                }
+            ]
+        }
+    ]
+}

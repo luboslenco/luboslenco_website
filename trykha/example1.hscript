@@ -1,0 +1,21 @@
+var size = 100;
+var x = 0;
+var y = 0;
+
+function update() {
+    x = Math.sin(Scheduler.time()) * 150 + (320 - size / 2);
+    y = Math.cos(Scheduler.time()) * 150 + (240 - size / 2);
+}
+
+function render(frame) {
+    g = frame.g2;
+    g.begin(true, 0xff222222);
+    
+    g.color = 0xffff4444;
+    g.fillRect(Std.int(x), Std.int(y), size, size);
+    
+    g.end();
+}
+
+System.notifyOnRender(render);
+Scheduler.addTimeTask(update, 0, 1 / 60);
