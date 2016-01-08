@@ -121,6 +121,16 @@ class Empty extends Game {
     <p>Here comes the most exciting moment of your life - drawing a triangle! The first thing we need to do is define triangle data and a pipeline state.</p>
 
     <p><pre><code class="hx">
+import kha.Shaders;
+import kha.graphics4.PipelineState;
+import kha.graphics4.VertexStructure;
+import kha.graphics4.VertexBuffer;
+import kha.graphics4.IndexBuffer;
+import kha.graphics4.FragmentShader;
+import kha.graphics4.VertexShader;
+import kha.graphics4.VertexData;
+import kha.graphics4.Usage;
+  
 // An array of 3 vectors representing 3 vertices to form a triangle
 static var vertices:Array&lt;Float&gt; = [
    -1.0, -1.0, 0.0, // Bottom-left
@@ -257,16 +267,16 @@ mvpID = pipeline.getConstantLocation("MVP");
 
     <p><pre><code class="hx">
 // Projection matrix: 45° Field of View, 4:3 ratio, 0.1-100 display range
-var projection = Matrix4.perspectiveProjection(45.0, 4.0 / 3.0, 0.1, 100.0);
+var projection = FastMatrix4.perspectiveProjection(45.0, 4.0 / 3.0, 0.1, 100.0);
 
 // Camera matrix
-var view = Matrix4.lookAt(new Vector3(4, 3, 3), // Position in World Space
-              new Vector3(0, 0, 0), // and looks at the origin
-              new Vector3(0, 1, 0) // Head is up
+var view = FastMatrix4.lookAt(new FastVector3(4, 3, 3), // Position in World Space
+              new FastVector3(0, 0, 0), // and looks at the origin
+              new FastVector3(0, 1, 0) // Head is up
 );
 
 // Model matrix: an identity matrix (model will be at the origin)
-var model = Matrix4.identity();
+var model = FastMatrix4.identity();
     </code></pre></p>
 
     <p>A final mvp matrix that will be passed to shader.</p>
@@ -274,7 +284,7 @@ var model = Matrix4.identity();
     <p><pre><code class="hx">
 // Our ModelViewProjection: multiplication of our 3 matrices
 // Remember, matrix multiplication is the other way around
-mvp = Matrix4.identity();
+mvp = FastMatrix4.identity();
 mvp = mvp.multmat(projection);
 mvp = mvp.multmat(view);
 mvp = mvp.multmat(model);
@@ -723,14 +733,14 @@ public function update() {
   }
 
   // Direction: Spherical coordinates to Cartesian coordinates conversion
-  var direction = new Vector3(
+  var direction = new FastVector3(
     Math.cos(verticalAngle) * Math.sin(horizontalAngle),
     Math.sin(verticalAngle),
     Math.cos(verticalAngle) * Math.cos(horizontalAngle)
   );
   
   // Right vector
-  var right = new Vector3(
+  var right = new FastVector3(
     Math.sin(horizontalAngle - 3.14 / 2.0), 
     0,
     Math.cos(horizontalAngle - 3.14 / 2.0)
@@ -761,13 +771,13 @@ public function update() {
   var look = position.add(direction);
   
   // Camera matrix
-  view = Matrix4.lookAt(position, // Camera is here
+  view = FastMatrix4.lookAt(position, // Camera is here
               look, // and looks here : at the same position, plus "direction"
               up // Head is up (set to (0, -1, 0) to look upside-down)
   );
   
   // Update model-view-projection matrix
-  mvp = Matrix4.identity();
+  mvp = FastMatrix4.identity();
   mvp = mvp.multmat(projection);
   mvp = mvp.multmat(view);
   mvp = mvp.multmat(model);
@@ -825,7 +835,7 @@ var structureLength = 8;
 
     <p><pre><code class="hx">
 // Parse .obj file
-var obj = new ObjLoader(Assets.blobs.cube.toString());
+var obj = new ObjLoader(Assets.blobs.cube_obj.toString());
 var data = obj.data;
 var indices = obj.indices;
 
@@ -894,7 +904,7 @@ lightID = pipeline.getConstantLocation("lightPos");
     <p>Load suzanne model instead.</p>
 
     <p><pre><code class="hx">
-var obj = new ObjLoader(Assets.blobs.suzanne.toString());
+var obj = new ObjLoader(Assets.blobs.suzanne_obj.toString());
     </code></pre></p>
 
     <p>Set shader uniforms.</p>
