@@ -1,0 +1,20 @@
+{
+    "material_resources": [
+        {
+            "contexts": [
+                {
+                    "bind_constants": [],
+                    "bind_textures": [
+                        {
+                            "id": "envmap",
+                            "name": "envmap"
+                        }
+                    ],
+                    "id": "env_map"
+                }
+            ],
+            "id": "World_material",
+            "shader": "env_map/env_map"
+        }
+    ]
+}

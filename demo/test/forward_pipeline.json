@@ -1,0 +1,70 @@
+{
+    "pipeline_resources": [
+        {
+            "id": "forward_pipeline",
+            "render_targets": [
+                {
+                    "color_buffers": 1,
+                    "depth_buffer": false,
+                    "format": "DEPTH16",
+                    "height": 1024,
+                    "id": "shadowMap",
+                    "width": 1024
+                }
+            ],
+            "stages": [
+                {
+                    "command": "set_target",
+                    "params": [
+                        "shadowMap"
+                    ]
+                },
+                {
+                    "command": "clear_target",
+                    "params": [
+                        "color",
+                        "depth"
+                    ]
+                },
+                {
+                    "command": "draw_geometry",
+                    "params": [
+                        "shadowmap"
+                    ]
+                },
+                {
+                    "command": "set_target",
+                    "params": [
+                        ""
+                    ]
+                },
+                {
+                    "command": "clear_target",
+                    "params": [
+                        "color",
+                        "depth"
+                    ]
+                },
+                {
+                    "command": "draw_quad",
+                    "params": [
+                        "World_material/World_material/env_map"
+                    ]
+                },
+                {
+                    "command": "bind_target",
+                    "params": [
+                        "shadowMap",
+                        "shadowMap"
+                    ]
+                },
+                {
+                    "command": "draw_geometry",
+                    "params": [
+                        "forward"
+                    ]
+                }
+            ]
+        }
+    ]
+}

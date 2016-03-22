@@ -1,0 +1,50 @@
+{
+    "pipeline_resources": [
+        {
+            "id": "pathtrace_pipeline",
+            "render_targets": [
+                {
+                    "color_buffers": 1,
+                    "depth_buffer": false,
+                    "format": "RGBA32",
+                    "height": 320,
+                    "id": "gbuffer",
+                    "width": 568
+                }
+            ],
+            "stages": [
+                {
+                    "command": "set_target",
+                    "params": [
+                        "gbuffer"
+                    ]
+                },
+                {
+                    "command": "draw_quad",
+                    "params": [
+                        "pt_material/pt_trace_material/pt_trace_pass"
+                    ]
+                },
+                {
+                    "command": "set_target",
+                    "params": [
+                        ""
+                    ]
+                },
+                {
+                    "command": "bind_target",
+                    "params": [
+                        "gbuffer",
+                        "gbuffer"
+                    ]
+                },
+                {
+                    "command": "draw_quad",
+                    "params": [
+                        "pt_material/pt_final_material/pt_final_pass"
+                    ]
+                }
+            ]
+        }
+    ]
+}

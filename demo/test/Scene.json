@@ -1,0 +1,1555 @@
+{
+    "camera_resources": [
+        {
+            "clear_color": [
+                0.05087608844041824,
+                0.05087608844041824,
+                0.05087608844041824,
+                1.0
+            ],
+            "draw_calls_sort": "none",
+            "far_plane": 1000.0,
+            "frustum_culling": false,
+            "id": "Camera",
+            "near_plane": 0.10000000149011612,
+            "pipeline": "forward_pipeline/forward_pipeline",
+            "type": "perspective"
+        }
+    ],
+    "geometry_resources": [],
+    "light_resources": [
+        {
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "id": "Lamp",
+            "type": "point"
+        }
+    ],
+    "material_resources": [
+        {
+            "cast_shadow": true,
+            "contexts": [
+                {
+                    "bind_constants": [
+                        {
+                            "bool": true,
+                            "id": "lighting"
+                        },
+                        {
+                            "bool": true,
+                            "id": "receiveShadow"
+                        },
+                        {
+                            "id": "albedo_color",
+                            "vec4": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        },
+                        {
+                            "float": 0.0,
+                            "id": "metalness"
+                        },
+                        {
+                            "float": 0.0,
+                            "id": "roughness"
+                        }
+                    ],
+                    "bind_textures": [
+                        {
+                            "id": "senvmapIrradiance",
+                            "name": "envmap_irradiance"
+                        },
+                        {
+                            "id": "senvmapRadiance",
+                            "mipmap_filter": "linear",
+                            "mipmaps": [
+                                "envmap_radiance_0",
+                                "envmap_radiance_1",
+                                "envmap_radiance_2",
+                                "envmap_radiance_3",
+                                "envmap_radiance_4",
+                                "envmap_radiance_5",
+                                "envmap_radiance_6",
+                                "envmap_radiance_7",
+                                "envmap_radiance_8",
+                                "envmap_radiance_9",
+                                "envmap_radiance_10"
+                            ],
+                            "name": "envmap_radiance"
+                        },
+                        {
+                            "id": "senvmapBrdf",
+                            "name": "envmap_brdf"
+                        }
+                    ],
+                    "id": "forward"
+                }
+            ],
+            "id": "Material",
+            "shader": "forward/forward"
+        }
+    ],
+    "nodes": [
+        {
+            "id": "Cube.002",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Cube/Cube",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        0,
+                        "0",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    7.549790126404332e-08,
+                    -1.0,
+                    0.0,
+                    -2.5542407035827637,
+                    1.0,
+                    7.549790126404332e-08,
+                    0.0,
+                    0.21272730827331543,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.9214410781860352,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Cube.001",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Cube/Cube",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        0,
+                        "0",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.3150966167449951,
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.6694285869598389,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.9214410781860352,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Cube",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Cube/Cube",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        0,
+                        "0",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.3150966167449951,
+                    0.0,
+                    1.0,
+                    0.0,
+                    -1.4747395515441895,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.9214410781860352,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.030",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.04739624261856079,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    23.618877410888672,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.029",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.009555190801620483,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    24.476268768310547,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.028",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.08850256353616714,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    25.27128791809082,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.027",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09101247787475586,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.06102399528026581,
+                    0.0,
+                    0.0,
+                    1.0,
+                    26.083024978637695,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.025",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09726369380950928,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    22.647510528564453,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.024",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09101247787475586,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.06102399528026581,
+                    0.0,
+                    0.0,
+                    1.0,
+                    21.768993377685547,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.023",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.08850256353616714,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    20.957256317138672,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.022",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.009555190801620483,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    20.1622371673584,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.021",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.04739624261856079,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    19.304845809936523,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.020",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.08850256353616714,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    16.922504425048828,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.019",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09101247787475586,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.06102399528026581,
+                    0.0,
+                    0.0,
+                    1.0,
+                    17.715919494628906,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.018",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09726369380950928,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    18.529075622558594,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.017",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09726369380950928,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    11.865984916687012,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.016",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09101247787475586,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.06102399528026581,
+                    0.0,
+                    0.0,
+                    1.0,
+                    11.05282974243164,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.015",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.08850256353616714,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    10.259413719177246,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.014",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.04739624261856079,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    12.641756057739258,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.013",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.009555190801620483,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    13.499147415161133,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.012",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.08850256353616714,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    14.29416561126709,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.011",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09101247787475586,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.06102399528026581,
+                    0.0,
+                    0.0,
+                    1.0,
+                    15.105903625488281,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.010",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09726369380950928,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    15.984420776367188,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.009",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09726369380950928,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    9.376738548278809,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.008",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09101247787475586,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.06102399528026581,
+                    0.0,
+                    0.0,
+                    1.0,
+                    8.498221397399902,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.007",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.08850256353616714,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    7.686483383178711,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.006",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.009555190801620483,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    6.891465187072754,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.005",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.04739624261856079,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    6.034074306488037,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.004",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.04739624261856079,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    2.1476333141326904,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.003",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.009555190801620483,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    2.865511178970337,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.002",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.08850256353616714,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    3.651731491088867,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere.001",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09101247787475586,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.06102399528026581,
+                    0.0,
+                    0.0,
+                    1.0,
+                    4.4451470375061035,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Sphere",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Sphere/Sphere",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        1.0,
+                        "1",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -0.09726369380950928,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    5.258302688598633,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Plane",
+            "material_refs": [
+                "Material"
+            ],
+            "nodes": [],
+            "object_ref": "geom_Plane/Plane",
+            "particle_refs": [],
+            "traits": [
+                {
+                    "class_name": "RigidBody",
+                    "parameters": [
+                        0,
+                        "0",
+                        0.5
+                    ],
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    -0.028123676776885986,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "geometry_node"
+        },
+        {
+            "id": "Lamp",
+            "nodes": [],
+            "object_ref": "Lamp",
+            "traits": [],
+            "transform": {
+                "values": [
+                    -0.29086464643478394,
+                    -0.7711008191108704,
+                    0.5663931965827942,
+                    -0.23205995559692383,
+                    0.9551711678504944,
+                    -0.1998833566904068,
+                    0.21839119493961334,
+                    16.012027740478516,
+                    -0.05518905818462372,
+                    0.6045247316360474,
+                    0.7946722507476807,
+                    19.420507431030273,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "light_node"
+        },
+        {
+            "id": "Camera",
+            "nodes": [],
+            "object_ref": "Camera",
+            "traits": [
+                {
+                    "class_name": "FlyCamera",
+                    "type": "Script"
+                }
+            ],
+            "transform": {
+                "values": [
+                    -6.397578431460715e-07,
+                    -0.75763338804245,
+                    0.6526803374290466,
+                    2.5279128551483154,
+                    1.0,
+                    -1.3783752592644305e-06,
+                    -6.198215487529524e-07,
+                    -4.5903374257250107e-07,
+                    1.3692359743799898e-06,
+                    0.6526803374290466,
+                    0.75763338804245,
+                    2.975632905960083,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "camera_node"
+        }
+    ],
+    "particle_resources": [],
+    "speaker_resources": []
+}
