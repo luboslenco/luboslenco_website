@@ -1,0 +1,79 @@
+{
+    "shader_resources": [
+        {
+            "contexts": [
+                {
+                    "compare_mode": "always", 
+                    "constants": [
+                        {
+                            "id": "invVP", 
+                            "link": "_inverseViewProjectionMatrix", 
+                            "type": "mat4"
+                        }, 
+                        {
+                            "id": "eye", 
+                            "link": "_cameraPosition", 
+                            "type": "vec3"
+                        }, 
+                        {
+                            "id": "LMVP", 
+                            "link": "_lightModelViewProjectionMatrix", 
+                            "type": "mat4"
+                        }, 
+                        {
+                            "id": "light", 
+                            "link": "_lightPosition", 
+                            "type": "vec3"
+                        }, 
+                        {
+                            "id": "eyeLook", 
+                            "link": "_cameraLook", 
+                            "type": "vec3"
+                        }
+                    ], 
+                    "cull_mode": "none", 
+                    "depth_write": true, 
+                    "fragment_shader": "deferred_light.frag", 
+                    "id": "deferred_light", 
+                    "texture_units": [
+                        {
+                            "id": "gbuffer0"
+                        }, 
+                        {
+                            "id": "gbuffer1"
+                        }, 
+                        {
+                            "id": "gbuffer2"
+                        }, 
+                        {
+                            "id": "ssaotex"
+                        }, 
+                        {
+                            "id": "shadowMap"
+                        }, 
+                        {
+                            "id": "senvmapRadiance", 
+                            "link": "_envmapRadiance"
+                        }, 
+                        {
+                            "id": "senvmapIrradiance", 
+                            "link": "_envmapIrradiance"
+                        }, 
+                        {
+                            "id": "senvmapBrdf", 
+                            "link": "_envmapBrdf"
+                        }
+                    ], 
+                    "vertex_shader": "deferred_light.vert"
+                }
+            ], 
+            "id": "deferred_light", 
+            "vertex_structure": [
+                {
+                    "name": "pos", 
+                    "size": 2
+                }
+            ]
+        }
+    ]
+}

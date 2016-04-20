@@ -1,0 +1,51 @@
+{
+    "shader_resources": [
+        {
+            "contexts": [
+                {
+                    "compare_mode": "always", 
+                    "constants": [
+                        {
+                            "id": "eye", 
+                            "link": "_cameraPosition", 
+                            "type": "vec3"
+                        }, 
+                        {
+                            "id": "light", 
+                            "link": "_lightPosition", 
+                            "type": "vec3"
+                        }, 
+                        {
+                            "id": "VP", 
+                            "link": "_viewProjectionMatrix", 
+                            "type": "mat4"
+                        }
+                    ], 
+                    "cull_mode": "none", 
+                    "depth_write": true, 
+                    "fragment_shader": "compositor_pass.frag", 
+                    "id": "compositor_pass", 
+                    "texture_units": [
+                        {
+                            "id": "tex"
+                        }, 
+                        {
+                            "id": "gbuffer0"
+                        }, 
+                        {
+                            "id": "gbuffer1"
+                        }
+                    ], 
+                    "vertex_shader": "compositor_pass.vert"
+                }
+            ], 
+            "id": "compositor_pass", 
+            "vertex_structure": [
+                {
+                    "name": "pos", 
+                    "size": 2
+                }
+            ]
+        }
+    ]
+}

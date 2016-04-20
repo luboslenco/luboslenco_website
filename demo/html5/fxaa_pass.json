@@ -1,0 +1,29 @@
+{
+    "shader_resources": [
+        {
+            "contexts": [
+                {
+                    "compare_mode": "always", 
+                    "constants": [], 
+                    "cull_mode": "none", 
+                    "depth_write": true, 
+                    "fragment_shader": "fxaa_pass.frag", 
+                    "id": "fxaa_pass", 
+                    "texture_units": [
+                        {
+                            "id": "tex"
+                        }
+                    ], 
+                    "vertex_shader": "fxaa_pass.vert"
+                }
+            ], 
+            "id": "fxaa_pass", 
+            "vertex_structure": [
+                {
+                    "name": "pos", 
+                    "size": 2
+                }
+            ]
+        }
+    ]
+}

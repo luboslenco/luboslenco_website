@@ -1,0 +1,29 @@
+{
+    "shader_resources": [
+        {
+            "contexts": [
+                {
+                    "compare_mode": "always", 
+                    "constants": [], 
+                    "cull_mode": "none", 
+                    "depth_write": true, 
+                    "fragment_shader": "bloom_pass.frag", 
+                    "id": "bloom_pass", 
+                    "texture_units": [
+                        {
+                            "id": "tex"
+                        }
+                    ], 
+                    "vertex_shader": "bloom_pass.vert"
+                }
+            ], 
+            "id": "bloom_pass", 
+            "vertex_structure": [
+                {
+                    "name": "pos", 
+                    "size": 2
+                }
+            ]
+        }
+    ]
+}
