@@ -1,19 +1,642 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width"/>
-  <title>Notes</title>
-
+  <title>LubosLenco.com / Notes</title>
   <link rel="stylesheet" href="css/styles.css?v=1.0">
 </head>
 
 <body>
-<h1 id="blog">Lorem - 14/01/16</h1>
-<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+
+<a href="#3d_game_engine_intro">
+<h1 style="text-align:center" id="3d_game_engine_intro">3D Game Engine Intro</h1>
+</a>
+
+<h6 style="text-align:center">April/28/16</h6>
+
+<p>
+  <h6 style="text-align:center">Jump to<br/>
+    <a href="#3d_game_engine_intro_what">What</a> |
+    <a href="#3d_game_engine_intro_why">Why</a> |
+    <a href="#3d_game_engine_intro_how">How</a> |
+    <a href="#3d_game_engine_intro_renderer">Renderer</a> |
+    <a href="#3d_game_engine_intro_render_path_composition">Render path composition</a> |
+    <a href="#3d_game_engine_intro_material_system">Material system</a> |
+    <a href="#3d_game_engine_intro_material_compilation">Material compilation</a> |
+    <a href="#3d_game_engine_intro_logic_system">Logic system</a> |
+    <a href="#3d_game_engine_intro_game_player">Game Player</a> |
+    <a href="#3d_game_engine_intro_performance">Performance</a> |
+    <a href="#3d_game_engine_intro_license">License</a> |
+    <a href="#3d_game_engine_intro_release_onwards">Release</a> |
+    <a href="#3d_game_engine_intro_video_clips">Video clips</a>
+    </h6>
+</p>
+
+<p><a href="2015_04_25/editor.jpg"><img src="2015_04_25/editor.jpg" alt=""/></a></p>
+<p>(Click to enlarge)</p>
+
+<p>
+<a href="#3d_game_engine_intro_what">
+<h2 id="3d_game_engine_intro_what">What</h2>
+</a>
+</p>
+
+<p>I have finally got myself to write a proper introduction of a project integrating <b>modern 3D
+game engine into Blender</b> (almost 2 years in development now)!<p/>
+
+<p>The 'code-name' of project is <b>Cycles Game Engine</b> - intention was to express it is
+based completely on nodes (like <b>Cycles Render</b> does - the Blender path-tracing renderer)
+and offer a familiar name. Ultimately the name will likely change, to not cause
+any confusion.</p>
+
+<p>As I started gathering the feedback from Blender users, the response was tremendous!
+I have been overwhelmed by the amount of positive comments.
+As usual with 3D engine development, there are also 'realistic' voices opposing it.
+We live in ages when you are not advised to make <b>serious 3D engines</b>,
+as you can no longer match the big teams and unlimited resources the giants possess.
+</p>
+
+<p>
+3D game development is such a broad topic, it deserves to explore and discover new ways of creating.
+Of course chasing a feature list of the giants is a dead-end.
+If you are going to reinvent the wheel, don't make it rounder, <b>change how it works</b> instead,
+even at a risk of failing terribly!
+</p>
+
+<p>
+Blender is a master piece of open-source with extremely active development.
+You can file a bug report and get it fixed in less than a day.
+The realtime / interactive content in general is a huge part that <b>Blender could excel
+at</b> but is lacking currently - even companies like NASA, IKEA, McLaren find a great use of realtime engines now.
+I want a <b>viable open-source alternative</b> on this front,
+that is all this project is about. There is no need to dominate the world as long
+as people using it <b>enjoy it</b>.
+</p>
+
+<p>
+In conclusion, the support has been fantastic. There is already so much enthusiasm and passion
+around the project.
+I have been carefully <b>gathering the feedback</b> to know what are the crucial things people are looking for.
+I have lurked everywhere for all kinds of
+engine programming wizardry that is going on these days.
+As the project moves forward, it is reaching time to <b>open up</b>!
+</p>
+
+<p>
+<a href="#3d_game_engine_intro_why">
+<h2 id="3d_game_engine_intro_why">Why</h2> 
+</a>
+</p>
+
+<h6>New workflow</h6>
+<p>
+I loved the idea of common ground for a complete game authoring - from
+content creation to interactive game world building.
+<b>Blender integration</b> is the sole point of this thing, offering a unique workflow.
+There is a <b>huge ecosystem</b> around Blender, you can use existing add-ons to generate
+architecture and then turn it into interactive simulation straight from Blender,
+potentially with support for <b>virtual reality</b>.
+Edit / sculpt / paint the models without hassle.
+Adjust rigged mesh animation on the fly. Use terrain / trees / foliage generators for landscapes,
+animation creation helpers, texture bakers, LoD generators, geometry modifiers...
+You might easily write custom object generators using existing Blender API
+or any tools that might suit your project to <b>speed you up</b>. The possibilities are endless.
+</p>
+
+<p>
+This is something that well established engines are seriously experimenting with too
+(ie. actively spending resources on it) -
+either by building integrated tools or by specialized plugins to create meshes <b>in-engine</b>.
+
+With that said, while Blender still is an essential tool
+for working with 3D game engines, in the future it may be getting more competition
+from game engines themself, at least for small-scale modelling.
+</p>
+
+<h6>Unmatched portability</h6>
+<p>
+The engine needs to be able to run on desktops, consoles, mobile and web with no
+compromises. It needs to run on a platform announced <b>tomorrow</b>.
+The common approach is to tie the renderer to OpenGL/ES/WebGL. For games,
+this is <b>disastrous</b> choice today. There are lots of different graphics APIs now,
+in order to maximize <b>portability and performance</b> on each platform we need to
+take advantage of this. What if one of the major platforms decide to axe
+OpenGL in favor of Vulkan/Metal/D3D12 in the future? Refactoring these things
+in an existing code-bases not prepared for this is a huge and painful task.
+</p>
+
+<p>
+The core of the engine has been developed will all this in mind,
+making it possible to add new targets/graphics APIs without rewriting existing code.
+There is already support for OpenGL/ES/WebGL, D3D9/11/12, Metal and Vulkan.
+The output to JavaScript is very straightforward making WebGL <b>first-class citizen</b>,
+preventing bloated file sizes and slow performance
+that regular engines compiled from C++ face.
+</p>
+
+<h6>State of art renderer</h6>
+<p>
+One of the goals was clean, flexible and <b>powerful render system</b>. 3D graphics features are
+not an afterthought. You want to spend as little effort to achieve 'wow, you did that?'
+effect instead of 'it looks like poop!'.
+While there is still a horde of features to implement, the process is most of the time
+<b>very straightforward</b>.
+</p>
+
+<p>
+A standard <b>metalness PBR</b> workflow is used, which makes it possible to
+easily <b>exchange content</b> with other game engines or import content from your favorite
+PBR enabled tools. There is nothing new to learn for game artists, which are already
+accustomed to this.
+</p>
+
+<p>
+On top of that, you can render each scene with Cycles Render path-tracer too,
+since the materials are compatible with subset of regular cycles nodes.
+</p>
+
+<p>
+<h6>Open</h6>
+The language, core, engine and tooling used are all open-source. It is easy to <b>fork</b>
+any part of it in case you need to. You may have noticed a huge usage of FBX today,
+a proprietary file format. A special care is placed to not fall short here and focus on
+<b>open pipelines</b>.
+</p>
+
+
+<p>
+<a href="#3d_game_engine_intro_how">
+<h2 id="3d_game_engine_intro_how">How</h2>
+</a>
+</p>
+
+<h6>Technologic & Bold</h6>
+<p>
+The engine is built on <b>Kha</b> - the most exciting technology I
+ever discovered. It handles all the low-level hard work flawlessly, forming
+a rock solid base. There is a 'generational' graphics/audio API pattern,
+ensuring we always use the <b>most relevant</b> technology. It is completely <b>self
+contained</b> - there is no any sort of dependency hell.
+It goes even further by integrating a build system with project generators, 
+powerful shader compiler,
+asset optimizer, IDE with full debugging support, ...
+</p>
+
+<p>
+<a href="2015_04_25/ide.jpg"><img src="2015_04_25/ide.jpg" alt=""/></a>
+</p>
+
+<p>
+<b>Python</b> is used to write Blender add-ons and it excels at doing so.
+For actual game logic, <b>Haxe</b> is used - a language at a level of C# or Java.
+This is the key to <b>superior portability</b> over purely native C++ engines or purely
+JS engines, while still maintaining good performance.
+We can still utilize C++ code for native targets, and JS for the web respectively.
+For visual programming a system of <b>logic nodes</b> is available.
+</p>
+
+<h6>Independent</h6>
+Engine tooling is purely <b>add-on based</b> - there is no special build
+of Blender required. This is all possible thanks to the very powerful scripting system. 
+It is not dependant on the development cycle of Blender
+which makes engine development itself independent and flexible.
+
+<h6>Together</h6>
+When you sum it up, the engine code itself is just a <b>small part</b> in a full view.
+Blender already offers a <b>stunning editor</b> with loads of features that can be leveraged and
+loads more in development. The low levels parts belonging to Kha are improving at
+very fast pace <b>every day</b>. The Haxe language itself is refining and adding
+new targets that can be used to conquer <b>new platforms</b>.
+When one part grows, the rest can grow with it. The goal is to
+live in harmony with these tools.
+
+<p>
+<a href="#3d_game_engine_intro_renderer">
+<h2 id="3d_game_engine_intro_renderer">Renderer</h2>
+</a>
+</p>
+
+<p>
+While still having ways to go, a decent set of features is already integrated out of the box.
+Bloom, gaussian blur, lens flares, volumetric fog, tone-mapping, lens distortion, vignette,
+depth of field, FXAA, motion blur, screen space ambient occlusion,
+ray-traced reflections and more are available. Additionally, it is easy
+to write <b>custom shaders</b> using modern GLSL.
+</p>
+
+<p>
+<b>Skinning</b> can be performed either using GPU or CPU, although currently in a basic form.
+<b>Particles</b> are rendered using GPU instancing in a single draw call.
+</p>
+
+<p>
+Render path is <b>fully programmable</b>, with <b>forward</b> and <b>deferred</b> path included.
+Considerable effort has already been placed on a deferred renderer optimization. At a minimum
+it can run using just 2 float textures(or half-floats at a cost of precision),
+using multiple render targets.
+Position is reconstructed from depth using ray interpolation, 
+octahedron encoding is used for normals and metalness / roughness is packed into single channel.
+Base color, mask and occlusion are also stored.
+</p>
+
+<p>
+Fully HDR enabled lighting:
+</p>
+<a href="2015_04_25/hdr.jpg"><img src="2015_04_25/hdr.jpg" alt=""/></a>
+
+<p>
+Video textures with real-time ray-traced reflections:
+</p>
+<a href="2015_04_25/ssr.jpg"><img src="2015_04_25/ssr.jpg" alt=""/></a>
+
+<p>
+Basic bloom, lens-flare, vignette and lens distortion:
+</p>
+<a href="2015_04_25/lensflare.jpg"><img src="2015_04_25/lensflare.jpg" alt=""/></a>
+
+<p>
+Interactive 3D GUI:
+</p>
+<a href="2015_04_25/3dgui.jpg"><img src="2015_04_25/3dgui.jpg" alt=""/></a>
+
+
+<p>
+<a href="#3d_game_engine_intro_render_path_composition">
+<h2 id="3d_game_engine_intro_render_path_composition">Render path composition</h2>
+</a>
+</p>
+
+<p>
+This is one of the most crucial parts of the engine. Since the render path is <b>programmable</b>,
+we can assembly it visually <b>using nodes</b> - it is then easy to see how the frame is being
+constructed, edit it, change the shaders contexts or further optimize it.
+</p>
+
+<p>
+For basics there is no need to alter this, as deferred and forward paths <b>come bundled</b>.
+You can edit existing paths to suit your needs, or use different paths on different
+targets. 
+</p>
+
+<p>
+Let's take a look at the simplest path. We clear the color and depth and do a geometry pass.
+</p>
+<a href="2015_04_25/path_forward_noshadow.jpg"><img src="2015_04_25/path_forward_noshadow.jpg" alt=""/></a>
+
+<p>
+'Draw World' is used to draw <b>environment map</b> for the background. The world nodes may look
+like this.
+</p>
+<a href="2015_04_25/path_world.jpg"><img src="2015_04_25/path_world.jpg" alt=""/></a>
+
+<p>
+If we are to draw shadows too, we render a shadow map in advance and then simply
+<b>attach it</b> when doing a forward geometry pass.
+</p>
+<a href="2015_04_25/path_forward.jpg"><img src="2015_04_25/path_forward.jpg" alt=""/></a>
+
+<p>
+A complete deferred render path with tons of post-processing may look like this.
+There are quite some steps now, but still <b>easily manageable</b>.
+</p>
+<a href="2015_04_25/path_deferred.jpg"><img src="2015_04_25/path_deferred.jpg" alt=""/></a>
+
+<p>
+If you are familiar with <b>shader programming</b>, you may know that we need to use two
+render targets for various post processing effects. We can simply check the 'Ping Pong'
+box below and act like it is possible to draw to and read from render target <b>at the same time</b>.
+You can also see we can configure <b>any</b> render target, even with MRT support.
+</p>
+<a href="2015_04_25/path_pong.jpg"><img src="2015_04_25/path_pong.jpg" alt=""/></a>
+
+<p>
+Using this approach and a bit of preprocessing, I created a proof of concept <b>path-tracing renderer</b>.
+Every other part of the engine is <b>still in place</b> - physics, logic, portability.
+It's important to note that this is only concept, no arbitrary geometry is supported,
+it only does spheres, cubes and planes for now. And it's still noisy of course.
+The path can be improved in the future independently,
+but I would also like to explore mixing the rasterized rendering with path-tracing
+for some effects.
+</p>
+<a href="2015_04_25/path_pathtrace.jpg"><img src="2015_04_25/path_pathtrace.jpg" alt=""/></a>
+
+<p>
+And the result, rendered in <b>real time</b>.
+</p>
+<a href="2015_04_25/path_pathtrace_render.jpg"><img src="2015_04_25/path_pathtrace_render.jpg" alt=""/></a>
+
+
+<p>
+<a href="#3d_game_engine_intro_material_system">
+<h2 id="3d_game_engine_intro_material_system">Material system</h2>
+</a>
+</p>
+
+<p>
+Another greatly important part, the material system! We use a <b>subset</b> of standard
+Cycles nodes, which you may already be familiar with. If the material is usable in
+game engine, you can be sure it is also <b>compatible</b> with Cycles Render. This is not
+yet true vice-versa, as real-time rendering needs to be more constrained to achieve good
+frame times. 
+</p>
+
+<p>
+The most basic material with <b>Diffuse BSDF</b> node used as default in Blender
+will work just as it is.
+</p>
+<a href="2015_04_25/mat_basic.jpg"><img src="2015_04_25/mat_basic.jpg" alt=""/></a>
+
+<p>
+We employ a bundled node group to setup a <b>PBR material</b>. It is just a single node where
+you can hook your textures, or set the values directly.
+</p>
+<a href="2015_04_25/mat_pbr.jpg"><img src="2015_04_25/mat_pbr.jpg" alt=""/></a>
+
+<p>
+This time taking <b>transparency</b> into account, using the alpha channel of base color.
+</p>
+<a href="2015_04_25/mat_transp.jpg"><img src="2015_04_25/mat_transp.jpg" alt=""/></a>
+
+<p>
+We can also use math or helper nodes, like a <b>checker texture</b>. PBR node group is working
+together with Cycles Render, as you can see below.
+</p>
+<a href="2015_04_25/mat_checker.jpg"><img src="2015_04_25/mat_checker.jpg" alt=""/></a>
+
+<p>
+<a href="#3d_game_engine_intro_material_compilation">
+<h2 id="3d_game_engine_intro_material_compilation">Material compilation</h2>
+</a>
+</p>
+
+<p>
+In order to consume all the materials in <b>efficient way</b>, we process them
+at build stage.
+</p>
+
+<p>
+First, we build the <b>render path nodes</b> attached to camera,
+to figure out which shaders are referenced in the scene.
+If we are running for the first time, Python script is invoked which analyzes used shaders
+and creates all needed <b>shader variants</b> and description files, which serve as a communication
+interface with the renderer. At this stage, thousands of shader variations may be pregenerated,
+which are then ready to be used by materials.
+</p>
+
+<p>
+Next, we go through all the objects and examine used material nodes. We choose a shader
+variant that <b>suits the object</b> perfectly. For example if object contains animation,
+we choose a shader variant with skinning included.
+</p>
+
+<p>
+When exporting <b>object data</b>, we export it based on the materials used -
+for example if normal map texture is attached, we precalculate and export tangent
+geometry data. If they are not needed we skip them to <b>save space</b>.
+</p>
+
+<p>
+Finally, we append all used shader files and referenced resources to the <b>project file</b>,
+to include them in build process. These shaders are then picked up by <b>shader compiler</b>
+called <b>krafix</b>. It parses them into SPIR-V and outputs shaders usable by the platform
+we are targeting - various versions of GLSL, ESSL, HLSL, ...
+</p>
+
+<p>
+At this stage, we also precalculate <b>radiance and irradiance maps</b>. This is done using a
+brilliant open-source tool CMFT. Below is an example of irradiance map.
+</p>
+
+<a href="2015_04_25/irradiance.jpg"><img src="2015_04_25/irradiance.jpg" alt=""/></a>
+
+
+<p>
+<a href="#3d_game_engine_intro_logic_system">
+<h2 id="3d_game_engine_intro_logic_system">Logic system</h2>
+</a>
+</p>
+
+<p>
+Now that we can render the scene with ease in real-time,
+it is time to make it <b>feel alive</b>.
+For each object you can specify a set of <b>traits</b> (ie components),
+which can be used to attach logic nodes, instantiate Haxe classes, setup animations, ...
+</p>
+
+<p>
+A set of <b>standard traits</b> is included, such as 'FirstPersonController' to simulate FPS
+camera movement, or 'VehicleController' to setup vehicle with physics.
+Traits are also easily <b>shared</b> among the objects.
+</p>
+
+<p>
+Behind the scenes all traits are <b>translated</b> into Haxe. It basically means
+that when you are composing logic nodes, you are creating Haxe code which
+in turn gets transpilled into C++ or JS (or others, based on target).
+</p>
+<a href="2015_04_25/traits.jpg"><img src="2015_04_25/traits.jpg" alt=""/></a>
+
+<p>
+Small example of logic nodes.
+In this case nodes just move the target object along X axis using sine value,
+and rotate it around Z axis. This is the <b>visual way</b> of composing logic.
+</p>
+
+<a href="2015_04_25/logic_nodes.jpg"><img src="2015_04_25/logic_nodes.jpg" alt=""/></a>
+
+<p>
+<a href="#3d_game_engine_intro_game_player">
+<h2 id="3d_game_engine_intro_game_player">Game player</h2>
+</a>
+</p>
+
+<p>
+In order to make development iteration fast, we need to <b>preview the game</b> as
+quickly as possible while making the experience feel <b>integrated</b> with the environment.
+</p>
+
+<p>
+I explored the possibilities in exhaustive detail - in the end I discovered <b>4 ways</b> to
+play the game directly 'in' Blender, I got all of them to work to some degree.
+</p>
+
+<p>
+<b>1.)</b> Integrate Kore, the C++ foundation of engine into Blender, which would act
+as a game interpreter. The game sources are then compiled to Python which communicates with
+the interpreter.</p>
+<p>
++ Fast<br/>
+- Requires modified Blender build<br/>
+- Hard to manage<br/>
+- Can alter Blender stability
+</p>
+
+<p>
+<b>2.)</b> The second approach is based on the BGL module of Blender, which exposes OpenGL API.
+Whole game gets compiled to Python and hooked to BGL. Unfortunately BGL is not complete
+and there are some issues with it.</p>
+<p>
++ Runs in vanilla Blender<br/>
++ Can not alter Blender stability<br/>
+- Slow<br/>
+- Hard to manage
+</p>
+
+<p>
+<b>3.)</b> The engine can run at extraordinary speeds in JS. What if chromium was integrated
+directly into Blender which would then run the game? I integrated Chromium Embedded Framework,
+just to figure out rendering into an existing context is far, far from straightforward.
+</p>
+
+<p>
+<b>4.)</b> I expanded on the previous idea. What if we could run standalone electron app exactly
+how we need it? Turns out you can easily scale and reposition the window, run it frameless,
+always on top, hide in taskbar, and also hide the whole window conveniently. Blender just needs to communicate
+the game player area coordinates using Python and send those to electron. As a bonus,
+we can use integrated IDE as electron player, so the size of SDK is not affected at all!</p>
+<p>
++ Runs in vanilla Blender<br/>
++ Can not alter Blender stability<br/>
++ Fast<br/>
++ Easy to manage<br/>
+- A little weird<br/>
+</p>
+
+<p>
+The <b>number 4</b> is a winner right now. There is another target
+coming into Kha, which may improve on this even more.
+</p>
+
+<p>
+<a href="#3d_game_engine_intro_performance">
+<h2 id="3d_game_engine_intro_performance">Performance</h2>
+</a>
+</p>
+
+<p>
+There will be a <b>separate post</b> focusing purely on performance and benchmarking
+with respect to different targets.
+The shaders are already after a few rounds of optimizations, cutting the frame time
+of deferred renderer almost in a half of original. Integrated Intel HD 5100 card is capable
+of running the 800x600 FPS template at <b>60 FPS in a web browser</b>, which is already
+very satisfying for relatively slow card. As always, there is still
+plenty of improvements to do.
+</p>
+
+<p>
+<a href="#3d_game_engine_intro_license">
+<h2 id="3d_game_engine_intro_license">License</h2>
+</a>
+</p>
+
+<p>
+Blender add-on suite is licensed under GPL.
+The core of engine which Blender add-on feeds data into is licensed under LGPL, which
+is <b>less restrictive</b>.
+The intention is that if you fork it you have to make it public so <b>others can benefit</b> from it,
+but you can do <b>whatever you want</b> with <b>your</b> game.
+</p>
+
+<p>
+<a href="#3d_game_engine_intro_release_onwards">
+<h2 id="3d_game_engine_intro_release_onwards">Release & Onwards</h2>
+</a>
+</p>
+
+<p>
+This is it! I summed up some of the most important parts. 
+Care will have to be placed on assets management, viewport rendering in Blender
+and danger of clutter. Further progress will be made in following areas.
+</p>
+
+<p>
+<b>Current focus:</b>
+<ul>
+<li>World streaming</li>
+<li>UI designer</li>
+<li>Documentation & polishing</li>
+</ul>
+</p>
+
+<p>
+<b>Features being developed in Kha:</b>
+<ul>
+<li>Networking</li>
+<li>Virtual reality</li>
+<li>3D audio</li>
+<li>Live editing (Krom)</li>
+</ul>
+</p>
+
+<p>
+I am starting to look for ways to fund the project - until a reasonable way is found,
+the engine may be paid. This may limit the
+audience initially, which is not a bad thing as there will be lot of things to fix.
+Eventually, the plan is to release for
+free and fund using other means. There will be <b>no separate paid modules</b> or any
+splash screen nonsense. Users should be able to include engine logo at their <b>own will</b>
+if they are proud to do so. The engine will always <b>stay open-source</b>.
+First release will be hopefuly ready
+by the <b>end of May</b>, aimed purely for curious minds and testing.
+</p>
+
+<p>
+The rendering system itself is <b>not tied</b> to Blender and will be also released separately,
+in a hope to aid in realtime 3D development in Kha.
+All the low level changes that are used in engine are already
+pushed back to Kha, so you may already benefit from those -
+just start being a <b>Kha developer</b> today :)
+These are absolutely great times for GPU programming!
+</p>
+
+<p>
+If you are by any chance interested in contributing & testing & feedback, <b>get in touch</b>!
+</p>
+<p>
+<a href="https://twitter.com/luboslenco">@luboslenco</a>,
+<script language="JavaScript">
+var user_name = "lubos.lenco";
+var host_name = "gmail.com";
+var link_text = user_name + "@" + host_name;
+document.write("<a href='" + "mail" + "to:" + user_name + "@" + host_name + "'>" + link_text + "</a>");
+</script>
+</p>
+
+<p>
+<a href="#3d_game_engine_intro_video_clips">
+<h2 id="3d_game_engine_intro_video_clips">Video clips</h2>
+</a>
+</p>
+
+<p>
+Some recordings from the development to finish off.
+</p>
+
+<iframe width="560" height="315" frameBorder="0"
+src="http://www.youtube.com/embed/qYhK4v3EvMU?autoplay=0">
+</iframe>
+<br/>
+<iframe width="560" height="315" frameBorder="0"
+src="http://www.youtube.com/embed/tgJogOYtLF0?autoplay=0">
+</iframe>
+<br/>
+<iframe width="560" height="315" frameBorder="0"
+src="http://www.youtube.com/embed/DzOTzvA09ck?autoplay=0">
+</iframe>
+
+<p>
+<a href="#3d_game_engine_intro_links">
+<h2 id="3d_game_engine_intro_links">Links</h2>
+</a>
+</p>
+
+<ul>
+<li><a href="https://www.blender.org">Blender</a></li>
+<li><a href="https://github.com/KTXSoftware/Kha">Kha</a></li>
+<li><a href="https://github.com/KTXSoftware/Kore">Kore</a></li>
+<li><a href="https://github.com/KTXSoftware/krafix">Krafix</a></li>
+<li><a href="http://haxe.org">Haxe</a></li>
+<li><a href="https://github.com/dariomanesku/cmft">CMFT</a></li>
+</ul>
