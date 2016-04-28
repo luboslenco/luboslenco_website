@@ -5,12 +5,18 @@ body {
     color: #bbb;
     font-family: 'Segoe WPC', 'Segoe UI', SFUIText-Light, HelveticaNeue-Light, sans-serif;
     font-size: 1rem;
-    line-height: 1.4;
+    line-height: 1.4;    
 
-    max-width: 35em;
     margin: 0 auto !important;
     float: none !important;
 }
+
+@media (orientation : landscape) {
+    body {
+        max-width: 35em; 
+    }        
+}
+
 a {
     color: #007acc;
     text-decoration: none;
