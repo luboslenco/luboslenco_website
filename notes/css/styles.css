@@ -5,11 +5,7 @@ body {
     color: #bbb;
     font-family: 'Segoe WPC', 'Segoe UI', SFUIText-Light, HelveticaNeue-Light, sans-serif;
     font-size: 1rem;
-    line-height: 1.4;
-
-    max-width: 35em;
-    
-
+    line-height: 1.4;    
 
     margin: 0 auto !important;
     float: none !important;
@@ -17,7 +13,7 @@ body {
 
 @media only screen {
     body {
-        max-width: none; 
+        max-width: 35em; 
     }        
 }
 
