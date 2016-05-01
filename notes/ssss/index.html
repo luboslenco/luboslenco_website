@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width"/>
+  <title>LubosLenco.com / Notes / SSSS</title>
+
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+</head>
+
+<body>
+
+
+<a href="#ssss">
+<h1 style="text-align:center" id="ssss">Subsurface Scattering Implementation</h1>
+</a>
+
+<h6 style="text-align:center">May/01/16</h6>
+
+<p>
+  <h6 style="text-align:center">Jump to<br/>
+    <a href="#ssss_process">Process</a> |
+    <a href="#ssss_video_clip">Video clip</a> |
+    <a href="#ssss_links">Links</a>
+    </h6>
+</p>
+
+<p><a href="images/result.jpg"><img src="images/result.jpg" alt=""/></a></p>
+<p>(Click to enlarge)</p>
+
+<p>
+<a href="#ssss_process">
+<h2 id="ssss_process">Process</h2>
+</a>
+</p>
+
+<h6>Overview</h6>
+
+<p>This page aims to provide a brief look at steps necessary to implement <b>any rendering procedure</b> you might need to achieve desired look. It is specific to a
+project integrating <b>game engine into Blender Cycles</b>. We will implement <b>Separable SSS by iryoku</b>, but these steps generally apply to any technique. Note this goes into low-level internals and it is not needed for general usage
+of the engine.</p>
+
+<p>
+<i>
+"Separable Subsurface Scattering is a technique that allows to efficiently perform subsurface scattering calculations in screen space in just two passes."
+</i>
+</p>
+
+<p>
+Obviously the first thing that needs to be done is to study the paper or laid out your own technique you want to implement. After we are ready with theory part, we jump onto <b>implementation</b>.
+</p>
+
+<h6>Importing geometry data</h6>
+<p>
+We begin by importing the scan of head, which will come handy for testing
+the effect. This is a <b>regular procedure</b> in Blender.
+</p>
+<p><a href="images/obj.jpg"><img src="images/obj.jpg" alt=""/></a></p>
+
+<h6>Setting up material</h6>
+<p>
+A regular PBR material is setup, using base color, roughness and normal map provided with model. This time, it is also being mixed with <b>Subsurface Scattering node</b>.
+Right now it is very, very simplistic as you can see. What happens behind the scenes is that the node is <b>approximated</b> using SSSS technique, to make it run in <b>real-time</b>.
+</p>
+
+<p>
+Since we want to process subsurface scattering only with materials that do <b>contain it</b>, instead of applying it to the whole screen, a stencil mask is set automatically for those materials. Shaders then do the work only for marked pixels in <b>screen-space</b>, which makes it run very fast. For your own shaders you can also set this mask manually, as it is <b>exposed</b> in material properties.
+</p>
+<p><a href="images/mat.jpg"><img src="images/mat.jpg" alt=""/></a></p>
+
+<h6>Render path nodes</h6>
+<p>
+The most interesting part is <b>setting up the shaders</b>. We prepare it
+in GLSL and write a small descriptor file picked up by shader processing script.
+This file just <b>links</b> needed <b>uniforms</b> and sets some of the render pipeline properties. Since the SSSS shader works in two passes, we make two <b>shader contexts</b> - one horizontal and one vertical. The first one will link the <b>direction uniform</b> to vec2(1.0, 0.0), while the other one will use vec2(0.0, 1.0).
+</p>
+
+<p>
+Now we need to hook up the shaders to the render path, as described
+in SSSS paper. We implement it into <b>deferred</b> render path, since SSSS is a
+post-processing technique. As advised, we set it up <b>before tonemapping</b>, 
+which happens in the compositor pass.
+</p>
+
+<p>
+The first pass is invoked by taking the <b>final color framebuffer</b> as input and storing the results into a <b>temporal framebuffer</b>. We go a little further here. To not create additional buffer and save memory, a framebuffer from gbuffer that was already processed is <b>reused</b>. That enables us to still use
+this technique at minimum setup, using gbuffer composed of
+two float textures with four channels, which at half precision fit into 128bit - exactly the size we need to cram into to also run reasonably at (newer) <b>mobile GPUs</b>, which have 128 bits of per-pixel on-chip memory.
+</p>
+
+<p>
+We then just add two passes referencing horizontal and vertical SSS shader <b>contexts</b>.
+</p>
+<p><a href="images/path.jpg"><img src="images/path.jpg" alt=""/></a></p>
+
+<h6>Head rotation</h6>
+<p>
+To better showcase the effect, we want to rotate the head with <b>minimum effort</b>.
+We throw these nodes together and add them as a <b>trait</b> to the head object.
+</p>
+<p><a href="images/logic.jpg"><img src="images/logic.jpg" alt=""/></a></p>
+
+<p>
+<a href="#ssss_video_clip">
+<h2 id="ssss_video_clip">Video clip</h2>
+</a>
+</p>
+
+<p>
+<b>The result!</b> Plenty of color/effect tweaking could be done to <b>improve</b> the look further, which would be much better handled by experienced artist.
+</p>
+
+<p>
+In case of any feedback, <b>get in touch</b>!<br/>
+<a href="https://twitter.com/luboslenco">@luboslenco</a>,
+<script language="JavaScript">
+var user_name = "lubos.lenco";
+var host_name = "gmail.com";
+var link_text = user_name + "@" + host_name;
+document.write("<a href='" + "mail" + "to:" + user_name + "@" + host_name + "'>" + link_text + "</a>");
+</script>
+</p>
+
+<p>
+<iframe width="560" height="315" frameBorder="0"
+src="http://www.youtube.com/embed/3kIqvqDnWt8?autoplay=0">
+</iframe>
+</p>
+
+<p>
+<a href="#ssss_links">
+<h2 id="ssss_links">Links</h2>
+</a>
+</p>
+
+<ul>
+<li><a href="http://www.iryoku.com/separable-sss/">Separable SSS Paper</a></li>
+<li><a href="http://ten24.info/skin-shading-in-unity/">Head Scan by Ten24</a></li>
+<li><a href="http://www.hdrlabs.com/sibl/archive.html">HDR Map</a></li>
+<li><a href="http://luboslenco.com/notes">Engine intro</a></li>
+<li><a href="https://www.blender.org">Blender</a></li>
+<li><a href="https://github.com/KTXSoftware/Kha">Kha</a></li>
+<li><a href="http://haxe.org">Haxe</a></li>
+</ul>
