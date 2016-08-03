@@ -1,1 +1,0 @@
-{"material_resources":[{"contexts":[{"bind_constants":[],"bind_textures":[{"name":"envmap","id":"envmap"}],"id":"env_map"}],"shader":"env_map/env_map","id":"World_material"}]}
