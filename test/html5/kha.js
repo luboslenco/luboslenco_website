@@ -189,6 +189,7 @@ Main.start = function() {
 		iron_App.init(function() {
 			iron_App.notifyOnRender2D(armory_trait_internal_LoadBar.render);
 			iron_Scene.setActive("Scene",function(object) {
+				iron_RenderPath.setActive(armory_renderpath_RenderPathCreator.get());
 			});
 		});
 	});
@@ -444,6 +445,177 @@ armory_object_Uniforms.externalFloatLink = function(clink) {
 var armory_renderpath_DynamicResolutionScale = function() { };
 $hxClasses["armory.renderpath.DynamicResolutionScale"] = armory_renderpath_DynamicResolutionScale;
 armory_renderpath_DynamicResolutionScale.__name__ = true;
+var armory_renderpath_RenderPathCreator = function() { };
+$hxClasses["armory.renderpath.RenderPathCreator"] = armory_renderpath_RenderPathCreator;
+armory_renderpath_RenderPathCreator.__name__ = true;
+armory_renderpath_RenderPathCreator.get = function() {
+	armory_renderpath_RenderPathCreator.path = new iron_RenderPath();
+	armory_renderpath_RenderPathCreator.init();
+	armory_renderpath_RenderPathCreator.path.commands = armory_renderpath_RenderPathCreator.commands;
+	return armory_renderpath_RenderPathCreator.path;
+};
+armory_renderpath_RenderPathCreator.init = function() {
+	armory_renderpath_RenderPathCreator.path.loadMaterial("_worldMaterial");
+	armory_renderpath_RenderPathCreator.path.createDepthBuffer("main","DEPTH24");
+	var t = new iron_RenderTargetRaw();
+	t.name = "tex";
+	t.width = 0;
+	t.height = 0;
+	t.displayp = null;
+	t.format = "RGBA64";
+	var ss = 1;
+	if(ss != 1) {
+		t.scale = ss;
+	}
+	t.depth_buffer = "main";
+	armory_renderpath_RenderPathCreator.path.createRenderTarget(t);
+	var t1 = new iron_RenderTargetRaw();
+	t1.name = "buf";
+	t1.width = 0;
+	t1.height = 0;
+	t1.displayp = null;
+	t1.format = "RGBA64";
+	var ss1 = 1;
+	if(ss1 != 1) {
+		t1.scale = ss1;
+	}
+	armory_renderpath_RenderPathCreator.path.createRenderTarget(t1);
+	armory_renderpath_RenderPathCreator.path.createDepthBuffer("main","DEPTH24");
+	var t2 = new iron_RenderTargetRaw();
+	t2.name = "gbuffer0";
+	t2.width = 0;
+	t2.height = 0;
+	t2.displayp = null;
+	t2.format = "RGBA64";
+	var ss2 = 1;
+	if(ss2 != 1) {
+		t2.scale = ss2;
+	}
+	t2.depth_buffer = "main";
+	armory_renderpath_RenderPathCreator.path.createRenderTarget(t2);
+	var t3 = new iron_RenderTargetRaw();
+	t3.name = "gbuffer1";
+	t3.width = 0;
+	t3.height = 0;
+	t3.displayp = null;
+	t3.format = "RGBA64";
+	var ss3 = 1;
+	if(ss3 != 1) {
+		t3.scale = ss3;
+	}
+	armory_renderpath_RenderPathCreator.path.createRenderTarget(t3);
+	armory_renderpath_RenderPathCreator.path.loadShader("deferred_indirect/deferred_indirect/deferred_indirect");
+	armory_renderpath_RenderPathCreator.path.loadShader("deferred_light/deferred_light/deferred_light");
+	armory_renderpath_RenderPathCreator.path.loadShader("deferred_light_quad/deferred_light_quad/deferred_light_quad");
+	armory_renderpath_RenderPathCreator.path.loadShader("ssao_pass/ssao_pass/ssao_pass");
+	armory_renderpath_RenderPathCreator.path.loadShader("blur_edge_pass/blur_edge_pass/blur_edge_pass_x");
+	armory_renderpath_RenderPathCreator.path.loadShader("blur_edge_pass/blur_edge_pass/blur_edge_pass_y");
+	var t4 = new iron_RenderTargetRaw();
+	t4.name = "bufa";
+	t4.width = 0;
+	t4.height = 0;
+	t4.displayp = null;
+	t4.format = "RGBA32";
+	var ss4 = 1;
+	if(ss4 != 1) {
+		t4.scale = ss4;
+	}
+	armory_renderpath_RenderPathCreator.path.createRenderTarget(t4);
+	var t5 = new iron_RenderTargetRaw();
+	t5.name = "bufb";
+	t5.width = 0;
+	t5.height = 0;
+	t5.displayp = null;
+	t5.format = "RGBA32";
+	var ss5 = 1;
+	if(ss5 != 1) {
+		t5.scale = ss5;
+	}
+	armory_renderpath_RenderPathCreator.path.createRenderTarget(t5);
+	armory_renderpath_RenderPathCreator.path.loadShader("compositor_pass/compositor_pass/compositor_pass");
+	armory_renderpath_RenderPathCreator.path.loadShader("smaa_edge_detect/smaa_edge_detect/smaa_edge_detect");
+	armory_renderpath_RenderPathCreator.path.loadShader("smaa_blend_weight/smaa_blend_weight/smaa_blend_weight");
+	armory_renderpath_RenderPathCreator.path.loadShader("smaa_neighborhood_blend/smaa_neighborhood_blend/smaa_neighborhood_blend");
+};
+armory_renderpath_RenderPathCreator.commands = function() {
+	armory_renderpath_RenderPathCreator.path.setTarget("gbuffer0",["gbuffer1"]);
+	armory_renderpath_RenderPathCreator.path.clearTarget(null,1.0);
+	armory_renderpath_RenderPathCreator.path.drawMeshes("mesh");
+	armory_renderpath_RenderPathCreator.path.setTarget("bufa");
+	armory_renderpath_RenderPathCreator.path.bindTarget("_main","gbufferD");
+	armory_renderpath_RenderPathCreator.path.bindTarget("gbuffer0","gbuffer0");
+	armory_renderpath_RenderPathCreator.path.drawShader("ssao_pass/ssao_pass/ssao_pass");
+	armory_renderpath_RenderPathCreator.path.setTarget("bufb");
+	armory_renderpath_RenderPathCreator.path.bindTarget("bufa","tex");
+	armory_renderpath_RenderPathCreator.path.bindTarget("gbuffer0","gbuffer0");
+	armory_renderpath_RenderPathCreator.path.drawShader("blur_edge_pass/blur_edge_pass/blur_edge_pass_x");
+	armory_renderpath_RenderPathCreator.path.setTarget("bufa");
+	armory_renderpath_RenderPathCreator.path.bindTarget("bufb","tex");
+	armory_renderpath_RenderPathCreator.path.bindTarget("gbuffer0","gbuffer0");
+	armory_renderpath_RenderPathCreator.path.drawShader("blur_edge_pass/blur_edge_pass/blur_edge_pass_y");
+	armory_renderpath_RenderPathCreator.path.setTarget("tex");
+	armory_renderpath_RenderPathCreator.path.bindTarget("_main","gbufferD");
+	armory_renderpath_RenderPathCreator.path.bindTarget("gbuffer0","gbuffer0");
+	armory_renderpath_RenderPathCreator.path.bindTarget("gbuffer1","gbuffer1");
+	armory_renderpath_RenderPathCreator.path.bindTarget("bufa","ssaotex");
+	armory_renderpath_RenderPathCreator.path.drawShader("deferred_indirect/deferred_indirect/deferred_indirect");
+	var lamps = iron_Scene.active.lamps;
+	var _g1 = 0;
+	var _g = lamps.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var l = lamps[i];
+		if(!l.visible) {
+			continue;
+		}
+		armory_renderpath_RenderPathCreator.path.currentLampIndex = i;
+		if(armory_renderpath_RenderPathCreator.path.lampCastShadow()) {
+			var faces = l.data.raw.shadowmap_cube ? 6 : 1;
+			var _g3 = 0;
+			var _g2 = faces;
+			while(_g3 < _g2) {
+				var i1 = _g3++;
+				if(faces > 1) {
+					armory_renderpath_RenderPathCreator.path.currentFace = i1;
+				}
+				armory_renderpath_RenderPathCreator.path.setTarget("shadowMap");
+				armory_renderpath_RenderPathCreator.path.clearTarget(null,1.0);
+				armory_renderpath_RenderPathCreator.path.drawMeshes("shadowmap");
+			}
+			armory_renderpath_RenderPathCreator.path.currentFace = -1;
+		}
+		armory_renderpath_RenderPathCreator.path.setTarget("tex");
+		armory_renderpath_RenderPathCreator.path.bindTarget("_main","gbufferD");
+		armory_renderpath_RenderPathCreator.path.bindTarget("gbuffer0","gbuffer0");
+		armory_renderpath_RenderPathCreator.path.bindTarget("gbuffer1","gbuffer1");
+		if(armory_renderpath_RenderPathCreator.path.lampCastShadow()) {
+			armory_renderpath_RenderPathCreator.path.bindTarget("shadowMap","shadowMap");
+		}
+		if(armory_renderpath_RenderPathCreator.path.lampIsSun()) {
+			armory_renderpath_RenderPathCreator.path.drawShader("deferred_light_quad/deferred_light_quad/deferred_light_quad");
+		} else {
+			armory_renderpath_RenderPathCreator.path.drawLampVolume("deferred_light/deferred_light/deferred_light");
+		}
+	}
+	armory_renderpath_RenderPathCreator.path.currentLampIndex = 0;
+	armory_renderpath_RenderPathCreator.path.drawSkydome("_worldMaterial");
+	var framebuffer = "";
+	armory_renderpath_RenderPathCreator.path.setTarget("buf");
+	armory_renderpath_RenderPathCreator.path.bindTarget("tex","tex");
+	armory_renderpath_RenderPathCreator.path.drawShader("compositor_pass/compositor_pass/compositor_pass");
+	armory_renderpath_RenderPathCreator.path.setTarget("bufa");
+	armory_renderpath_RenderPathCreator.path.clearTarget(0);
+	armory_renderpath_RenderPathCreator.path.bindTarget("buf","colorTex");
+	armory_renderpath_RenderPathCreator.path.drawShader("smaa_edge_detect/smaa_edge_detect/smaa_edge_detect");
+	armory_renderpath_RenderPathCreator.path.setTarget("bufb");
+	armory_renderpath_RenderPathCreator.path.clearTarget(0);
+	armory_renderpath_RenderPathCreator.path.bindTarget("bufa","edgesTex");
+	armory_renderpath_RenderPathCreator.path.drawShader("smaa_blend_weight/smaa_blend_weight/smaa_blend_weight");
+	armory_renderpath_RenderPathCreator.path.setTarget(framebuffer);
+	armory_renderpath_RenderPathCreator.path.bindTarget("buf","colorTex");
+	armory_renderpath_RenderPathCreator.path.bindTarget("bufb","blendTex");
+	armory_renderpath_RenderPathCreator.path.drawShader("smaa_neighborhood_blend/smaa_neighborhood_blend/smaa_neighborhood_blend");
+};
 var armory_trait_internal_LoadBar = function() { };
 $hxClasses["armory.trait.internal.LoadBar"] = armory_trait_internal_LoadBar;
 armory_trait_internal_LoadBar.__name__ = true;
@@ -2315,6 +2487,12 @@ iron_math_Vec4.prototype = {
 		this.w = w;
 		return this;
 	}
+	,addf: function(x,y,z) {
+		this.x += x;
+		this.y += y;
+		this.z += z;
+		return this;
+	}
 	,addvecs: function(a,b) {
 		this.x = a.x + b.x;
 		this.y = a.y + b.y;
@@ -2325,6 +2503,35 @@ iron_math_Vec4.prototype = {
 		this.x *= f;
 		this.y *= f;
 		this.z *= f;
+		return this;
+	}
+	,dot: function(v) {
+		return this.x * v.x + this.y * v.y + this.z * v.z;
+	}
+	,setFrom: function(v) {
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+		return this;
+	}
+	,applymat: function(m) {
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+		this.x = m.self._00 * x + m.self._10 * y + m.self._20 * z + m.self._30;
+		this.y = m.self._01 * x + m.self._11 * y + m.self._21 * z + m.self._31;
+		this.z = m.self._02 * x + m.self._12 * y + m.self._22 * z + m.self._32;
+		return this;
+	}
+	,applymat4: function(m) {
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+		var w = this.w;
+		this.x = m.self._00 * x + m.self._10 * y + m.self._20 * z + m.self._30 * w;
+		this.y = m.self._01 * x + m.self._11 * y + m.self._21 * z + m.self._31 * w;
+		this.z = m.self._02 * x + m.self._12 * y + m.self._22 * z + m.self._32 * w;
+		this.w = m.self._03 * x + m.self._13 * y + m.self._23 * z + m.self._33 * w;
 		return this;
 	}
 	,__class__: iron_math_Vec4
@@ -2758,6 +2965,37 @@ iron_math_Mat4.prototype = {
 		this.mult(1.0 / det);
 		return this;
 	}
+	,transpose: function() {
+		var tmp = this.self._01;
+		this.self._01 = this.self._10;
+		this.self._10 = tmp;
+		tmp = this.self._02;
+		this.self._02 = this.self._20;
+		this.self._20 = tmp;
+		tmp = this.self._03;
+		this.self._03 = this.self._30;
+		this.self._30 = tmp;
+		tmp = this.self._12;
+		this.self._12 = this.self._21;
+		this.self._21 = tmp;
+		tmp = this.self._13;
+		this.self._13 = this.self._31;
+		this.self._31 = tmp;
+		tmp = this.self._23;
+		this.self._23 = this.self._32;
+		this.self._32 = tmp;
+	}
+	,transpose3x3: function() {
+		var tmp = this.self._01;
+		this.self._01 = this.self._10;
+		this.self._10 = tmp;
+		tmp = this.self._02;
+		this.self._02 = this.self._20;
+		this.self._20 = tmp;
+		tmp = this.self._12;
+		this.self._12 = this.self._21;
+		this.self._21 = tmp;
+	}
 	,setF32: function(a,offset) {
 		if(offset == null) {
 			offset = 0;
@@ -2835,22 +3073,161 @@ iron_math_Mat4.prototype = {
 		_g15.self._33 *= s;
 		return this;
 	}
+	,toRotation: function() {
+		var v1 = new iron_math_Vec4();
+		var _this = v1.set(this.self._00,this.self._01,this.self._02);
+		var scaleX = 1.0 / Math.sqrt(_this.x * _this.x + _this.y * _this.y + _this.z * _this.z);
+		var _this1 = v1.set(this.self._10,this.self._11,this.self._12);
+		var scaleY = 1.0 / Math.sqrt(_this1.x * _this1.x + _this1.y * _this1.y + _this1.z * _this1.z);
+		var _this2 = v1.set(this.self._20,this.self._21,this.self._22);
+		var scaleZ = 1.0 / Math.sqrt(_this2.x * _this2.x + _this2.y * _this2.y + _this2.z * _this2.z);
+		this.self._00 *= scaleX;
+		this.self._01 *= scaleX;
+		this.self._02 *= scaleX;
+		this.self._03 = 0.0;
+		this.self._10 *= scaleY;
+		this.self._11 *= scaleY;
+		this.self._12 *= scaleY;
+		this.self._13 = 0.0;
+		this.self._20 *= scaleZ;
+		this.self._21 *= scaleZ;
+		this.self._22 *= scaleZ;
+		this.self._23 = 0.0;
+		this.self._30 = 0.0;
+		this.self._31 = 0.0;
+		this.self._32 = 0.0;
+		this.self._33 = 1.0;
+		return this;
+	}
+	,setLookAt: function(eye,center,up) {
+		var f0 = center.x - eye.x;
+		var f1 = center.y - eye.y;
+		var f2 = center.z - eye.z;
+		var n = 1.0 / Math.sqrt(f0 * f0 + f1 * f1 + f2 * f2);
+		f0 *= n;
+		f1 *= n;
+		f2 *= n;
+		var s0 = f1 * up.z - f2 * up.y;
+		var s1 = f2 * up.x - f0 * up.z;
+		var s2 = f0 * up.y - f1 * up.x;
+		n = 1.0 / Math.sqrt(s0 * s0 + s1 * s1 + s2 * s2);
+		s0 *= n;
+		s1 *= n;
+		s2 *= n;
+		var u0 = s1 * f2 - s2 * f1;
+		var u1 = s2 * f0 - s0 * f2;
+		var u2 = s0 * f1 - s1 * f0;
+		var d0 = -eye.x * s0 - eye.y * s1 - eye.z * s2;
+		var d1 = -eye.x * u0 - eye.y * u1 - eye.z * u2;
+		var d2 = eye.x * f0 + eye.y * f1 + eye.z * f2;
+		this.self._00 = s0;
+		this.self._10 = s1;
+		this.self._20 = s2;
+		this.self._30 = d0;
+		this.self._01 = u0;
+		this.self._11 = u1;
+		this.self._21 = u2;
+		this.self._31 = d1;
+		this.self._02 = -f0;
+		this.self._12 = -f1;
+		this.self._22 = -f2;
+		this.self._32 = d2;
+		this.self._03 = 0.0;
+		this.self._13 = 0.0;
+		this.self._23 = 0.0;
+		this.self._33 = 1.0;
+		return this;
+	}
+	,write: function(ar,offset) {
+		if(offset == null) {
+			offset = 0;
+		}
+		ar[offset] = this.self._00;
+		ar[offset + 1] = this.self._01;
+		ar[offset + 2] = this.self._02;
+		ar[offset + 3] = this.self._03;
+		ar[offset + 4] = this.self._10;
+		ar[offset + 5] = this.self._11;
+		ar[offset + 6] = this.self._12;
+		ar[offset + 7] = this.self._13;
+		ar[offset + 8] = this.self._20;
+		ar[offset + 9] = this.self._21;
+		ar[offset + 10] = this.self._22;
+		ar[offset + 11] = this.self._23;
+		ar[offset + 12] = this.self._30;
+		ar[offset + 13] = this.self._31;
+		ar[offset + 14] = this.self._32;
+		ar[offset + 15] = this.self._33;
+	}
 	,__class__: iron_math_Mat4
 };
 var iron_RenderPath = function() {
+	this.depthBuffers = [];
+	this.currentMaterial = null;
 	this.depthToRenderTarget = new haxe_ds_StringMap();
 	this.renderTargets = new haxe_ds_StringMap();
 	this.commands = null;
+	this.cachedShaderContexts = new haxe_ds_StringMap();
 	this.loading = 0;
 	this.currentLampIndex = 0;
 	this.lastH = 0;
 	this.lastW = 0;
+	this.viewportScaled = false;
+	this.scissorSet = false;
+	this.frameScissorH = 0;
+	this.frameScissorW = 0;
+	this.frameScissorY = 0;
+	this.frameScissorX = 0;
+	this.frameScissor = false;
+	var tempty = new iron_RenderTargetRaw();
+	tempty.name = "arm_empty";
+	tempty.width = 1;
+	tempty.height = 1;
+	tempty.format = "DEPTH16";
+	this.createRenderTarget(tempty);
+	var temptyCube = new iron_RenderTargetRaw();
+	temptyCube.name = "arm_empty_cube";
+	temptyCube.width = 1;
+	temptyCube.height = 1;
+	temptyCube.format = "DEPTH16";
+	temptyCube.is_cubemap = true;
+	this.createRenderTarget(temptyCube);
 };
 $hxClasses["iron.RenderPath"] = iron_RenderPath;
 iron_RenderPath.__name__ = true;
+iron_RenderPath.setActive = function(renderPath) {
+	iron_RenderPath.active = renderPath;
+};
+iron_RenderPath.sortMeshes = function(meshes,camera) {
+	var camX = camera.transform.world.self._30;
+	var camY = camera.transform.world.self._31;
+	var camZ = camera.transform.world.self._32;
+	var _g = 0;
+	while(_g < meshes.length) {
+		var mesh = meshes[_g];
+		++_g;
+		var vx = camX - mesh.transform.world.self._30;
+		var vy = camY - mesh.transform.world.self._31;
+		var vz = camZ - mesh.transform.world.self._32;
+		mesh.cameraDistance = Math.sqrt(vx * vx + vy * vy + vz * vz);
+	}
+	meshes.sort(function(a,b) {
+		if(a.cameraDistance >= b.cameraDistance) {
+			return 1;
+		} else {
+			return -1;
+		}
+	});
+};
 iron_RenderPath.prototype = {
 	get_ready: function() {
 		return this.loading == 0;
+	}
+	,lampCastShadow: function() {
+		return (iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null).data.raw.cast_shadow;
+	}
+	,lampIsSun: function() {
+		return (iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null).data.raw.type == "sun";
 	}
 	,renderFrame: function(g) {
 		if(!this.get_ready()) {
@@ -2881,6 +3258,323 @@ iron_RenderPath.prototype = {
 		}
 		this.commands();
 	}
+	,setTarget: function(target,additional,viewportScale) {
+		if(viewportScale == null) {
+			viewportScale = 1.0;
+		}
+		if(target == "") {
+			this.currentG = this.frameG;
+			this.currentW = kha_System.windowWidth();
+			this.currentH = kha_System.windowHeight();
+			this.currentD = 1;
+			this.currentCube = false;
+			this.currentFace = -1;
+			if(this.frameScissor) {
+				this.setFrameScissor();
+			}
+			var g = this.currentG;
+			g.begin(null);
+		} else {
+			var _this = this.renderTargets;
+			var rt = __map_reserved[target] != null ? _this.getReserved(target) : _this.h[target];
+			if(target == "shadowMap" && (iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null).data.raw.shadowmap_cube) {
+				var _this1 = this.renderTargets;
+				var key = target + "Cube";
+				if(__map_reserved[key] != null) {
+					rt = _this1.getReserved(key);
+				} else {
+					rt = _this1.h[key];
+				}
+				if(rt == null) {
+					var size = (iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null).data.raw.shadowmap_size | 0;
+					var t = new iron_RenderTargetRaw();
+					t.name = target + "Cube";
+					t.width = size;
+					t.height = size;
+					t.format = "DEPTH16";
+					t.is_cubemap = true;
+					rt = this.createRenderTarget(t);
+				}
+			}
+			if(target == "shadowMap" && rt == null) {
+				var sizew = (iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null).data.raw.shadowmap_size;
+				var sizeh = sizew;
+				sizew = sizeh * iron_object_LampObject.cascadeCount;
+				var t1 = new iron_RenderTargetRaw();
+				t1.name = target;
+				t1.width = sizew;
+				t1.height = sizeh;
+				t1.format = "DEPTH16";
+				rt = this.createRenderTarget(t1);
+			}
+			var additionalImages = null;
+			if(additional != null) {
+				additionalImages = [];
+				var _g = 0;
+				while(_g < additional.length) {
+					var s = additional[_g];
+					++_g;
+					var _this2 = this.renderTargets;
+					var t2 = __map_reserved[s] != null ? _this2.getReserved(s) : _this2.h[s];
+					additionalImages.push(t2.image);
+				}
+			}
+			this.currentG = rt.isCubeMap ? rt.cubeMap.get_g4() : rt.image.get_g4();
+			this.currentW = rt.isCubeMap ? rt.cubeMap.get_width() : rt.image.get_width();
+			this.currentH = rt.isCubeMap ? rt.cubeMap.get_height() : rt.image.get_height();
+			if(rt.is3D) {
+				this.currentD = rt.image.get_depth();
+			}
+			this.currentCube = rt.isCubeMap;
+			var g1 = this.currentG;
+			var face = this.currentFace;
+			if(face >= 0) {
+				g1.beginFace(5 - face);
+			} else {
+				g1.begin(additionalImages);
+			}
+		}
+		if(viewportScale != 1.0) {
+			this.viewportScaled = true;
+			var viewW = this.currentW * viewportScale | 0;
+			var viewH = this.currentH * viewportScale | 0;
+			this.currentG.viewport(0,viewH,viewW,viewH);
+			this.currentG.scissor(0,viewH,viewW,viewH);
+		} else if(this.viewportScaled) {
+			this.viewportScaled = false;
+			this.setCurrentViewport(this.currentW,this.currentH);
+			this.setCurrentScissor(this.currentW,this.currentH);
+		}
+		this.bindParams = null;
+	}
+	,setCurrentViewport: function(viewW,viewH) {
+		this.currentG.viewport(0,this.currentH - viewH,viewW,viewH);
+	}
+	,setCurrentScissor: function(viewW,viewH) {
+		this.currentG.scissor(0,this.currentH - viewH,viewW,viewH);
+		this.scissorSet = true;
+	}
+	,setFrameScissor: function() {
+		this.frameG.scissor(this.frameScissorX,this.currentH - (this.frameScissorH - this.frameScissorY),this.frameScissorW,this.frameScissorH);
+	}
+	,clearTarget: function(colorFlag,depthFlag) {
+		if(colorFlag == -1) {
+			colorFlag = iron_Scene.active.world.raw.background_color;
+		}
+		this.currentG.clear(colorFlag,depthFlag,null);
+	}
+	,drawMeshes: function(context) {
+		var lamp = iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null;
+		if(lamp != null && !lamp.visible) {
+			if(this.currentLampIndex > 0) {
+				return;
+			}
+		}
+		var isShadows = context == "shadowmap";
+		if(isShadows) {
+			if(lamp == null || !lamp.data.raw.cast_shadow) {
+				return;
+			}
+		}
+		if(this.currentFace >= 0 && lamp != null) {
+			lamp.setCubeFace(5 - this.currentFace,iron_Scene.active.camera);
+		}
+		var g = this.currentG;
+		var drawn = false;
+		if(isShadows && lamp.data.raw.type == "sun") {
+			var step = this.currentH;
+			var _g1 = 0;
+			var _g = iron_object_LampObject.cascadeCount;
+			while(_g1 < _g) {
+				var i = _g1++;
+				lamp.setCascade(iron_Scene.active.camera,i);
+				g.viewport(i * step,0,step,step);
+				this.submitDraw(context);
+			}
+			drawn = true;
+		}
+		if(!drawn) {
+			this.submitDraw(context);
+		}
+		g.end();
+		if(this.scissorSet) {
+			g.disableScissor();
+			this.scissorSet = false;
+		}
+		this.bindParams = null;
+	}
+	,submitDraw: function(context) {
+		var lamp = iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null;
+		var g = this.currentG;
+		if(!this.meshesSorted) {
+			iron_RenderPath.sortMeshes(iron_Scene.active.meshes,iron_Scene.active.camera);
+			this.meshesSorted = true;
+		}
+		var _g = 0;
+		var _g1 = iron_Scene.active.meshes;
+		while(_g < _g1.length) {
+			var m = _g1[_g];
+			++_g;
+			m.render(g,context,iron_Scene.active.camera,lamp,this.bindParams);
+		}
+	}
+	,parseMaterialLink: function(handle) {
+		if(handle == "_worldMaterial" && iron_Scene.active.world != null) {
+			return iron_Scene.active.world.raw.material_ref.split("/");
+		}
+		return null;
+	}
+	,drawSkydome: function(handle) {
+		if(iron_data_ConstData.skydomeVB == null) {
+			iron_data_ConstData.createSkydomeData();
+		}
+		var _this = this.cachedShaderContexts;
+		var cc = __map_reserved[handle] != null ? _this.getReserved(handle) : _this.h[handle];
+		if(cc.context == null) {
+			return;
+		}
+		var g = this.currentG;
+		g.setPipeline(cc.context.pipeState);
+		var lamp = iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null;
+		iron_object_Uniforms.setConstants(g,cc.context,null,iron_Scene.active.camera,lamp,this.bindParams);
+		if(cc.materialContext != null) {
+			iron_object_Uniforms.setMaterialConstants(g,cc.context,cc.materialContext);
+		}
+		g.setVertexBuffer(iron_data_ConstData.skydomeVB);
+		g.setIndexBuffer(iron_data_ConstData.skydomeIB);
+		g.drawIndexedVertices();
+		g.end();
+		if(this.scissorSet) {
+			g.disableScissor();
+			this.scissorSet = false;
+		}
+		this.bindParams = null;
+	}
+	,drawLampVolume: function(handle) {
+		var vb = null;
+		var ib = null;
+		var lamp = iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null;
+		var type = lamp.data.raw.type;
+		if(type == "point" || type == "area") {
+			if(iron_data_ConstData.sphereVB == null) {
+				iron_data_ConstData.createSphereData();
+			}
+			vb = iron_data_ConstData.sphereVB;
+			ib = iron_data_ConstData.sphereIB;
+		} else if(type == "spot") {
+			if(iron_data_ConstData.sphereVB == null) {
+				iron_data_ConstData.createSphereData();
+			}
+			vb = iron_data_ConstData.sphereVB;
+			ib = iron_data_ConstData.sphereIB;
+		}
+		var _this = this.cachedShaderContexts;
+		var cc = __map_reserved[handle] != null ? _this.getReserved(handle) : _this.h[handle];
+		var g = this.currentG;
+		g.setPipeline(cc.context.pipeState);
+		iron_object_Uniforms.setConstants(g,cc.context,null,iron_Scene.active.camera,lamp,this.bindParams);
+		if(cc.materialContext != null) {
+			iron_object_Uniforms.setMaterialConstants(g,cc.context,cc.materialContext);
+		}
+		g.setVertexBuffer(vb);
+		g.setIndexBuffer(ib);
+		g.drawIndexedVertices();
+		g.end();
+		if(this.scissorSet) {
+			g.disableScissor();
+			this.scissorSet = false;
+		}
+		this.bindParams = null;
+	}
+	,bindTarget: function(target,uniform) {
+		if(this.bindParams != null) {
+			this.bindParams.push(target);
+			this.bindParams.push(uniform);
+		} else {
+			this.bindParams = [target,uniform];
+		}
+	}
+	,drawShader: function(handle) {
+		var _this = this.cachedShaderContexts;
+		var cc = __map_reserved[handle] != null ? _this.getReserved(handle) : _this.h[handle];
+		this.drawQuad(cc);
+	}
+	,drawQuad: function(cc) {
+		if(iron_data_ConstData.screenAlignedVB == null) {
+			iron_data_ConstData.createScreenAlignedData();
+		}
+		var g = this.currentG;
+		g.setPipeline(cc.context.pipeState);
+		var lamp = iron_Scene.active.lamps.length > 0 ? iron_Scene.active.lamps[this.currentLampIndex] : null;
+		iron_object_Uniforms.setConstants(g,cc.context,null,iron_Scene.active.camera,lamp,this.bindParams);
+		if(cc.materialContext != null) {
+			iron_object_Uniforms.setMaterialConstants(g,cc.context,cc.materialContext);
+		}
+		g.setVertexBuffer(iron_data_ConstData.screenAlignedVB);
+		g.setIndexBuffer(iron_data_ConstData.screenAlignedIB);
+		g.drawIndexedVertices();
+		g.end();
+		if(this.scissorSet) {
+			g.disableScissor();
+			this.scissorSet = false;
+		}
+		this.bindParams = null;
+	}
+	,loadMaterial: function(handle) {
+		var _gthis = this;
+		this.loading++;
+		var _this = this.cachedShaderContexts;
+		var cc = __map_reserved[handle] != null ? _this.getReserved(handle) : _this.h[handle];
+		if(cc != null) {
+			this.loading--;
+			return;
+		}
+		cc = new iron_CachedShaderContext();
+		var _this1 = this.cachedShaderContexts;
+		if(__map_reserved[handle] != null) {
+			_this1.setReserved(handle,cc);
+		} else {
+			_this1.h[handle] = cc;
+		}
+		var matPath = null;
+		if(handle.charAt(0) == "_") {
+			matPath = this.parseMaterialLink(handle);
+		} else {
+			matPath = handle.split("/");
+		}
+		if(matPath == null) {
+			this.loading--;
+			return;
+		}
+		iron_data_Data.getMaterial(matPath[0],matPath[1],function(res) {
+			cc.materialContext = res.getContext(matPath[2]);
+			cc.context = res.shader.getContext(matPath[2]);
+			_gthis.loading--;
+		});
+	}
+	,loadShader: function(handle) {
+		var _gthis = this;
+		this.loading++;
+		var _this = this.cachedShaderContexts;
+		var cc = __map_reserved[handle] != null ? _this.getReserved(handle) : _this.h[handle];
+		if(cc != null) {
+			this.loading--;
+			return;
+		}
+		cc = new iron_CachedShaderContext();
+		var _this1 = this.cachedShaderContexts;
+		if(__map_reserved[handle] != null) {
+			_this1.setReserved(handle,cc);
+		} else {
+			_this1.h[handle] = cc;
+		}
+		var shaderPath = handle.split("/");
+		iron_data_Data.getShader(shaderPath[0],shaderPath[1],null,function(res) {
+			cc.materialContext = null;
+			cc.context = res.getContext(shaderPath[2]);
+			_gthis.loading--;
+		});
+	}
 	,resize: function() {
 		var _this = this.renderTargets;
 		var rt = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
@@ -2896,6 +3590,84 @@ iron_RenderPath.prototype = {
 				}
 			}
 		}
+	}
+	,createRenderTarget: function(t) {
+		var rt = this.createTarget(t);
+		var key = t.name;
+		var _this = this.renderTargets;
+		if(__map_reserved[key] != null) {
+			_this.setReserved(key,rt);
+		} else {
+			_this.h[key] = rt;
+		}
+		return rt;
+	}
+	,createDepthBuffer: function(name,format) {
+		this.depthBuffers.push({ name : name, format : format});
+	}
+	,createTarget: function(t) {
+		var rt = new iron_RenderTarget(t);
+		if(t.depth_buffer != null) {
+			rt.hasDepth = true;
+			var key = t.depth_buffer;
+			var _this = this.depthToRenderTarget;
+			var depthTarget = __map_reserved[key] != null ? _this.getReserved(key) : _this.h[key];
+			if(depthTarget == null) {
+				var _g = 0;
+				var _g1 = this.depthBuffers;
+				while(_g < _g1.length) {
+					var db = _g1[_g];
+					++_g;
+					if(db.name == t.depth_buffer) {
+						var key1 = db.name;
+						var _this1 = this.depthToRenderTarget;
+						if(__map_reserved[key1] != null) {
+							_this1.setReserved(key1,rt);
+						} else {
+							_this1.h[key1] = rt;
+						}
+						var s = db.format;
+						var tmp;
+						if(s == null || s == "") {
+							tmp = 1;
+						} else {
+							switch(s) {
+							case "DEPTH16":
+								tmp = 5;
+								break;
+							case "DEPTH24":
+								tmp = 1;
+								break;
+							default:
+								tmp = 1;
+							}
+						}
+						rt.depthStencil = tmp;
+						rt.image = this.createImage(t,rt.depthStencil);
+						break;
+					}
+				}
+			} else {
+				rt.depthStencil = 0;
+				rt.depthStencilFrom = t.depth_buffer;
+				rt.image = this.createImage(t,rt.depthStencil);
+				rt.image.setDepthStencilFrom(depthTarget.image);
+			}
+		} else {
+			rt.hasDepth = false;
+			if(t.depth != null && t.depth > 1) {
+				rt.is3D = true;
+			}
+			if(t.is_cubemap) {
+				rt.isCubeMap = true;
+				rt.depthStencil = 0;
+				rt.cubeMap = this.createCubeMap(t,rt.depthStencil);
+			} else {
+				rt.depthStencil = 0;
+				rt.image = this.createImage(t,rt.depthStencil);
+			}
+		}
+		return rt;
 	}
 	,createImage: function(t,depthStencil) {
 		var width = t.width == 0 ? kha_System.windowWidth() : t.width;
@@ -3040,12 +3812,57 @@ iron_RenderPath.prototype = {
 			return kha_Image.createRenderTarget(width,height,tmp2,depthStencil);
 		}
 	}
+	,createCubeMap: function(t,depthStencil) {
+		var tmp;
+		if(t.format != null) {
+			switch(t.format) {
+			case "A16":
+				tmp = kha_graphics4_TextureFormat.A16;
+				break;
+			case "A32":
+				tmp = kha_graphics4_TextureFormat.A32;
+				break;
+			case "A8":
+				tmp = kha_graphics4_TextureFormat.L8;
+				break;
+			case "DEPTH16":
+				tmp = kha_graphics4_TextureFormat.DEPTH16;
+				break;
+			case "R16":
+				tmp = kha_graphics4_TextureFormat.A16;
+				break;
+			case "R32":
+				tmp = kha_graphics4_TextureFormat.A32;
+				break;
+			case "R8":
+				tmp = kha_graphics4_TextureFormat.L8;
+				break;
+			case "RGBA128":
+				tmp = kha_graphics4_TextureFormat.RGBA128;
+				break;
+			case "RGBA32":
+				tmp = kha_graphics4_TextureFormat.RGBA32;
+				break;
+			case "RGBA64":
+				tmp = kha_graphics4_TextureFormat.RGBA64;
+				break;
+			default:
+				tmp = kha_graphics4_TextureFormat.RGBA32;
+			}
+		} else {
+			tmp = kha_graphics4_TextureFormat.RGBA32;
+		}
+		return kha_graphics4_CubeMap.createRenderTarget(t.width,tmp,depthStencil);
+	}
 	,__class__: iron_RenderPath
 	,__properties__: {get_ready:"get_ready"}
 };
 var iron_RenderTargetRaw = function() {
+	this.is_cubemap = null;
 	this.is_image = null;
 	this.depth = null;
+	this.mipmaps = null;
+	this.depth_buffer = null;
 	this.displayp = null;
 	this.scale = null;
 	this.format = null;
@@ -3055,14 +3872,26 @@ iron_RenderTargetRaw.__name__ = true;
 iron_RenderTargetRaw.prototype = {
 	__class__: iron_RenderTargetRaw
 };
-var iron_RenderTarget = function() {
+var iron_RenderTarget = function(raw) {
+	this.isCubeMap = false;
+	this.is3D = false;
+	this.hasDepth = false;
+	this.cubeMap = null;
 	this.image = null;
 	this.depthStencilFrom = "";
+	this.raw = raw;
 };
 $hxClasses["iron.RenderTarget"] = iron_RenderTarget;
 iron_RenderTarget.__name__ = true;
 iron_RenderTarget.prototype = {
 	__class__: iron_RenderTarget
+};
+var iron_CachedShaderContext = function() {
+};
+$hxClasses["iron.CachedShaderContext"] = iron_CachedShaderContext;
+iron_CachedShaderContext.__name__ = true;
+iron_CachedShaderContext.prototype = {
+	__class__: iron_CachedShaderContext
 };
 var iron_Scene = function() {
 	this.traitInits = [];
@@ -4507,6 +5336,89 @@ iron_data_CameraData.__super__ = iron_data_Data;
 iron_data_CameraData.prototype = $extend(iron_data_Data.prototype,{
 	__class__: iron_data_CameraData
 });
+var iron_data_ConstData = function() { };
+$hxClasses["iron.data.ConstData"] = iron_data_ConstData;
+iron_data_ConstData.__name__ = true;
+iron_data_ConstData.createScreenAlignedData = function() {
+	var data = [-1.0,-1.0,3.0,-1.0,-1.0,3.0];
+	var indices = [0,1,2];
+	var structure = new kha_graphics4_VertexStructure();
+	structure.add("pos",kha_graphics4_VertexData.Float2);
+	iron_data_ConstData.screenAlignedVB = new kha_graphics4_VertexBuffer(data.length / (structure.byteSize() / 4 | 0) | 0,structure,kha_graphics4_Usage.StaticUsage);
+	var vertices = iron_data_ConstData.screenAlignedVB.lock();
+	var _g1 = 0;
+	var _g = vertices.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		vertices[i] = data[i];
+	}
+	iron_data_ConstData.screenAlignedVB.unlock();
+	iron_data_ConstData.screenAlignedIB = new kha_graphics4_IndexBuffer(indices.length,kha_graphics4_Usage.StaticUsage);
+	var id = iron_data_ConstData.screenAlignedIB.lock();
+	var _g11 = 0;
+	var _g2 = id.length;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		id[i1] = indices[i1];
+	}
+	iron_data_ConstData.screenAlignedIB.unlock();
+};
+iron_data_ConstData.createSkydomeData = function() {
+	var structure = new kha_graphics4_VertexStructure();
+	structure.add("pos",kha_graphics4_VertexData.Float3);
+	structure.add("nor",kha_graphics4_VertexData.Float3);
+	var structLength = structure.byteSize() / 4 | 0;
+	var pos = iron_data_ConstData.skydomePos;
+	var nor = iron_data_ConstData.skydomeNor;
+	iron_data_ConstData.skydomeVB = new kha_graphics4_VertexBuffer(pos.length / 3 | 0,structure,kha_graphics4_Usage.StaticUsage);
+	var vertices = iron_data_ConstData.skydomeVB.lock();
+	var _g1 = 0;
+	var _g = vertices.length / structLength | 0;
+	while(_g1 < _g) {
+		var i = _g1++;
+		vertices[i * structLength] = pos[i * 3];
+		vertices[i * structLength + 1] = pos[i * 3 + 1];
+		vertices[i * structLength + 2] = pos[i * 3 + 2];
+		vertices[i * structLength + 3] = -nor[i * 3];
+		vertices[i * structLength + 4] = -nor[i * 3 + 1];
+		vertices[i * structLength + 5] = -nor[i * 3 + 2];
+	}
+	iron_data_ConstData.skydomeVB.unlock();
+	var indices = iron_data_ConstData.skydomeIndices;
+	iron_data_ConstData.skydomeIB = new kha_graphics4_IndexBuffer(indices.length,kha_graphics4_Usage.StaticUsage);
+	var id = iron_data_ConstData.skydomeIB.lock();
+	var _g11 = 0;
+	var _g2 = id.length;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		id[i1] = indices[i1];
+	}
+	iron_data_ConstData.skydomeIB.unlock();
+};
+iron_data_ConstData.createSphereData = function() {
+	var structure = new kha_graphics4_VertexStructure();
+	structure.add("pos",kha_graphics4_VertexData.Float3);
+	var data = iron_data_ConstData.spherePos;
+	iron_data_ConstData.sphereVB = new kha_graphics4_VertexBuffer(data.length / (structure.byteSize() / 4 | 0) | 0,structure,kha_graphics4_Usage.StaticUsage);
+	var vertices = iron_data_ConstData.sphereVB.lock();
+	var _g1 = 0;
+	var _g = vertices.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		vertices[i] = data[i];
+	}
+	iron_data_ConstData.sphereVB.unlock();
+	var indices = iron_data_ConstData.sphereIndices;
+	iron_data_ConstData.sphereIB = new kha_graphics4_IndexBuffer(indices.length,kha_graphics4_Usage.StaticUsage);
+	var id = iron_data_ConstData.sphereIB.lock();
+	var _g11 = 0;
+	var _g2 = id.length;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		id[i1] = indices[i1];
+	}
+	iron_data_ConstData.sphereIB.unlock();
+};
 var iron_data_Geometry = function(indices,materialIndices,positions,normals,uvs,uvs1,cols,tangents,bones,weights,usage,instanceOffsets) {
 	this.mats = null;
 	this.actions = null;
@@ -4646,7 +5558,25 @@ iron_data_Geometry.buildVertices = function(vertices,pa,na,uva,uva1,ca,tanga,bon
 	}
 };
 iron_data_Geometry.prototype = {
-	setupInstanced: function(offsets,usage) {
+	applyScale: function(sx,sy,sz) {
+		var vertices = this.vertexBuffer.lock();
+		var _g1 = 0;
+		var _g = vertices.length / this.structLength | 0;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var _g2 = i * this.structLength;
+			var _g3 = vertices;
+			_g3[_g2] *= sx;
+			var _g21 = i * this.structLength + 1;
+			var _g31 = vertices;
+			_g31[_g21] *= sy;
+			var _g22 = i * this.structLength + 2;
+			var _g32 = vertices;
+			_g32[_g22] *= sz;
+		}
+		this.vertexBuffer.unlock();
+	}
+	,setupInstanced: function(offsets,usage) {
 		this.offsetVecs = [];
 		var _g1 = 0;
 		var _g = offsets.length / 3 | 0;
@@ -4854,7 +5784,19 @@ iron_data_MaterialData.parse = function(file,name,done) {
 };
 iron_data_MaterialData.__super__ = iron_data_Data;
 iron_data_MaterialData.prototype = $extend(iron_data_Data.prototype,{
-	__class__: iron_data_MaterialData
+	getContext: function(name) {
+		var _g = 0;
+		var _g1 = this.contexts;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			if(HxOverrides.substr(c.raw.name,0,name.length) == name) {
+				return c;
+			}
+		}
+		return null;
+	}
+	,__class__: iron_data_MaterialData
 });
 var iron_data_MaterialContext = function(raw,done) {
 	this.id = 0;
@@ -4927,7 +5869,14 @@ var iron_data_MaterialContext = function(raw,done) {
 $hxClasses["iron.data.MaterialContext"] = iron_data_MaterialContext;
 iron_data_MaterialContext.__name__ = true;
 iron_data_MaterialContext.prototype = {
-	__class__: iron_data_MaterialContext
+	setTextureParameters: function(g,textureIndex,context,unitIndex) {
+		var tex = this.raw.bind_textures[textureIndex];
+		if(tex.params_set == null) {
+			context.setTextureParameters(g,unitIndex,tex);
+			tex.params_set = true;
+		}
+	}
+	,__class__: iron_data_MaterialContext
 };
 var iron_data_MeshBatch = function() {
 	this.buckets = new haxe_ds_ObjectMap();
@@ -5119,7 +6068,19 @@ iron_data_ShaderData.parse = function(file,name,overrideContext,done) {
 };
 iron_data_ShaderData.__super__ = iron_data_Data;
 iron_data_ShaderData.prototype = $extend(iron_data_Data.prototype,{
-	__class__: iron_data_ShaderData
+	getContext: function(name) {
+		var _g = 0;
+		var _g1 = this.contexts;
+		while(_g < _g1.length) {
+			var c = _g1[_g];
+			++_g;
+			if(c.raw.name == name) {
+				return c;
+			}
+		}
+		return null;
+	}
+	,__class__: iron_data_ShaderData
 });
 var iron_data_ShaderContext = function(raw,overrideContext,done) {
 	this.instancing = false;
@@ -5368,6 +6329,36 @@ iron_data_ShaderContext.prototype = {
 			return kha_graphics4_BlendingFactor.Undefined;
 		}
 	}
+	,getTextureAddresing: function(s) {
+		switch(s) {
+		case "mirror":
+			return kha_graphics4_TextureAddressing.Mirror;
+		case "repeat":
+			return kha_graphics4_TextureAddressing.Repeat;
+		default:
+			return kha_graphics4_TextureAddressing.Clamp;
+		}
+	}
+	,getTextureFilter: function(s) {
+		switch(s) {
+		case "linear":
+			return kha_graphics4_TextureFilter.LinearFilter;
+		case "point":
+			return kha_graphics4_TextureFilter.PointFilter;
+		default:
+			return kha_graphics4_TextureFilter.AnisotropicFilter;
+		}
+	}
+	,getMipmapFilter: function(s) {
+		switch(s) {
+		case "no":
+			return kha_graphics4_MipMapFilter.NoMipFilter;
+		case "point":
+			return kha_graphics4_MipMapFilter.PointMipFilter;
+		default:
+			return kha_graphics4_MipMapFilter.LinearMipFilter;
+		}
+	}
 	,addConstant: function(c) {
 		this.constants.push(this.pipeState.getConstantLocation(c.name));
 	}
@@ -5375,9 +6366,15 @@ iron_data_ShaderContext.prototype = {
 		var unit = this.pipeState.getTextureUnit(tu.name);
 		this.textureUnits.push(unit);
 	}
+	,setTextureParameters: function(g,unitIndex,tex) {
+		var unit = this.textureUnits[unitIndex];
+		g.setTextureParameters(unit,tex.u_addressing == null ? kha_graphics4_TextureAddressing.Repeat : this.getTextureAddresing(tex.u_addressing),tex.v_addressing == null ? kha_graphics4_TextureAddressing.Repeat : this.getTextureAddresing(tex.v_addressing),tex.min_filter == null ? kha_graphics4_TextureFilter.LinearFilter : this.getTextureFilter(tex.min_filter),tex.mag_filter == null ? kha_graphics4_TextureFilter.LinearFilter : this.getTextureFilter(tex.mag_filter),tex.mipmap_filter == null ? kha_graphics4_MipMapFilter.NoMipFilter : this.getMipmapFilter(tex.mipmap_filter));
+	}
 	,__class__: iron_data_ShaderContext
 };
 var iron_data_WorldData = function(raw,done) {
+	this.vec = new iron_math_Vec4();
+	this.shirr = null;
 	var _gthis = this;
 	iron_data_Data.call(this);
 	this.raw = raw;
@@ -5412,9 +6409,68 @@ iron_data_WorldData.parse = function(name,id,done) {
 		new iron_data_WorldData(raw,done);
 	});
 };
+iron_data_WorldData.getEmptyIrradiance = function() {
+	if(iron_data_WorldData.emptyIrr == null) {
+		var this1 = new Array(28);
+		iron_data_WorldData.emptyIrr = this1;
+		var _g1 = 0;
+		var _g = iron_data_WorldData.emptyIrr.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			iron_data_WorldData.emptyIrr[i] = 0.0;
+		}
+	}
+	return iron_data_WorldData.emptyIrr;
+};
 iron_data_WorldData.__super__ = iron_data_Data;
 iron_data_WorldData.prototype = $extend(iron_data_Data.prototype,{
-	__class__: iron_data_WorldData
+	getGlobalProbe: function() {
+		return this.probes[0];
+	}
+	,getSHIrradiance: function() {
+		if(this.shirr == null) {
+			var this1 = new Array(28);
+			this.shirr = this1;
+			var p = this.probes[0];
+			var _g1 = 0;
+			var _g = p.irradiance.length;
+			while(_g1 < _g) {
+				var j = _g1++;
+				this.shirr[j] = p.irradiance[j];
+			}
+		}
+		return this.shirr;
+	}
+	,getProbeID: function(t) {
+		this.vec.x = t.world.self._30;
+		this.vec.y = t.world.self._31;
+		this.vec.z = t.world.self._32;
+		var dim = t.dim;
+		var _g1 = 1;
+		var _g = this.probes.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var p = this.probes[i];
+			if(this.vec.x + dim.x / 2 < p.volumeMin.x || this.vec.x - dim.x / 2 > p.volumeMax.x || this.vec.y + dim.y / 2 < p.volumeMin.y || this.vec.y - dim.y / 2 > p.volumeMax.y || this.vec.z + dim.z / 2 < p.volumeMin.z || this.vec.z - dim.z / 2 > p.volumeMax.z) {
+				continue;
+			}
+			return i;
+		}
+		return 0;
+	}
+	,getProbeVolumeCenter: function(t) {
+		return this.probes[this.getProbeID(t)].volumeCenter;
+	}
+	,getProbeVolumeSize: function(t) {
+		return this.probes[this.getProbeID(t)].volume;
+	}
+	,getProbeStrength: function(t) {
+		return this.probes[this.getProbeID(t)].raw.strength;
+	}
+	,getProbeBlending: function(t) {
+		return this.probes[this.getProbeID(t)].raw.blending;
+	}
+	,__class__: iron_data_WorldData
 });
 var iron_data_Probe = function(raw,done) {
 	var _gthis = this;
@@ -5483,6 +6539,28 @@ iron_data_Probe.prototype = {
 		}
 	}
 	,__class__: iron_data_Probe
+};
+var iron_math_Mat3 = function(_00,_10,_20,_01,_11,_21,_02,_12,_22) {
+	this.self = new kha_math_FastMatrix3(_00,_10,_20,_01,_11,_21,_02,_12,_22);
+};
+$hxClasses["iron.math.Mat3"] = iron_math_Mat3;
+iron_math_Mat3.__name__ = true;
+iron_math_Mat3.identity = function() {
+	return new iron_math_Mat3(1,0,0,0,1,0,0,0,1);
+};
+iron_math_Mat3.prototype = {
+	setFrom4: function(m) {
+		this.self._00 = m.self._00;
+		this.self._01 = m.self._01;
+		this.self._02 = m.self._02;
+		this.self._10 = m.self._10;
+		this.self._11 = m.self._11;
+		this.self._12 = m.self._12;
+		this.self._20 = m.self._20;
+		this.self._21 = m.self._21;
+		this.self._22 = m.self._22;
+	}
+	,__class__: iron_math_Mat3
 };
 var iron_math_Quat = function(x,y,z,w) {
 	if(w == null) {
@@ -6095,11 +7173,14 @@ iron_object_BoneAnimation.prototype = $extend(iron_object_Animation.prototype,{
 });
 var iron_object_Object = function() {
 	this.isEmpty = false;
+	this.culledShadow = false;
+	this.culledMesh = false;
 	this.culled = false;
 	this.visibleShadow = true;
 	this.visibleMesh = true;
 	this.visible = true;
 	this.animation = null;
+	this.lods = null;
 	this.children = [];
 	this.parent = null;
 	this.traits = [];
@@ -6305,6 +7386,31 @@ iron_object_CameraObject.buildViewFrustum = function(VP,frustumPlanes) {
 		plane.normalize();
 	}
 };
+iron_object_CameraObject.sphereInFrustum = function(frustumPlanes,t,radiusScale,offsetX,offsetY,offsetZ) {
+	if(offsetZ == null) {
+		offsetZ = 0.0;
+	}
+	if(offsetY == null) {
+		offsetY = 0.0;
+	}
+	if(offsetX == null) {
+		offsetX = 0.0;
+	}
+	if(radiusScale == null) {
+		radiusScale = 1.0;
+	}
+	var radius = t.radius * radiusScale;
+	var _g = 0;
+	while(_g < frustumPlanes.length) {
+		var plane = frustumPlanes[_g];
+		++_g;
+		iron_object_CameraObject.sphereCenter.set(t.world.self._30 + offsetX,t.world.self._31 + offsetY,t.world.self._32 + offsetZ);
+		if(plane.distanceToSphere(iron_object_CameraObject.sphereCenter,radius) + radius * 2 < 0) {
+			return false;
+		}
+	}
+	return true;
+};
 iron_object_CameraObject.__super__ = iron_object_Object;
 iron_object_CameraObject.prototype = $extend(iron_object_Object.prototype,{
 	buildProjection: function() {
@@ -6353,6 +7459,9 @@ iron_object_FrustumPlane.prototype = {
 		var inverseNormalLength = 1.0 / Math.sqrt(_this.x * _this.x + _this.y * _this.y + _this.z * _this.z);
 		this.normal.mult(inverseNormalLength);
 		this.constant *= inverseNormalLength;
+	}
+	,distanceToSphere: function(sphereCenter,sphereRadius) {
+		return this.normal.dot(sphereCenter) + this.constant - sphereRadius;
 	}
 	,__class__: iron_object_FrustumPlane
 };
@@ -6411,10 +7520,13 @@ iron_object_DecalObject.prototype = $extend(iron_object_Object.prototype,{
 	,__class__: iron_object_DecalObject
 });
 var iron_object_LampObject = function(data) {
+	this.bias = iron_math_Mat4.identity();
 	this.frustumPlanes = null;
 	this.VP = iron_math_Mat4.identity();
 	this.P = null;
 	this.V = iron_math_Mat4.identity();
+	this.camSlicedP = null;
+	this.cascadeData = null;
 	iron_object_Object.call(this);
 	this.data = data;
 	var type = data.raw.type;
@@ -6438,6 +7550,16 @@ var iron_object_LampObject = function(data) {
 };
 $hxClasses["iron.object.LampObject"] = iron_object_LampObject;
 iron_object_LampObject.__name__ = true;
+iron_object_LampObject.setCorners = function() {
+	iron_object_LampObject.corners[0].set(-1.0,-1.0,1.0);
+	iron_object_LampObject.corners[1].set(-1.0,-1.0,-1.0);
+	iron_object_LampObject.corners[2].set(-1.0,1.0,1.0);
+	iron_object_LampObject.corners[3].set(-1.0,1.0,-1.0);
+	iron_object_LampObject.corners[4].set(1.0,-1.0,1.0);
+	iron_object_LampObject.corners[5].set(1.0,-1.0,-1.0);
+	iron_object_LampObject.corners[6].set(1.0,1.0,1.0);
+	iron_object_LampObject.corners[7].set(1.0,1.0,-1.0);
+};
 iron_object_LampObject.__super__ = iron_object_Object;
 iron_object_LampObject.prototype = $extend(iron_object_Object.prototype,{
 	remove: function() {
@@ -6453,6 +7575,113 @@ iron_object_LampObject.prototype = $extend(iron_object_Object.prototype,{
 			this.updateViewFrustum(camera);
 		}
 	}
+	,setCascade: function(camera,cascade) {
+		iron_object_LampObject.m.setFrom(camera.V);
+		if(this.camSlicedP == null) {
+			this.camSlicedP = [];
+			this.cascadeSplit = [];
+			var aspect = camera.data.raw.aspect != null ? camera.data.raw.aspect : kha_System.windowWidth() / kha_System.windowHeight();
+			var fov = camera.data.raw.fov;
+			var near = camera.data.raw.near_plane;
+			var far = camera.data.raw.far_plane;
+			var factor = iron_object_LampObject.cascadeCount > 2 ? iron_object_LampObject.cascadeSplitFactor : iron_object_LampObject.cascadeSplitFactor * 0.25;
+			var _g1 = 0;
+			var _g = iron_object_LampObject.cascadeCount;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var f = i + 1.0;
+				var cfar = (near + f / iron_object_LampObject.cascadeCount * (far - near)) * (1 - factor) + near * Math.pow(far / near,f / iron_object_LampObject.cascadeCount) * factor;
+				this.cascadeSplit.push(cfar);
+				this.camSlicedP.push(iron_math_Mat4.perspective(fov,aspect,near,cfar));
+			}
+		}
+		iron_object_LampObject.m.multmat2(this.camSlicedP[cascade]);
+		iron_object_LampObject.m.getInverse(iron_object_LampObject.m);
+		this.V.getInverse(this.transform.world);
+		this.V.toRotation();
+		iron_object_LampObject.m.multmat2(this.V);
+		iron_object_LampObject.setCorners();
+		var _g2 = 0;
+		var _g11 = iron_object_LampObject.corners;
+		while(_g2 < _g11.length) {
+			var v = _g11[_g2];
+			++_g2;
+			v.applymat4(iron_object_LampObject.m);
+			v.set(v.x / v.w,v.y / v.w,v.z / v.w);
+		}
+		var minx = iron_object_LampObject.corners[0].x;
+		var miny = iron_object_LampObject.corners[0].y;
+		var minz = iron_object_LampObject.corners[0].z;
+		var maxx = iron_object_LampObject.corners[0].x;
+		var maxy = iron_object_LampObject.corners[0].y;
+		var maxz = iron_object_LampObject.corners[0].z;
+		var _g3 = 0;
+		var _g12 = iron_object_LampObject.corners;
+		while(_g3 < _g12.length) {
+			var v1 = _g12[_g3];
+			++_g3;
+			if(v1.x < minx) {
+				minx = v1.x;
+			}
+			if(v1.x > maxx) {
+				maxx = v1.x;
+			}
+			if(v1.y < miny) {
+				miny = v1.y;
+			}
+			if(v1.y > maxy) {
+				maxy = v1.y;
+			}
+			if(v1.z < minz) {
+				minz = v1.z;
+			}
+			if(v1.z > maxz) {
+				maxz = v1.z;
+			}
+		}
+		var v11 = iron_object_LampObject.corners[0];
+		var v2 = iron_object_LampObject.corners[7];
+		var vx = v11.x - v2.x;
+		var vy = v11.y - v2.y;
+		var vz = v11.z - v2.z;
+		var diag0 = Math.sqrt(vx * vx + vy * vy + vz * vz);
+		var offx = (diag0 - (maxx - minx)) * 0.5;
+		var offy = (diag0 - (maxy - miny)) * 0.5;
+		minx -= offx;
+		maxx += offx;
+		miny -= offy;
+		maxy += offy;
+		var smsize = this.data.raw.shadowmap_size;
+		smsize = smsize / 4 | 0;
+		var worldPerTexelX = (maxx - minx) / smsize;
+		var worldPerTexelY = (maxy - miny) / smsize;
+		var worldPerTexelZ = (maxz - minz) / smsize;
+		minx = Math.floor(minx / worldPerTexelX) * worldPerTexelX;
+		miny = Math.floor(miny / worldPerTexelY) * worldPerTexelY;
+		minz = Math.floor(minz / worldPerTexelZ) * worldPerTexelZ;
+		maxx = Math.floor(maxx / worldPerTexelX) * worldPerTexelX;
+		maxy = Math.floor(maxy / worldPerTexelY) * worldPerTexelY;
+		maxz = Math.floor(maxz / worldPerTexelZ) * worldPerTexelZ;
+		var hx = (maxx - minx) / 2;
+		var hy = (maxy - miny) / 2;
+		var hz = (maxz - minz) / 2;
+		this.V.self._30 = -(minx + hx);
+		this.V.self._31 = -(miny + hy);
+		this.V.self._32 = -(minz + hz);
+		iron_object_LampObject.m = iron_math_Mat4.orthogonal(-hx,hx,-hy,hy,-hz * 4,hz);
+		this.P.setFrom(iron_object_LampObject.m);
+		this.updateViewFrustum(camera);
+		if(this.cascadeVP == null) {
+			this.cascadeVP = [];
+			var _g13 = 0;
+			var _g4 = iron_object_LampObject.cascadeCount;
+			while(_g13 < _g4) {
+				var i1 = _g13++;
+				this.cascadeVP.push(iron_math_Mat4.identity());
+			}
+		}
+		this.cascadeVP[cascade].setFrom(this.VP);
+	}
 	,updateViewFrustum: function(camera) {
 		this.VP.multmats(this.P,this.V);
 		if(camera.data.raw.frustum_culling) {
@@ -6467,10 +7696,77 @@ iron_object_LampObject.prototype = $extend(iron_object_Object.prototype,{
 			iron_object_CameraObject.buildViewFrustum(this.VP,this.frustumPlanes);
 		}
 	}
+	,setCubeFace: function(face,camera) {
+		iron_object_LampObject.p1.set(this.transform.world.self._30,this.transform.world.self._31,this.transform.world.self._32);
+		iron_object_LampObject.p2.setFrom(iron_object_LampObject.p1);
+		switch(face) {
+		case 0:
+			iron_object_LampObject.p2.addf(1.0,0.0,0.0);
+			iron_object_LampObject.p3.set(0.0,-1.0,0.0);
+			break;
+		case 1:
+			iron_object_LampObject.p2.addf(-1.0,0.0,0.0);
+			iron_object_LampObject.p3.set(0.0,-1.0,0.0);
+			break;
+		case 2:
+			iron_object_LampObject.p2.addf(0.0,1.0,0.0);
+			iron_object_LampObject.p3.set(0.0,0.0,1.0);
+			break;
+		case 3:
+			iron_object_LampObject.p2.addf(0.0,-1.0,0.0);
+			iron_object_LampObject.p3.set(0.0,0.0,-1.0);
+			break;
+		case 4:
+			iron_object_LampObject.p2.addf(0.0,0.0,1.0);
+			iron_object_LampObject.p3.set(0.0,-1.0,0.0);
+			break;
+		case 5:
+			iron_object_LampObject.p2.addf(0.0,0.0,-1.0);
+			iron_object_LampObject.p3.set(0.0,-1.0,0.0);
+			break;
+		}
+		this.V.setLookAt(iron_object_LampObject.p1,iron_object_LampObject.p2,iron_object_LampObject.p3);
+		this.updateViewFrustum(camera);
+	}
+	,getCascadeData: function() {
+		if(this.cascadeData == null) {
+			var length = iron_object_LampObject.cascadeCount * 16 + 4;
+			var this1 = new Array(length);
+			this.cascadeData = this1;
+		}
+		if(this.cascadeVP == null) {
+			return this.cascadeData;
+		}
+		var _g1 = 0;
+		var _g = iron_object_LampObject.cascadeCount;
+		while(_g1 < _g) {
+			var i = _g1++;
+			iron_object_LampObject.m.setFrom(this.cascadeVP[i]);
+			this.bias.setFrom(iron_object_Uniforms.biasMat);
+			var _g2 = this.bias;
+			_g2.self._00 /= iron_object_LampObject.cascadeCount;
+			var _g21 = this.bias;
+			_g21.self._30 /= iron_object_LampObject.cascadeCount;
+			var _g22 = this.bias;
+			_g22.self._30 += i * (1 / iron_object_LampObject.cascadeCount);
+			iron_object_LampObject.m.multmat2(this.bias);
+			iron_object_LampObject.m.write(this.cascadeData,i * 16);
+		}
+		this.cascadeData[iron_object_LampObject.cascadeCount * 16] = this.cascadeSplit[0];
+		this.cascadeData[iron_object_LampObject.cascadeCount * 16 + 1] = this.cascadeSplit[1];
+		this.cascadeData[iron_object_LampObject.cascadeCount * 16 + 2] = this.cascadeSplit[2];
+		this.cascadeData[iron_object_LampObject.cascadeCount * 16 + 3] = this.cascadeSplit[3];
+		return this.cascadeData;
+	}
 	,__class__: iron_object_LampObject
 });
 var iron_object_MeshObject = function(data,materials) {
 	this.tilesheet = null;
+	this.frustumCulling = true;
+	this.screenSize = 0.0;
+	this.particleIndex = -1;
+	this.particleOwner = null;
+	this.particleChildren = null;
 	this.particleSystems = null;
 	this.data = null;
 	iron_object_Object.call(this);
@@ -6545,6 +7841,215 @@ iron_object_MeshObject.prototype = $extend(iron_object_Object.prototype,{
 	}
 	,setupTilesheet: function(sceneName,tilesheet_ref,tilesheet_action_ref) {
 		this.tilesheet = new iron_object_Tilesheet(sceneName,tilesheet_ref,tilesheet_action_ref);
+	}
+	,setCulled: function(shadowsContext,b) {
+		if(shadowsContext) {
+			this.culledShadow = b;
+		} else {
+			this.culledMesh = b;
+		}
+		this.culled = this.culledMesh && this.culledShadow;
+		return b;
+	}
+	,cullMaterial: function(context,camera) {
+		var mats = this.materials;
+		if(!(this.raw != null && this.raw.lod_material != null && this.raw.lod_material == true) && mats[0].getContext(context) == null) {
+			return true;
+		}
+		var shadowsContext = context == "shadowmap";
+		if(!this.visibleMesh && !shadowsContext) {
+			return this.setCulled(shadowsContext,true);
+		}
+		if(!this.visibleShadow && shadowsContext) {
+			return this.setCulled(shadowsContext,true);
+		}
+		if(this.skipContext(context)) {
+			return this.setCulled(shadowsContext,true);
+		}
+		return this.setCulled(shadowsContext,false);
+	}
+	,cullMesh: function(context,camera,lamp) {
+		if(camera.data.raw.frustum_culling && this.frustumCulling) {
+			var radiusScale = this.data.isSkinned ? 2.0 : 1.0;
+			if(this.particleSystems != null || this.particleOwner != null) {
+				radiusScale *= 1000;
+			}
+			if(context == "voxel") {
+				radiusScale *= 100;
+			}
+			var shadowsContext = context == "shadowmap";
+			var frustumPlanes = shadowsContext ? lamp.frustumPlanes : camera.frustumPlanes;
+			if(shadowsContext && lamp.data.raw.type != "sun") {
+				lamp.transform.radius = lamp.data.raw.far_plane;
+				if(!iron_object_CameraObject.sphereInFrustum(camera.frustumPlanes,lamp.transform)) {
+					return this.setCulled(shadowsContext,true);
+				}
+			}
+			if(this.data.geom.instanced) {
+				var instanceInFrustum = false;
+				var _g = 0;
+				var _g1 = this.data.geom.offsetVecs;
+				while(_g < _g1.length) {
+					var v = _g1[_g];
+					++_g;
+					if(iron_object_CameraObject.sphereInFrustum(frustumPlanes,this.transform,radiusScale,v.x,v.y,v.z)) {
+						instanceInFrustum = true;
+						break;
+					}
+				}
+				if(!instanceInFrustum) {
+					return this.setCulled(shadowsContext,true);
+				}
+			} else if(!iron_object_CameraObject.sphereInFrustum(frustumPlanes,this.transform,radiusScale)) {
+				return this.setCulled(shadowsContext,true);
+			}
+		}
+		this.culled = false;
+		return this.culled;
+	}
+	,skipContext: function(context) {
+		var _g = 0;
+		var _g1 = this.materials;
+		while(_g < _g1.length) {
+			var mat = _g1[_g];
+			++_g;
+			if(mat.raw.skip_context != null && mat.raw.skip_context == context) {
+				return true;
+			}
+		}
+		return false;
+	}
+	,getContexts: function(context,materials,materialContexts,shaderContexts) {
+		var _g = 0;
+		while(_g < materials.length) {
+			var mat = materials[_g];
+			++_g;
+			var _g2 = 0;
+			var _g1 = mat.raw.contexts.length;
+			while(_g2 < _g1) {
+				var i = _g2++;
+				if(HxOverrides.substr(mat.raw.contexts[i].name,0,context.length) == context) {
+					materialContexts.push(mat.contexts[i]);
+					shaderContexts.push(mat.shader.getContext(context));
+					break;
+				}
+			}
+		}
+	}
+	,render: function(g,context,camera,lamp,bindParams) {
+		if(this.data == null || !this.data.geom.ready) {
+			return;
+		}
+		if(!this.visible) {
+			return;
+		}
+		if(this.cullMaterial(context,camera)) {
+			return;
+		}
+		if(this.cullMesh(context,camera,lamp)) {
+			return;
+		}
+		if(this.raw != null && this.raw.is_particle && this.particleOwner == null) {
+			return;
+		}
+		var meshContext = this.raw != null && "mesh" == context;
+		if(this.particleSystems != null && meshContext) {
+			if(this.particleChildren == null) {
+				this.particleChildren = [];
+				var _g = 0;
+				var _g1 = this.particleSystems;
+				while(_g < _g1.length) {
+					var psys = _g1[_g];
+					++_g;
+					var c = iron_Scene.active.getChild(psys.data.raw.dupli_object);
+					this.particleChildren.push(c);
+					if(c != null) {
+						c.particleOwner = this;
+						c.particleIndex = this.particleChildren.length - 1;
+						c.transform = this.transform;
+					}
+				}
+			}
+			var _g11 = 0;
+			var _g2 = this.particleSystems.length;
+			while(_g11 < _g2) {
+				var i = _g11++;
+				this.particleSystems[i].update(this.particleChildren[i],this);
+			}
+		}
+		if(this.tilesheet != null) {
+			this.tilesheet.update();
+		}
+		var mats = this.materials;
+		var lod = this;
+		if(this.raw != null && this.raw.lods != null && this.raw.lods.length > 0) {
+			var tr = this.transform;
+			var volume = tr.dim.x * tr.scale.x * tr.dim.y * tr.scale.y * tr.dim.z * tr.scale.z;
+			this.screenSize = volume * (1.0 / this.cameraDistance);
+			this.screenSize = this.screenSize > 1.0 ? 1.0 : this.screenSize;
+			if(this.lods == null) {
+				this.lods = [];
+				var _g3 = 0;
+				var _g12 = this.raw.lods;
+				while(_g3 < _g12.length) {
+					var l = _g12[_g3];
+					++_g3;
+					if(l.object_ref == "") {
+						this.lods.push(null);
+					} else {
+						this.lods.push(iron_Scene.active.getChild(l.object_ref));
+					}
+				}
+			}
+			var _g13 = 0;
+			var _g4 = this.raw.lods.length;
+			while(_g13 < _g4) {
+				var i1 = _g13++;
+				if(this.screenSize > this.raw.lods[i1].screen_size) {
+					break;
+				}
+				lod = this.lods[i1];
+				if(this.raw != null && this.raw.lod_material != null && this.raw.lod_material == true) {
+					mats = lod.materials;
+				}
+			}
+			if(lod == null) {
+				return;
+			}
+		}
+		if(this.raw != null && this.raw.lod_material != null && this.raw.lod_material == true && mats[0].getContext(context) == null) {
+			return;
+		}
+		var materialContexts = [];
+		var shaderContexts = [];
+		this.getContexts(context,mats,materialContexts,shaderContexts);
+		this.transform.update();
+		var ldata = lod.data;
+		if(ldata.geom.instanced) {
+			g.setVertexBuffers([ldata.geom.vertexBuffer,ldata.geom.instancedVB]);
+		} else {
+			g.setVertexBuffer(ldata.geom.vertexBuffer);
+		}
+		var _g14 = 0;
+		var _g5 = ldata.geom.indexBuffers.length;
+		while(_g14 < _g5) {
+			var i2 = _g14++;
+			var mi = ldata.geom.materialIndices[i2];
+			if(shaderContexts.length <= mi) {
+				continue;
+			}
+			g.setIndexBuffer(ldata.geom.indexBuffers[i2]);
+			g.setPipeline(shaderContexts[mi].pipeState);
+			iron_object_Uniforms.setConstants(g,shaderContexts[mi],this,camera,lamp,bindParams);
+			if(materialContexts.length > mi) {
+				iron_object_Uniforms.setMaterialConstants(g,shaderContexts[mi],materialContexts[mi]);
+			}
+			if(ldata.geom.instanced) {
+				g.drawIndexedVerticesInstanced(ldata.geom.instanceCount);
+			} else {
+				g.drawIndexedVertices();
+			}
+		}
 	}
 	,__class__: iron_object_MeshObject
 });
@@ -6754,8 +8259,14 @@ iron_object_ObjectAnimation.prototype = $extend(iron_object_Animation.prototype,
 	,__class__: iron_object_ObjectAnimation
 });
 var iron_object_ParticleSystem = function(sceneName,pref) {
+	this.m = iron_math_Mat4.identity();
+	this.lapTime = 0.0;
+	this.lap = 0;
+	this.count = 0;
+	this.emitFrom = null;
 	this.seed = 0.0;
 	this.spawnRate = 0.0;
+	this.time = 0.0;
 	this.animtime = 0.0;
 	this.lifetime = 0.0;
 	this.frameRate = 24;
@@ -6787,11 +8298,217 @@ var iron_object_ParticleSystem = function(sceneName,pref) {
 $hxClasses["iron.object.ParticleSystem"] = iron_object_ParticleSystem;
 iron_object_ParticleSystem.__name__ = true;
 iron_object_ParticleSystem.prototype = {
-	remove: function() {
+	getData: function() {
+		this.m.self._00 = this.r.loop ? this.animtime : -this.animtime;
+		this.m.self._01 = this.spawnRate;
+		this.m.self._02 = this.lifetime;
+		this.m.self._03 = this.particles.length;
+		this.m.self._10 = this.alignx;
+		this.m.self._11 = this.aligny;
+		this.m.self._12 = this.alignz;
+		this.m.self._13 = this.r.factor_random;
+		this.m.self._20 = this.gx * this.r.mass;
+		this.m.self._21 = this.gy * this.r.mass;
+		this.m.self._22 = this.gz * this.r.mass;
+		this.m.self._23 = this.r.lifetime_random;
+		this.m.self._30 = this.tilesx;
+		this.m.self._31 = this.tilesy;
+		this.m.self._32 = 1 / this.tilesFramerate;
+		this.m.self._33 = this.lapTime;
+		return this.m;
+	}
+	,update: function(object,owner) {
+		if(!this.ready) {
+			return;
+		}
+		this.dimx = object.transform.dim.x;
+		this.dimy = object.transform.dim.y;
+		if(object.tilesheet != null) {
+			this.tilesx = object.tilesheet.raw.tilesx;
+			this.tilesy = object.tilesheet.raw.tilesy;
+			this.tilesFramerate = object.tilesheet.raw.framerate;
+		}
+		this.time += 0.0166666666666666664 * iron_system_Time.scale;
+		this.lap = this.time / this.animtime | 0;
+		this.lapTime = this.time - this.lap * this.animtime;
+		this.count = this.lapTime / this.spawnRate | 0;
+		if(this.r.gpu_sim) {
+			this.updateGpu(object,owner);
+		} else {
+			this.updateCpu(object,owner);
+		}
+	}
+	,updateGpu: function(object,owner) {
+		if(!object.data.geom.instanced) {
+			this.setupGeomGpu(object,owner);
+		}
+	}
+	,updateCpu: function(object,owner) {
+		if(!object.data.geom.instanced) {
+			this.setupGeomCpu(object,owner);
+		}
+		if(this.r.type == 0) {
+			var _g = 0;
+			var _g1 = this.particles;
+			while(_g < _g1.length) {
+				var p = _g1[_g];
+				++_g;
+				this.computePos(p,object,this.particles.length,this.lap,this.count);
+			}
+		}
+		var instancedData = object.data.geom.instancedVB.lock();
+		var _g11 = 0;
+		var _g2 = this.particles.length;
+		while(_g11 < _g2) {
+			var i = _g11++;
+			var p1 = this.particles[i];
+			var px = p1.x;
+			var py = p1.y;
+			var pz = p1.z;
+			px += this.emitFrom[i * 3];
+			py += this.emitFrom[i * 3 + 1];
+			pz += this.emitFrom[i * 3 + 2];
+			instancedData[i * 3] = px;
+			instancedData[i * 3 + 1] = py;
+			instancedData[i * 3 + 2] = pz;
+		}
+		object.data.geom.instancedVB.unlock();
+	}
+	,computePos: function(p,object,l,lap,count) {
+		var i = p.i;
+		var age = this.lapTime - p.i * this.spawnRate;
+		age -= age * this.fhash(i) * this.r.lifetime_random;
+		if(this.r.loop) {
+			while(age < 0) age += this.animtime;
+		}
+		if(age < 0 || age > this.lifetime) {
+			p.x = p.y = p.z = -99999;
+			return;
+		}
+		if(this.r.physics_type == 1) {
+			this.computeNewton(p,i,age);
+		}
+	}
+	,computeNewton: function(p,i,age) {
+		p.x = this.alignx;
+		p.y = this.aligny;
+		p.z = this.alignz;
+		var l = this.particles.length;
+		p.x += this.fhash(p.i + 0 * l) * this.r.factor_random - this.r.factor_random / 2;
+		p.y += this.fhash(p.i + l) * this.r.factor_random - this.r.factor_random / 2;
+		p.z += this.fhash(p.i + 2 * l) * this.r.factor_random - this.r.factor_random / 2;
+		p.x += this.gx * this.r.mass * age / 5;
+		p.y += this.gy * this.r.mass * age / 5;
+		p.z += this.gz * this.r.mass * age / 5;
+		p.x *= age;
+		p.y *= age;
+		p.z *= age;
+	}
+	,setupGeomGpu: function(object,owner) {
+		var this1 = new Float32Array(this.particles.length * 3);
+		var instancedData = this1;
+		var i = 0;
+		if(this.r.emit_from == 0) {
+			var pa = owner.data.geom.positions;
+			var _g = 0;
+			var _g1 = this.particles;
+			while(_g < _g1.length) {
+				var p = _g1[_g];
+				++_g;
+				var j = this.fhash(i) * (pa.length / 3) | 0;
+				instancedData[i] = pa[j * 3];
+				++i;
+				instancedData[i] = pa[j * 3 + 1];
+				++i;
+				instancedData[i] = pa[j * 3 + 2];
+				++i;
+			}
+		} else {
+			var _g2 = 0;
+			var _g11 = this.particles;
+			while(_g2 < _g11.length) {
+				var p1 = _g11[_g2];
+				++_g2;
+				instancedData[i] = (Math.random() * 2.0 - 1.0) * (object.transform.dim.x / 2.0);
+				++i;
+				instancedData[i] = (Math.random() * 2.0 - 1.0) * (object.transform.dim.y / 2.0);
+				++i;
+				instancedData[i] = (Math.random() * 2.0 - 1.0) * (object.transform.dim.z / 2.0);
+				++i;
+			}
+		}
+		if(this.r.particle_size != 1.0) {
+			object.data.geom.applyScale(this.r.particle_size,this.r.particle_size,this.r.particle_size);
+		}
+		object.data.geom.setupInstanced(instancedData,kha_graphics4_Usage.StaticUsage);
+	}
+	,setupGeomCpu: function(object,owner) {
+		var this1 = new Float32Array(this.particles.length * 3);
+		var instancedData = this1;
+		var i = 0;
+		var _g = 0;
+		var _g1 = this.particles;
+		while(_g < _g1.length) {
+			var p = _g1[_g];
+			++_g;
+			instancedData[i] = 0.0;
+			++i;
+			instancedData[i] = 0.0;
+			++i;
+			instancedData[i] = 0.0;
+			++i;
+		}
+		if(this.r.particle_size != 1.0) {
+			object.data.geom.applyScale(this.r.particle_size,this.r.particle_size,this.r.particle_size);
+		}
+		object.data.geom.setupInstanced(instancedData,kha_graphics4_Usage.DynamicUsage);
+		var this2 = new Float32Array(this.particles.length * 3);
+		this.emitFrom = this2;
+		i = 0;
+		if(this.r.emit_from == 0) {
+			var pa = owner.data.geom.positions;
+			var _g2 = 0;
+			var _g11 = this.particles;
+			while(_g2 < _g11.length) {
+				var p1 = _g11[_g2];
+				++_g2;
+				var j = this.fhash(i) * (pa.length / 3) | 0;
+				this.emitFrom[i] = pa[j * 3];
+				++i;
+				this.emitFrom[i] = pa[j * 3 + 1];
+				++i;
+				this.emitFrom[i] = pa[j * 3 + 2];
+				++i;
+			}
+		} else {
+			var _g3 = 0;
+			var _g12 = this.particles;
+			while(_g3 < _g12.length) {
+				var p2 = _g12[_g3];
+				++_g3;
+				this.emitFrom[i] = (Math.random() * 2.0 - 1.0) * (object.transform.dim.x / 2.0);
+				++i;
+				this.emitFrom[i] = (Math.random() * 2.0 - 1.0) * (object.transform.dim.y / 2.0);
+				++i;
+				this.emitFrom[i] = (Math.random() * 2.0 - 1.0) * (object.transform.dim.z / 2.0);
+				++i;
+			}
+		}
+	}
+	,fhash: function(n) {
+		var s = n + 1.0;
+		s *= 9301.0 % s;
+		s = (s * 9301.0 + 49297.0) % 233280.0;
+		return s / 233280.0;
+	}
+	,remove: function() {
 	}
 	,__class__: iron_object_ParticleSystem
 };
 var iron_object_Particle = function(i) {
+	this.z = 0.0;
+	this.y = 0.0;
+	this.x = 0.0;
 	this.i = i;
 };
 $hxClasses["iron.object.Particle"] = iron_object_Particle;
@@ -6877,6 +8594,15 @@ iron_object_Tilesheet.prototype = {
 		this.paused = false;
 	}
 	,remove: function() {
+	}
+	,update: function() {
+		if(!this.ready || this.paused || this.action.start >= this.action.end) {
+			return;
+		}
+		this.time += 0.0166666666666666664 * iron_system_Time.scale;
+		if(this.time >= 1 / this.raw.framerate) {
+			this.setFrame(this.frame + 1);
+		}
 	}
 	,setFrame: function(f) {
 		this.frame = f;
@@ -7037,6 +8763,799 @@ kha_math_FastMatrix3.prototype = {
 var iron_object_Uniforms = function() { };
 $hxClasses["iron.object.Uniforms"] = iron_object_Uniforms;
 iron_object_Uniforms.__name__ = true;
+iron_object_Uniforms.setConstants = function(g,context,object,camera,lamp,bindParams) {
+	if(context.raw.constants != null) {
+		var _g1 = 0;
+		var _g = context.raw.constants.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var c = context.raw.constants[i];
+			iron_object_Uniforms.setConstant(g,object,camera,lamp,context.constants[i],c);
+		}
+	}
+	if(bindParams != null) {
+		var _g11 = 0;
+		var _g2 = bindParams.length / 2 | 0;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var pos = i1 * 2;
+			var rtID = bindParams[pos];
+			var samplerID = bindParams[pos + 1];
+			var attachDepth = false;
+			var $char = rtID.charAt(0);
+			if($char == "_") {
+				attachDepth = true;
+			}
+			if(attachDepth) {
+				rtID = HxOverrides.substr(rtID,1,null);
+			}
+			if(rtID == "shadowMap" && lamp != null && lamp.data.raw.shadowmap_cube) {
+				var _this = iron_RenderPath.active.renderTargets;
+				iron_object_Uniforms.bindRenderTarget(g,__map_reserved["arm_empty"] != null ? _this.getReserved("arm_empty") : _this.h["arm_empty"],context,samplerID,attachDepth);
+				rtID += "Cube";
+				samplerID += "Cube";
+			} else {
+				var _this1 = iron_RenderPath.active.renderTargets;
+				iron_object_Uniforms.bindRenderTarget(g,__map_reserved["arm_empty_cube"] != null ? _this1.getReserved("arm_empty_cube") : _this1.h["arm_empty_cube"],context,samplerID + "Cube",attachDepth);
+			}
+			var rt;
+			if(attachDepth) {
+				var _this2 = iron_RenderPath.active.depthToRenderTarget;
+				if(__map_reserved[rtID] != null) {
+					rt = _this2.getReserved(rtID);
+				} else {
+					rt = _this2.h[rtID];
+				}
+			} else {
+				var _this3 = iron_RenderPath.active.renderTargets;
+				if(__map_reserved[rtID] != null) {
+					rt = _this3.getReserved(rtID);
+				} else {
+					rt = _this3.h[rtID];
+				}
+			}
+			iron_object_Uniforms.bindRenderTarget(g,rt,context,samplerID,attachDepth);
+		}
+	}
+	if(context.raw.texture_units != null) {
+		var _g12 = 0;
+		var _g3 = context.raw.texture_units.length;
+		while(_g12 < _g3) {
+			var j = _g12++;
+			var tulink = context.raw.texture_units[j].link;
+			if(tulink == null) {
+				continue;
+			}
+			var tuid = context.raw.texture_units[j].name;
+			if(tulink == "_envmapRadiance") {
+				var w = iron_Scene.active.world;
+				if(w != null) {
+					g.setTexture(context.textureUnits[j],w.getGlobalProbe().radiance);
+					g.setTextureParameters(context.textureUnits[j],kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_MipMapFilter.LinearMipFilter);
+				}
+			} else if(tulink == "_envmapBrdf") {
+				var _this4 = iron_Scene.active.embedded;
+				g.setTexture(context.textureUnits[j],__map_reserved["brdf.png"] != null ? _this4.getReserved("brdf.png") : _this4.h["brdf.png"]);
+			} else if(tulink == "_noise8") {
+				var _this5 = iron_Scene.active.embedded;
+				g.setTexture(context.textureUnits[j],__map_reserved["noise8.png"] != null ? _this5.getReserved("noise8.png") : _this5.h["noise8.png"]);
+				g.setTextureParameters(context.textureUnits[j],kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_MipMapFilter.NoMipFilter);
+			} else if(tulink == "_noise64") {
+				var _this6 = iron_Scene.active.embedded;
+				g.setTexture(context.textureUnits[j],__map_reserved["noise64.png"] != null ? _this6.getReserved("noise64.png") : _this6.h["noise64.png"]);
+				g.setTextureParameters(context.textureUnits[j],kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_MipMapFilter.NoMipFilter);
+			} else if(tulink == "_noise256") {
+				var _this7 = iron_Scene.active.embedded;
+				g.setTexture(context.textureUnits[j],__map_reserved["noise256.png"] != null ? _this7.getReserved("noise256.png") : _this7.h["noise256.png"]);
+				g.setTextureParameters(context.textureUnits[j],kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_MipMapFilter.NoMipFilter);
+			} else if(tulink == "_lampColorTexture") {
+				if(lamp != null) {
+					g.setTexture(context.textureUnits[j],lamp.data.colorTexture);
+					g.setTextureParameters(context.textureUnits[j],kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_MipMapFilter.NoMipFilter);
+				}
+			} else if(tulink == "_iesTexture") {
+				var _this8 = iron_Scene.active.embedded;
+				g.setTexture(context.textureUnits[j],__map_reserved["iestexture.png"] != null ? _this8.getReserved("iestexture.png") : _this8.h["iestexture.png"]);
+				g.setTextureParameters(context.textureUnits[j],kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureAddressing.Repeat,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_MipMapFilter.NoMipFilter);
+			} else if(tulink != "_sdfTexture") {
+				if(iron_object_Uniforms.externalTextureLinks != null) {
+					var _g21 = 0;
+					var _g31 = iron_object_Uniforms.externalTextureLinks;
+					while(_g21 < _g31.length) {
+						var f = _g31[_g21];
+						++_g21;
+						var image = f(tulink);
+						if(image != null) {
+							g.setTexture(context.textureUnits[j],image);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+};
+iron_object_Uniforms.bindRenderTarget = function(g,rt,context,samplerID,attachDepth) {
+	if(rt != null) {
+		var tus = context.raw.texture_units;
+		var _g1 = 0;
+		var _g = tus.length;
+		while(_g1 < _g) {
+			var j = _g1++;
+			if(samplerID == tus[j].name) {
+				if(!(tus[j].is_image != null && tus[j].is_image)) {
+					if(rt.isCubeMap) {
+						if(attachDepth) {
+							g.setCubeMapDepth(context.textureUnits[j],rt.cubeMap);
+						} else {
+							g.setCubeMap(context.textureUnits[j],rt.cubeMap);
+						}
+					} else if(attachDepth) {
+						g.setTextureDepth(context.textureUnits[j],rt.image);
+					} else {
+						g.setTexture(context.textureUnits[j],rt.image);
+					}
+				}
+				if(rt.raw.mipmaps && tus[j].params_set == null) {
+					tus[j].params_set = true;
+					g.setTextureParameters(context.textureUnits[j],kha_graphics4_TextureAddressing.Clamp,kha_graphics4_TextureAddressing.Clamp,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_TextureFilter.LinearFilter,kha_graphics4_MipMapFilter.LinearMipFilter);
+				}
+			}
+		}
+	}
+};
+iron_object_Uniforms.setConstant = function(g,object,camera,lamp,location,c) {
+	if(c.link == null) {
+		return;
+	}
+	if(c.type == "mat4") {
+		var m = null;
+		if(c.link == "_worldMatrix") {
+			m = object.transform.world;
+		} else if(c.link == "_inverseWorldMatrix") {
+			iron_object_Uniforms.helpMat.getInverse(object.transform.world);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_viewMatrix") {
+			m = camera.V;
+		} else if(c.link == "_transposeInverseViewMatrix") {
+			iron_object_Uniforms.helpMat.setFrom(camera.V);
+			iron_object_Uniforms.helpMat.getInverse(iron_object_Uniforms.helpMat);
+			iron_object_Uniforms.helpMat.transpose();
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_inverseViewMatrix") {
+			iron_object_Uniforms.helpMat.getInverse(camera.V);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_transposeViewMatrix") {
+			iron_object_Uniforms.helpMat.setFrom(camera.V);
+			iron_object_Uniforms.helpMat.transpose3x3();
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_projectionMatrix") {
+			m = camera.P;
+		} else if(c.link == "_inverseProjectionMatrix") {
+			iron_object_Uniforms.helpMat.getInverse(camera.P);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_inverseViewProjectionMatrix") {
+			iron_object_Uniforms.helpMat.setFrom(camera.V);
+			iron_object_Uniforms.helpMat.multmat2(camera.P);
+			iron_object_Uniforms.helpMat.getInverse(iron_object_Uniforms.helpMat);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_worldViewProjectionMatrix") {
+			iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+			iron_object_Uniforms.helpMat.multmat2(camera.V);
+			iron_object_Uniforms.helpMat.multmat2(camera.P);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_worldViewProjectionMatrixSphere") {
+			iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+			iron_object_Uniforms.helpMat.multmat2(camera.V);
+			iron_object_Uniforms.helpMat.self._00 = 1.0;
+			iron_object_Uniforms.helpMat.self._10 = 0.0;
+			iron_object_Uniforms.helpMat.self._20 = 0.0;
+			iron_object_Uniforms.helpMat.self._01 = 0.0;
+			iron_object_Uniforms.helpMat.self._11 = 1.0;
+			iron_object_Uniforms.helpMat.self._21 = 0.0;
+			iron_object_Uniforms.helpMat.self._02 = 0.0;
+			iron_object_Uniforms.helpMat.self._12 = 0.0;
+			iron_object_Uniforms.helpMat.self._22 = 1.0;
+			iron_object_Uniforms.helpMat.multmat2(camera.P);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_worldViewProjectionMatrixCylinder") {
+			iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+			iron_object_Uniforms.helpMat.multmat2(camera.V);
+			iron_object_Uniforms.helpMat.self._00 = 1.0;
+			iron_object_Uniforms.helpMat.self._20 = 0.0;
+			iron_object_Uniforms.helpMat.self._01 = 0.0;
+			iron_object_Uniforms.helpMat.self._21 = 0.0;
+			iron_object_Uniforms.helpMat.self._02 = 0.0;
+			iron_object_Uniforms.helpMat.self._22 = 1.0;
+			iron_object_Uniforms.helpMat.multmat2(camera.P);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_worldViewMatrix") {
+			iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+			iron_object_Uniforms.helpMat.multmat2(camera.V);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_viewProjectionMatrix") {
+			m = camera.VP;
+		} else if(c.link == "_prevViewProjectionMatrix") {
+			iron_object_Uniforms.helpMat.setFrom(camera.prevV);
+			iron_object_Uniforms.helpMat.multmat2(camera.P);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_lampWorldViewProjectionMatrix") {
+			if(lamp != null) {
+				if(object == null) {
+					iron_object_Uniforms.helpMat.setIdentity();
+				} else {
+					iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+				}
+				iron_object_Uniforms.helpMat.multmat2(lamp.VP);
+				m = iron_object_Uniforms.helpMat;
+			}
+		} else if(c.link == "_lampWorldViewProjectionMatrixSphere") {
+			if(lamp != null) {
+				iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+				iron_object_Uniforms.helpMat.multmat2(camera.V);
+				iron_object_Uniforms.helpMat.self._00 = 1.0;
+				iron_object_Uniforms.helpMat.self._10 = 0.0;
+				iron_object_Uniforms.helpMat.self._20 = 0.0;
+				iron_object_Uniforms.helpMat.self._01 = 0.0;
+				iron_object_Uniforms.helpMat.self._11 = 1.0;
+				iron_object_Uniforms.helpMat.self._21 = 0.0;
+				iron_object_Uniforms.helpMat.self._02 = 0.0;
+				iron_object_Uniforms.helpMat.self._12 = 0.0;
+				iron_object_Uniforms.helpMat.self._22 = 1.0;
+				iron_object_Uniforms.helpMat2.getInverse(camera.V);
+				iron_object_Uniforms.helpMat.multmat2(iron_object_Uniforms.helpMat2);
+				iron_object_Uniforms.helpMat.multmat2(lamp.VP);
+				m = iron_object_Uniforms.helpMat;
+			}
+		} else if(c.link == "_lampWorldViewProjectionMatrixCylinder") {
+			if(lamp != null) {
+				iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+				iron_object_Uniforms.helpMat.multmat2(camera.V);
+				iron_object_Uniforms.helpMat.self._00 = 1.0;
+				iron_object_Uniforms.helpMat.self._20 = 0.0;
+				iron_object_Uniforms.helpMat.self._01 = 0.0;
+				iron_object_Uniforms.helpMat.self._21 = 0.0;
+				iron_object_Uniforms.helpMat.self._02 = 0.0;
+				iron_object_Uniforms.helpMat.self._22 = 1.0;
+				iron_object_Uniforms.helpMat2.getInverse(camera.V);
+				iron_object_Uniforms.helpMat.multmat2(iron_object_Uniforms.helpMat2);
+				iron_object_Uniforms.helpMat.multmat2(lamp.VP);
+				m = iron_object_Uniforms.helpMat;
+			}
+		} else if(c.link == "_biasLampWorldViewProjectionMatrix") {
+			if(lamp != null) {
+				if(object == null) {
+					iron_object_Uniforms.helpMat.setIdentity();
+				} else {
+					iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+				}
+				iron_object_Uniforms.helpMat.multmat2(lamp.VP);
+				iron_object_Uniforms.helpMat.multmat2(iron_object_Uniforms.biasMat);
+				m = iron_object_Uniforms.helpMat;
+			}
+		} else if(c.link == "_lampViewProjectionMatrix") {
+			if(lamp != null) {
+				m = lamp.VP;
+			}
+		} else if(c.link == "_biasLampViewProjectionMatrix") {
+			if(lamp != null) {
+				iron_object_Uniforms.helpMat.setFrom(lamp.VP);
+				iron_object_Uniforms.helpMat.multmat2(iron_object_Uniforms.biasMat);
+				m = iron_object_Uniforms.helpMat;
+			}
+		} else if(c.link == "_lampVolumeWorldViewProjectionMatrix") {
+			if(lamp != null) {
+				var tr = lamp.transform;
+				var type = lamp.data.raw.type;
+				if(type == "spot") {
+					iron_object_Uniforms.helpVec.set(tr.world.self._30,tr.world.self._31,tr.world.self._32);
+					iron_object_Uniforms.helpVec2.set(lamp.data.raw.far_plane,lamp.data.raw.far_plane * 2.0,lamp.data.raw.far_plane * 2.0);
+					iron_object_Uniforms.helpMat.compose(iron_object_Uniforms.helpVec,iron_object_Uniforms.helpQuat,iron_object_Uniforms.helpVec2);
+				} else if(type == "point" || type == "area") {
+					iron_object_Uniforms.helpVec.set(tr.world.self._30,tr.world.self._31,tr.world.self._32);
+					iron_object_Uniforms.helpVec2.set(lamp.data.raw.far_plane,lamp.data.raw.far_plane * 2.0,lamp.data.raw.far_plane * 2.0);
+					iron_object_Uniforms.helpMat.compose(iron_object_Uniforms.helpVec,iron_object_Uniforms.helpQuat,iron_object_Uniforms.helpVec2);
+				}
+				iron_object_Uniforms.helpMat.multmat2(camera.V);
+				iron_object_Uniforms.helpMat.multmat2(camera.P);
+				m = iron_object_Uniforms.helpMat;
+			}
+		} else if(c.link == "_skydomeMatrix") {
+			var tr1 = camera.transform;
+			iron_object_Uniforms.helpVec.set(tr1.world.self._30,tr1.world.self._31,tr1.world.self._32 - 3.5);
+			var bounds = camera.farPlane * 0.95;
+			iron_object_Uniforms.helpVec2.set(bounds,bounds,bounds);
+			iron_object_Uniforms.helpMat.compose(iron_object_Uniforms.helpVec,iron_object_Uniforms.helpQuat,iron_object_Uniforms.helpVec2);
+			iron_object_Uniforms.helpMat.multmat2(camera.V);
+			iron_object_Uniforms.helpMat.multmat2(camera.P);
+			m = iron_object_Uniforms.helpMat;
+		} else if(c.link == "_lampViewMatrix") {
+			if(lamp != null) {
+				m = lamp.V;
+			}
+		} else if(c.link == "_lampProjectionMatrix") {
+			if(lamp != null) {
+				m = lamp.P;
+			}
+		} else if(c.link == "_particleData") {
+			var mo = js_Boot.__cast(object , iron_object_MeshObject);
+			if(mo.particleOwner != null) {
+				m = mo.particleOwner.particleSystems[mo.particleIndex].getData();
+			}
+		} else if(iron_object_Uniforms.externalMat4Links != null) {
+			var _g = 0;
+			var _g1 = iron_object_Uniforms.externalMat4Links;
+			while(_g < _g1.length) {
+				var fn = _g1[_g];
+				++_g;
+				m = fn(c.link);
+				if(m != null) {
+					break;
+				}
+			}
+		}
+		if(m == null) {
+			return;
+		}
+		g.setMatrix(location,m.self);
+	} else if(c.type == "mat3") {
+		var m1 = null;
+		if(c.link == "_normalMatrix") {
+			iron_object_Uniforms.helpMat.setFrom(object.transform.world);
+			iron_object_Uniforms.helpMat.getInverse(iron_object_Uniforms.helpMat);
+			iron_object_Uniforms.helpMat.transpose3x3();
+			iron_object_Uniforms.helpMat3.setFrom4(iron_object_Uniforms.helpMat);
+			m1 = iron_object_Uniforms.helpMat3;
+		}
+		if(m1 == null) {
+			return;
+		}
+		g.setMatrix3(location,m1.self);
+	} else if(c.type == "vec4") {
+		var v = null;
+		iron_object_Uniforms.helpVec.set(0,0,0);
+		if(c.link == "_input") {
+			iron_object_Uniforms.helpVec.set(iron_system_Input.getMouse().x / kha_System.windowWidth(),iron_system_Input.getMouse().y / kha_System.windowHeight(),iron_system_Input.getMouse().down() ? 1.0 : 0.0,0.0);
+			v = iron_object_Uniforms.helpVec;
+		} else if(iron_object_Uniforms.externalVec4Links != null) {
+			var _g2 = 0;
+			var _g11 = iron_object_Uniforms.externalVec4Links;
+			while(_g2 < _g11.length) {
+				var fn1 = _g11[_g2];
+				++_g2;
+				v = fn1(c.link);
+				if(v != null) {
+					break;
+				}
+			}
+		}
+		if(v == null) {
+			return;
+		}
+		g.setFloat4(location,v.x,v.y,v.z,v.w);
+	} else if(c.type == "vec3") {
+		var v1 = null;
+		iron_object_Uniforms.helpVec.set(0,0,0);
+		if(c.link == "_lampPosition") {
+			if(lamp != null) {
+				iron_object_Uniforms.helpVec.set(lamp.transform.world.self._30,lamp.transform.world.self._31,lamp.transform.world.self._32);
+			}
+			v1 = iron_object_Uniforms.helpVec;
+		} else if(c.link == "_lampDirection") {
+			if(lamp != null) {
+				iron_object_Uniforms.helpVec = new iron_math_Vec4(lamp.V.self._02,lamp.V.self._12,lamp.V.self._22);
+			}
+			v1 = iron_object_Uniforms.helpVec;
+		} else if(c.link == "_lampColor") {
+			if(lamp != null) {
+				var str = lamp.data.raw.strength;
+				iron_object_Uniforms.helpVec.set(lamp.data.raw.color[0] * str,lamp.data.raw.color[1] * str,lamp.data.raw.color[2] * str);
+			}
+			v1 = iron_object_Uniforms.helpVec;
+		} else if(c.link == "_lampColorVoxel") {
+			if(lamp != null) {
+				var str1 = lamp.data.raw.strength;
+				iron_object_Uniforms.helpVec.set(lamp.data.raw.color[0] * str1,lamp.data.raw.color[1] * str1,lamp.data.raw.color[2] * str1);
+			}
+			v1 = iron_object_Uniforms.helpVec;
+		} else if(c.link == "_lampArea0") {
+			if(lamp != null && lamp.data.raw.size != null) {
+				var sx = lamp.data.raw.size / 2;
+				var sy = lamp.data.raw.size_y / 2;
+				iron_object_Uniforms.helpVec.set(-sx,sy,0.0);
+				iron_object_Uniforms.helpVec.applymat(lamp.transform.world);
+				v1 = iron_object_Uniforms.helpVec;
+			}
+		} else if(c.link == "_lampArea1") {
+			if(lamp != null && lamp.data.raw.size != null) {
+				var sx1 = lamp.data.raw.size / 2;
+				var sy1 = lamp.data.raw.size_y / 2;
+				iron_object_Uniforms.helpVec.set(sx1,sy1,0.0);
+				iron_object_Uniforms.helpVec.applymat(lamp.transform.world);
+				v1 = iron_object_Uniforms.helpVec;
+			}
+		} else if(c.link == "_lampArea2") {
+			if(lamp != null && lamp.data.raw.size != null) {
+				var sx2 = lamp.data.raw.size / 2;
+				var sy2 = lamp.data.raw.size_y / 2;
+				iron_object_Uniforms.helpVec.set(sx2,-sy2,0.0);
+				iron_object_Uniforms.helpVec.applymat(lamp.transform.world);
+				v1 = iron_object_Uniforms.helpVec;
+			}
+		} else if(c.link == "_lampArea3") {
+			if(lamp != null && lamp.data.raw.size != null) {
+				var sx3 = lamp.data.raw.size / 2;
+				var sy3 = lamp.data.raw.size_y / 2;
+				iron_object_Uniforms.helpVec.set(-sx3,-sy3,0.0);
+				iron_object_Uniforms.helpVec.applymat(lamp.transform.world);
+				v1 = iron_object_Uniforms.helpVec;
+			}
+		} else if(c.link == "_cameraPosition") {
+			iron_object_Uniforms.helpVec.set(camera.transform.world.self._30,camera.transform.world.self._31,camera.transform.world.self._32);
+			v1 = iron_object_Uniforms.helpVec;
+		} else if(c.link != "_cameraPositionSnap") {
+			if(c.link == "_cameraLook") {
+				iron_object_Uniforms.helpVec = new iron_math_Vec4(-camera.transform.world.self._20,-camera.transform.world.self._21,-camera.transform.world.self._22);
+				v1 = iron_object_Uniforms.helpVec;
+			} else if(c.link == "_cameraUp") {
+				iron_object_Uniforms.helpVec = new iron_math_Vec4(camera.transform.world.self._10,camera.transform.world.self._11,camera.transform.world.self._12);
+				v1 = iron_object_Uniforms.helpVec;
+			} else if(c.link == "_cameraRight") {
+				iron_object_Uniforms.helpVec = new iron_math_Vec4(camera.transform.world.self._00,camera.transform.world.self._01,camera.transform.world.self._02);
+				v1 = iron_object_Uniforms.helpVec;
+			} else if(c.link == "_backgroundCol") {
+				iron_object_Uniforms.helpVec.set(camera.data.raw.clear_color[0],camera.data.raw.clear_color[1],camera.data.raw.clear_color[2]);
+				v1 = iron_object_Uniforms.helpVec;
+			} else if(c.link == "_probeVolumeCenter") {
+				v1 = iron_Scene.active.world.getProbeVolumeCenter(object.transform);
+			} else if(c.link == "_probeVolumeSize") {
+				v1 = iron_Scene.active.world.getProbeVolumeSize(object.transform);
+			} else if(iron_object_Uniforms.externalVec3Links != null) {
+				var _g3 = 0;
+				var _g12 = iron_object_Uniforms.externalVec3Links;
+				while(_g3 < _g12.length) {
+					var f = _g12[_g3];
+					++_g3;
+					v1 = f(c.link);
+					if(v1 != null) {
+						break;
+					}
+				}
+			}
+		}
+		if(v1 == null) {
+			return;
+		}
+		g.setFloat3(location,v1.x,v1.y,v1.z);
+	} else if(c.type == "vec2") {
+		var vx = 0;
+		var vy = 0;
+		if(c.link == "_vec2x") {
+			vx = 1.0;
+		} else if(c.link == "_vec2xInv") {
+			vx = 1.0 / iron_RenderPath.active.currentW;
+		} else if(c.link == "_vec2x2") {
+			vx = 2.0;
+		} else if(c.link == "_vec2x2Inv") {
+			vx = 2.0 / iron_RenderPath.active.currentW;
+		} else if(c.link == "_vec2y") {
+			vy = 1.0;
+		} else if(c.link == "_vec2yInv") {
+			vy = 1.0 / iron_RenderPath.active.currentH;
+		} else if(c.link == "_vec2y2") {
+			vy = 2.0;
+		} else if(c.link == "_vec2y2Inv") {
+			vy = 2.0 / iron_RenderPath.active.currentH;
+		} else if(c.link == "_vec2y3") {
+			vy = 3.0;
+		} else if(c.link == "_vec2y3Inv") {
+			vy = 3.0 / iron_RenderPath.active.currentH;
+		} else if(c.link == "_windowSize") {
+			vx = kha_System.windowWidth();
+			vy = kha_System.windowHeight();
+		} else if(c.link == "_windowSizeInv") {
+			vx = 1.0 / kha_System.windowWidth();
+			vy = 1.0 / kha_System.windowHeight();
+		} else if(c.link == "_screenSize") {
+			vx = iron_RenderPath.active.currentW;
+			vy = iron_RenderPath.active.currentH;
+		} else if(c.link == "_screenSizeInv") {
+			vx = 1.0 / iron_RenderPath.active.currentW;
+			vy = 1.0 / iron_RenderPath.active.currentH;
+		} else if(c.link == "_aspectRatio") {
+			vx = iron_RenderPath.active.currentH / iron_RenderPath.active.currentW;
+			vy = iron_RenderPath.active.currentW / iron_RenderPath.active.currentH;
+			if(vx > 1.0) {
+				vx = 1.0;
+			} else {
+				vx = vx;
+			}
+			if(vy > 1.0) {
+				vy = 1.0;
+			} else {
+				vy = vy;
+			}
+		} else if(c.link == "_cameraPlane") {
+			vx = camera.data.raw.near_plane;
+			vy = camera.data.raw.far_plane;
+		} else if(c.link == "_cameraPlaneProj") {
+			var near = camera.data.raw.near_plane;
+			var far = camera.data.raw.far_plane;
+			vx = far / (far - near);
+			vy = -far * near / (far - near);
+		} else if(c.link == "_lampPlane") {
+			if(lamp == null) {
+				vx = 0.0;
+			} else {
+				vx = lamp.data.raw.near_plane;
+			}
+			if(lamp == null) {
+				vy = 0.0;
+			} else {
+				vy = lamp.data.raw.far_plane;
+			}
+		} else if(c.link == "_lampPlaneProj") {
+			if(lamp != null) {
+				var near1 = lamp.data.raw.near_plane;
+				var far1 = lamp.data.raw.far_plane;
+				var a = far1 + near1;
+				var b = far1 - near1;
+				var c1 = 2.0 * far1 * near1;
+				vx = a / b;
+				vy = c1 / b;
+			}
+		} else if(c.link == "_spotlampData") {
+			if(lamp == null) {
+				vx = 0.0;
+			} else {
+				vx = lamp.data.raw.spot_size;
+			}
+			if(lamp == null) {
+				vy = 0.0;
+			} else {
+				vy = vx - lamp.data.raw.spot_blend;
+			}
+		} else if(c.link == "_tilesheetOffset") {
+			var ts = (js_Boot.__cast(object , iron_object_MeshObject)).tilesheet;
+			vx = ts.tileX;
+			vy = ts.tileY;
+		} else if(iron_object_Uniforms.externalVec2Links != null) {
+			var _g4 = 0;
+			var _g13 = iron_object_Uniforms.externalVec2Links;
+			while(_g4 < _g13.length) {
+				var fn2 = _g13[_g4];
+				++_g4;
+				var v2 = fn2(c.link);
+				if(v2 != null) {
+					vx = v2.x;
+					vy = v2.y;
+					break;
+				}
+			}
+		}
+		g.setFloat2(location,vx,vy);
+	} else if(c.type == "float") {
+		var f1 = 0.0;
+		if(c.link == "_time") {
+			f1 = kha_Scheduler.time();
+		} else if(c.link == "_deltaTime") {
+			f1 = 0.0166666666666666664 * iron_system_Time.scale;
+		} else if(c.link == "_lampRadius") {
+			if(lamp == null) {
+				f1 = 0.0;
+			} else {
+				f1 = lamp.data.raw.far_plane;
+			}
+		} else if(c.link == "_lampShadowsBias") {
+			if(lamp == null) {
+				f1 = 0.0;
+			} else {
+				f1 = lamp.data.raw.shadows_bias;
+			}
+		} else if(c.link == "_lampSize") {
+			if(lamp != null && lamp.data.raw.lamp_size != null) {
+				f1 = lamp.data.raw.lamp_size;
+			}
+		} else if(c.link == "_lampSizeUV") {
+			if(lamp != null && lamp.data.raw.lamp_size != null) {
+				f1 = lamp.data.raw.lamp_size / lamp.data.raw.fov;
+			}
+		} else if(c.link == "_envmapStrength") {
+			if(iron_Scene.active.world == null) {
+				f1 = 0.0;
+			} else {
+				f1 = iron_Scene.active.world.getGlobalProbe().raw.strength;
+			}
+		} else if(c.link == "_probeStrength") {
+			f1 = iron_Scene.active.world.getProbeStrength(object.transform);
+		} else if(c.link == "_probeBlending") {
+			f1 = iron_Scene.active.world.getProbeBlending(object.transform);
+		} else if(c.link == "_aspectRatioF") {
+			f1 = iron_RenderPath.active.currentW / iron_RenderPath.active.currentH;
+		} else if(c.link == "_aspectRatioWindowF") {
+			f1 = kha_System.windowWidth() / kha_System.windowHeight();
+		} else if(c.link == "_objectInfoIndex") {
+			f1 = object.uid;
+		} else if(c.link == "_objectInfoMaterialIndex") {
+			if(iron_RenderPath.active.currentMaterial != null) {
+				f1 = iron_RenderPath.active.currentMaterial.uid;
+			} else {
+				f1 = (js_Boot.__cast(object , iron_object_MeshObject)).materials[0].uid;
+			}
+		} else if(c.link == "_objectInfoRandom") {
+			f1 = object.urandom;
+		} else if(iron_object_Uniforms.externalFloatLinks != null) {
+			var _g5 = 0;
+			var _g14 = iron_object_Uniforms.externalFloatLinks;
+			while(_g5 < _g14.length) {
+				var fn3 = _g14[_g5];
+				++_g5;
+				var res = fn3(c.link);
+				if(res != null) {
+					f1 = res;
+					break;
+				}
+			}
+		}
+		g.setFloat(location,f1);
+	} else if(c.type == "floats") {
+		var fa = null;
+		if(c.link == "_skinBones") {
+			if(object.animation != null) {
+				fa = (js_Boot.__cast(object.animation , iron_object_BoneAnimation)).skinBuffer;
+			}
+		} else if(c.link == "_envmapIrradiance") {
+			if(iron_Scene.active.world == null) {
+				fa = iron_data_WorldData.getEmptyIrradiance();
+			} else {
+				fa = iron_Scene.active.world.getSHIrradiance();
+			}
+		}
+		if(c.link == "_cascadeData") {
+			if(lamp != null) {
+				fa = lamp.getCascadeData();
+			}
+		} else if(iron_object_Uniforms.externalFloatsLinks != null) {
+			var _g6 = 0;
+			var _g15 = iron_object_Uniforms.externalFloatsLinks;
+			while(_g6 < _g15.length) {
+				var fn4 = _g15[_g6];
+				++_g6;
+				fa = fn4(c.link);
+				if(fa != null) {
+					break;
+				}
+			}
+		}
+		if(fa != null) {
+			g.setFloats(location,fa);
+		}
+	} else if(c.type == "int") {
+		var i = 0;
+		if(c.link == "_uid") {
+			i = object.uid;
+		}
+		if(c.link == "_lampType") {
+			if(lamp == null) {
+				i = 0;
+			} else {
+				switch(lamp.data.raw.type) {
+				case "area":
+					i = 3;
+					break;
+				case "point":
+					i = 1;
+					break;
+				case "spot":
+					i = 2;
+					break;
+				case "sun":
+					i = 0;
+					break;
+				default:
+					i = 0;
+				}
+			}
+		} else if(c.link == "_lampIndex") {
+			i = iron_RenderPath.active.currentLampIndex;
+		} else if(c.link == "_lampCastShadow") {
+			if(lamp != null && lamp.data.raw.cast_shadow) {
+				if(lamp.data.raw.shadowmap_cube) {
+					i = 2;
+				} else {
+					i = 1;
+				}
+			}
+		} else if(c.link == "_envmapNumMipmaps") {
+			var w = iron_Scene.active.world;
+			if(w != null) {
+				i = w.getGlobalProbe().raw.radiance_mipmaps + 1 - 2;
+			} else {
+				i = 1;
+			}
+		} else if(iron_object_Uniforms.externalIntLinks != null) {
+			var _g7 = 0;
+			var _g16 = iron_object_Uniforms.externalIntLinks;
+			while(_g7 < _g16.length) {
+				var fn5 = _g16[_g7];
+				++_g7;
+				var res1 = fn5(c.link);
+				if(res1 != null) {
+					i = res1;
+					break;
+				}
+			}
+		}
+		g.setInt(location,i);
+	}
+};
+iron_object_Uniforms.setMaterialConstants = function(g,context,materialContext) {
+	if(materialContext.raw.bind_constants != null) {
+		var _g1 = 0;
+		var _g = materialContext.raw.bind_constants.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var matc = materialContext.raw.bind_constants[i];
+			var pos = -1;
+			var _g3 = 0;
+			var _g2 = context.raw.constants.length;
+			while(_g3 < _g2) {
+				var i1 = _g3++;
+				if(context.raw.constants[i1].name == matc.name) {
+					pos = i1;
+					break;
+				}
+			}
+			if(pos == -1) {
+				continue;
+			}
+			var c = context.raw.constants[pos];
+			iron_object_Uniforms.setMaterialConstant(g,context.constants[pos],c,matc);
+		}
+	}
+	if(materialContext.textures != null) {
+		var _g11 = 0;
+		var _g4 = materialContext.textures.length;
+		while(_g11 < _g4) {
+			var i2 = _g11++;
+			var mname = materialContext.raw.bind_textures[i2].name;
+			var _g31 = 0;
+			var _g21 = context.textureUnits.length;
+			while(_g31 < _g21) {
+				var j = _g31++;
+				var sname = context.raw.texture_units[j].name;
+				if(mname == sname) {
+					g.setTexture(context.textureUnits[j],materialContext.textures[i2]);
+					materialContext.setTextureParameters(g,i2,context,j);
+					break;
+				}
+			}
+		}
+	}
+};
+iron_object_Uniforms.setMaterialConstant = function(g,location,c,matc) {
+	var _g = c.type;
+	switch(_g) {
+	case "bool":
+		g.setBool(location,matc.bool);
+		break;
+	case "float":
+		g.setFloat(location,matc["float"]);
+		break;
+	case "int":
+		g.setInt(location,matc["int"]);
+		break;
+	case "vec2":
+		g.setFloat2(location,matc.vec2[0],matc.vec2[1]);
+		break;
+	case "vec3":
+		g.setFloat3(location,matc.vec3[0],matc.vec3[1],matc.vec3[2]);
+		break;
+	case "vec4":
+		g.setFloat4(location,matc.vec4[0],matc.vec4[1],matc.vec4[2],matc.vec4[3]);
+		break;
+	}
+};
 var iron_system_ArmPack = function() { };
 $hxClasses["iron.system.ArmPack"] = iron_system_ArmPack;
 iron_system_ArmPack.__name__ = true;
@@ -7195,7 +9714,14 @@ iron_system_Input.endFrame = function() {
 		}
 	}
 };
+iron_system_Input.getMouse = function() {
+	if(iron_system_Input.mouse == null) {
+		iron_system_Input.mouse = new iron_system_Mouse();
+	}
+	return iron_system_Input.mouse;
+};
 var iron_system_VirtualButton = function() {
+	this.down = false;
 	this.released = false;
 	this.started = false;
 };
@@ -7204,16 +9730,48 @@ iron_system_VirtualButton.__name__ = true;
 iron_system_VirtualButton.prototype = {
 	__class__: iron_system_VirtualButton
 };
-var iron_system_VirutalInput = function() { };
+var iron_system_VirutalInput = function() {
+	this.virtualButtons = null;
+};
 $hxClasses["iron.system.VirutalInput"] = iron_system_VirutalInput;
 iron_system_VirutalInput.__name__ = true;
+iron_system_VirutalInput.prototype = {
+	downVirtual: function(button) {
+		if(this.virtualButtons != null) {
+			var _this = this.virtualButtons;
+			var vb = __map_reserved[button] != null ? _this.getReserved(button) : _this.h[button];
+			if(vb != null) {
+				vb.down = true;
+				vb.started = true;
+			}
+		}
+	}
+	,upVirtual: function(button) {
+		if(this.virtualButtons != null) {
+			var _this = this.virtualButtons;
+			var vb = __map_reserved[button] != null ? _this.getReserved(button) : _this.h[button];
+			if(vb != null) {
+				vb.down = false;
+				vb.released = true;
+			}
+		}
+	}
+	,__class__: iron_system_VirutalInput
+};
 var iron_system_Mouse = function() {
+	this.lastY = 0.0;
+	this.lastX = 0.0;
 	this.wheelDelta = 0;
 	this.movementY = 0.0;
 	this.movementX = 0.0;
 	this.moved = false;
+	this.y = 0.0;
+	this.x = 0.0;
 	this.buttonsReleased = [false,false,false];
 	this.buttonsStarted = [false,false,false];
+	this.buttonsDown = [false,false,false];
+	iron_system_VirutalInput.call(this);
+	kha_input_Mouse.get().notify($bind(this,this.downListener),$bind(this,this.upListener),$bind(this,this.moveListener),$bind(this,this.wheelListener));
 };
 $hxClasses["iron.system.Mouse"] = iron_system_Mouse;
 iron_system_Mouse.__name__ = true;
@@ -7228,6 +9786,47 @@ iron_system_Mouse.prototype = $extend(iron_system_VirutalInput.prototype,{
 		this.movementX = 0;
 		this.movementY = 0;
 		this.wheelDelta = 0;
+	}
+	,buttonIndex: function(button) {
+		if(button == "left") {
+			return 0;
+		} else if(button == "right") {
+			return 1;
+		} else {
+			return 2;
+		}
+	}
+	,down: function(button) {
+		if(button == null) {
+			button = "left";
+		}
+		return this.buttonsDown[this.buttonIndex(button)];
+	}
+	,downListener: function(index,x,y) {
+		this.buttonsDown[index] = true;
+		this.buttonsStarted[index] = true;
+		this.x = x;
+		this.y = y;
+		this.downVirtual(iron_system_Mouse.buttons[index]);
+	}
+	,upListener: function(index,x,y) {
+		this.buttonsDown[index] = false;
+		this.buttonsReleased[index] = true;
+		this.x = x;
+		this.y = y;
+		this.upVirtual(iron_system_Mouse.buttons[index]);
+	}
+	,moveListener: function(x,y,movementX,movementY) {
+		this.movementX = x - this.lastX;
+		this.movementY = y - this.lastY;
+		this.lastX = x;
+		this.lastY = y;
+		this.x = x;
+		this.y = y;
+		this.moved = true;
+	}
+	,wheelListener: function(delta) {
+		this.wheelDelta = delta;
 	}
 	,__class__: iron_system_Mouse
 });
@@ -8080,11 +10679,14 @@ kha_Image.prototype = {
 	,get_height: function() {
 		return 0;
 	}
+	,get_depth: function() {
+		return 1;
+	}
 	,get_g4: function() {
 		return null;
 	}
 	,__class__: kha_Image
-	,__properties__: {get_g4:"get_g4",get_height:"get_height",get_width:"get_width"}
+	,__properties__: {get_g4:"get_g4",get_depth:"get_depth",get_height:"get_height",get_width:"get_width"}
 };
 var kha_CanvasImage = function(width,height,format,renderTarget) {
 	this.myWidth = width;
@@ -8683,6 +11285,9 @@ kha_Scheduler.executeFrame = function() {
 };
 kha_Scheduler.archiveTimeTask = function(timeTask,frameEnd) {
 };
+kha_Scheduler.time = function() {
+	return kha_Scheduler.current;
+};
 kha_Scheduler.realTime = function() {
 	return kha_System.get_time();
 };
@@ -9026,38 +11631,38 @@ kha_Shaders.init = function() {
 	var _g25 = 0;
 	while(_g25 < 3) {
 		var i25 = _g25++;
-		var data25 = Reflect.field(kha_Shaders,"painter_colored_vertData" + i25);
+		var data25 = Reflect.field(kha_Shaders,"painter_image_fragData" + i25);
 		var bytes25 = haxe_Unserializer.run(data25);
 		blobs25.push(kha_internal_BytesBlob.fromBytes(bytes25));
 	}
-	kha_Shaders.painter_colored_vert = new kha_graphics4_VertexShader(blobs25,["painter-colored.vert.essl","painter-colored-relaxed.vert.essl","painter-colored-webgl2.vert.essl"]);
+	kha_Shaders.painter_image_frag = new kha_graphics4_FragmentShader(blobs25,["painter-image.frag.essl","painter-image-relaxed.frag.essl","painter-image-webgl2.frag.essl"]);
 	var blobs26 = [];
 	var _g26 = 0;
 	while(_g26 < 3) {
 		var i26 = _g26++;
-		var data26 = Reflect.field(kha_Shaders,"painter_image_fragData" + i26);
+		var data26 = Reflect.field(kha_Shaders,"painter_colored_vertData" + i26);
 		var bytes26 = haxe_Unserializer.run(data26);
 		blobs26.push(kha_internal_BytesBlob.fromBytes(bytes26));
 	}
-	kha_Shaders.painter_image_frag = new kha_graphics4_FragmentShader(blobs26,["painter-image.frag.essl","painter-image-relaxed.frag.essl","painter-image-webgl2.frag.essl"]);
+	kha_Shaders.painter_colored_vert = new kha_graphics4_VertexShader(blobs26,["painter-colored.vert.essl","painter-colored-relaxed.vert.essl","painter-colored-webgl2.vert.essl"]);
 	var blobs27 = [];
 	var _g27 = 0;
 	while(_g27 < 3) {
 		var i27 = _g27++;
-		var data27 = Reflect.field(kha_Shaders,"painter_image_vertData" + i27);
+		var data27 = Reflect.field(kha_Shaders,"painter_text_fragData" + i27);
 		var bytes27 = haxe_Unserializer.run(data27);
 		blobs27.push(kha_internal_BytesBlob.fromBytes(bytes27));
 	}
-	kha_Shaders.painter_image_vert = new kha_graphics4_VertexShader(blobs27,["painter-image.vert.essl","painter-image-relaxed.vert.essl","painter-image-webgl2.vert.essl"]);
+	kha_Shaders.painter_text_frag = new kha_graphics4_FragmentShader(blobs27,["painter-text.frag.essl","painter-text-relaxed.frag.essl","painter-text-webgl2.frag.essl"]);
 	var blobs28 = [];
 	var _g28 = 0;
 	while(_g28 < 3) {
 		var i28 = _g28++;
-		var data28 = Reflect.field(kha_Shaders,"painter_text_fragData" + i28);
+		var data28 = Reflect.field(kha_Shaders,"painter_image_vertData" + i28);
 		var bytes28 = haxe_Unserializer.run(data28);
 		blobs28.push(kha_internal_BytesBlob.fromBytes(bytes28));
 	}
-	kha_Shaders.painter_text_frag = new kha_graphics4_FragmentShader(blobs28,["painter-text.frag.essl","painter-text-relaxed.frag.essl","painter-text-webgl2.frag.essl"]);
+	kha_Shaders.painter_image_vert = new kha_graphics4_VertexShader(blobs28,["painter-image.vert.essl","painter-image-relaxed.vert.essl","painter-image-webgl2.vert.essl"]);
 	var blobs29 = [];
 	var _g29 = 0;
 	while(_g29 < 3) {
@@ -9348,6 +11953,12 @@ kha_SystemImpl.init2 = function(backbufferFormat) {
 	kha_Scheduler.init();
 	kha_SystemImpl.loadFinished();
 	kha_EnvironmentVariables.instance = new kha_js_EnvironmentVariables();
+};
+kha_SystemImpl.getMouse = function(num) {
+	if(num != 0) {
+		return null;
+	}
+	return kha_SystemImpl.mouse;
 };
 kha_SystemImpl.checkGamepad = function(pad) {
 	var _g1 = 0;
@@ -9988,6 +12599,10 @@ kha_WebGLImage.prototype = $extend(kha_Image.prototype,{
 		if(this.video != null) {
 			kha_SystemImpl.gl.texImage2D(3553,0,6408,6408,5121,this.video);
 		}
+	}
+	,setDepth: function(stage) {
+		kha_SystemImpl.gl.activeTexture(33984 + stage);
+		kha_SystemImpl.gl.bindTexture(3553,this.depthTexture);
 	}
 	,setDepthStencilFrom: function(image) {
 		kha_SystemImpl.gl.bindFramebuffer(36160,this.frameBuffer);
@@ -18957,6 +21572,14 @@ kha_graphics4_CubeMap.prototype = {
 			break;
 		}
 	}
+	,set: function(stage) {
+		kha_SystemImpl.gl.activeTexture(33984 + stage);
+		kha_SystemImpl.gl.bindTexture(34067,this.texture);
+	}
+	,setDepth: function(stage) {
+		kha_SystemImpl.gl.activeTexture(33984 + stage);
+		kha_SystemImpl.gl.bindTexture(34067,this.depthTexture);
+	}
 	,get_width: function() {
 		return this.myWidth;
 	}
@@ -20098,9 +22721,55 @@ var kha_input_Mouse = $hx_exports["kha"]["input"]["Mouse"] = function() {
 };
 $hxClasses["kha.input.Mouse"] = kha_input_Mouse;
 kha_input_Mouse.__name__ = true;
+kha_input_Mouse.get = function(num) {
+	if(num == null) {
+		num = 0;
+	}
+	return kha_SystemImpl.getMouse(num);
+};
 kha_input_Mouse.__super__ = kha_network_Controller;
 kha_input_Mouse.prototype = $extend(kha_network_Controller.prototype,{
-	sendLeaveEvent: function(windowId) {
+	notify: function(downListener,upListener,moveListener,wheelListener,leaveListener) {
+		this.notifyWindowed(0,downListener,upListener,moveListener,wheelListener,leaveListener);
+	}
+	,notifyWindowed: function(windowId,downListener,upListener,moveListener,wheelListener,leaveListener) {
+		if(downListener != null) {
+			if(this.windowDownListeners == null) {
+				this.windowDownListeners = [];
+			}
+			while(this.windowDownListeners.length <= windowId) this.windowDownListeners.push([]);
+			this.windowDownListeners[windowId].push(downListener);
+		}
+		if(upListener != null) {
+			if(this.windowUpListeners == null) {
+				this.windowUpListeners = [];
+			}
+			while(this.windowUpListeners.length <= windowId) this.windowUpListeners.push([]);
+			this.windowUpListeners[windowId].push(upListener);
+		}
+		if(moveListener != null) {
+			if(this.windowMoveListeners == null) {
+				this.windowMoveListeners = [];
+			}
+			while(this.windowMoveListeners.length <= windowId) this.windowMoveListeners.push([]);
+			this.windowMoveListeners[windowId].push(moveListener);
+		}
+		if(wheelListener != null) {
+			if(this.windowWheelListeners == null) {
+				this.windowWheelListeners = [];
+			}
+			while(this.windowWheelListeners.length <= windowId) this.windowWheelListeners.push([]);
+			this.windowWheelListeners[windowId].push(wheelListener);
+		}
+		if(leaveListener != null) {
+			if(this.windowLeaveListeners == null) {
+				this.windowLeaveListeners = [];
+			}
+			while(this.windowLeaveListeners.length <= windowId) this.windowLeaveListeners.push([]);
+			this.windowLeaveListeners[windowId].push(leaveListener);
+		}
+	}
+	,sendLeaveEvent: function(windowId) {
 		if(kha_network_Session.the() != null) {
 			var bytes = new haxe_io_Bytes(new ArrayBuffer(8));
 			bytes.setInt32(0,0);
@@ -21044,8 +23713,10 @@ kha_js_graphics4_ConstantLocation.prototype = {
 	__class__: kha_js_graphics4_ConstantLocation
 };
 var kha_js_graphics4_Graphics = function(renderTarget) {
-	var this1 = new Array(16);
-	this.matrixCache = this1;
+	var this1 = new Array(9);
+	this.matrix3Cache = this1;
+	var this11 = new Array(16);
+	this.matrixCache = this11;
 	this.isDepthAttachment = false;
 	this.isCubeMap = false;
 	this.colorMaskAlpha = true;
@@ -21153,6 +23824,13 @@ kha_js_graphics4_Graphics.prototype = {
 			}
 		}
 	}
+	,beginFace: function(face) {
+		kha_SystemImpl.gl.enable(3042);
+		kha_SystemImpl.gl.blendFunc(770,771);
+		kha_SystemImpl.gl.bindFramebuffer(36160,this.renderTargetFrameBuffer);
+		kha_SystemImpl.gl.framebufferTexture2D(36160,this.isDepthAttachment ? 36096 : 36064,34069 + face,this.renderTargetTexture,0);
+		kha_SystemImpl.gl.viewport(0,0,this.renderTarget.get_width(),this.renderTarget.get_height());
+	}
 	,end: function() {
 		var error = kha_SystemImpl.gl.getError();
 		switch(error) {
@@ -21207,6 +23885,10 @@ kha_js_graphics4_Graphics.prototype = {
 			kha_SystemImpl.gl.disable(2929);
 		}
 		kha_SystemImpl.gl.depthMask(this.depthMask);
+	}
+	,viewport: function(x,y,width,height) {
+		var h = this.renderTarget == null ? kha_System.windowHeight(0) : this.renderTarget.get_height();
+		kha_SystemImpl.gl.viewport(x,h - y - height,width,height);
 	}
 	,setDepthMode: function(write,mode) {
 		switch(mode[1]) {
@@ -21270,6 +23952,15 @@ kha_js_graphics4_Graphics.prototype = {
 	,setVertexBuffer: function(vertexBuffer) {
 		(js_Boot.__cast(vertexBuffer , kha_graphics4_VertexBuffer)).set(0);
 	}
+	,setVertexBuffers: function(vertexBuffers) {
+		var offset = 0;
+		var _g = 0;
+		while(_g < vertexBuffers.length) {
+			var vertexBuffer = vertexBuffers[_g];
+			++_g;
+			offset += (js_Boot.__cast(vertexBuffer , kha_graphics4_VertexBuffer)).set(offset);
+		}
+	}
 	,setIndexBuffer: function(indexBuffer) {
 		this.indicesCount = indexBuffer.count();
 		(js_Boot.__cast(indexBuffer , kha_graphics4_IndexBuffer)).set();
@@ -21281,6 +23972,9 @@ kha_js_graphics4_Graphics.prototype = {
 		} else {
 			(js_Boot.__cast(texture , kha_WebGLImage)).set((js_Boot.__cast(stage , kha_js_graphics4_TextureUnit)).value);
 		}
+	}
+	,setTextureDepth: function(stage,texture) {
+		(js_Boot.__cast(texture , kha_WebGLImage)).setDepth((js_Boot.__cast(stage , kha_js_graphics4_TextureUnit)).value);
 	}
 	,setTextureParameters: function(texunit,uAddressing,vAddressing,minificationFilter,magnificationFilter,mipmapFilter) {
 		kha_SystemImpl.gl.activeTexture(33984 + (js_Boot.__cast(texunit , kha_js_graphics4_TextureUnit)).value);
@@ -21346,6 +24040,17 @@ kha_js_graphics4_Graphics.prototype = {
 			break;
 		}
 	}
+	,setCubeMap: function(stage,cubeMap) {
+		if(cubeMap == null) {
+			kha_SystemImpl.gl.activeTexture(33984 + (js_Boot.__cast(stage , kha_js_graphics4_TextureUnit)).value);
+			kha_SystemImpl.gl.bindTexture(34067,null);
+		} else {
+			cubeMap.set((js_Boot.__cast(stage , kha_js_graphics4_TextureUnit)).value);
+		}
+	}
+	,setCubeMapDepth: function(stage,cubeMap) {
+		cubeMap.setDepth((js_Boot.__cast(stage , kha_js_graphics4_TextureUnit)).value);
+	}
 	,setCullMode: function(mode) {
 		switch(mode[1]) {
 		case 0:
@@ -21372,6 +24077,41 @@ kha_js_graphics4_Graphics.prototype = {
 		this.colorMaskBlue = pipe.colorWriteMaskBlue;
 		this.colorMaskAlpha = pipe.colorWriteMaskAlpha;
 	}
+	,setBool: function(location,value) {
+		kha_SystemImpl.gl.uniform1i((js_Boot.__cast(location , kha_js_graphics4_ConstantLocation)).value,value ? 1 : 0);
+	}
+	,setInt: function(location,value) {
+		kha_SystemImpl.gl.uniform1i((js_Boot.__cast(location , kha_js_graphics4_ConstantLocation)).value,value);
+	}
+	,setFloat: function(location,value) {
+		kha_SystemImpl.gl.uniform1f((js_Boot.__cast(location , kha_js_graphics4_ConstantLocation)).value,value);
+	}
+	,setFloat2: function(location,value1,value2) {
+		kha_SystemImpl.gl.uniform2f((js_Boot.__cast(location , kha_js_graphics4_ConstantLocation)).value,value1,value2);
+	}
+	,setFloat3: function(location,value1,value2,value3) {
+		kha_SystemImpl.gl.uniform3f((js_Boot.__cast(location , kha_js_graphics4_ConstantLocation)).value,value1,value2,value3);
+	}
+	,setFloat4: function(location,value1,value2,value3,value4) {
+		kha_SystemImpl.gl.uniform4f((js_Boot.__cast(location , kha_js_graphics4_ConstantLocation)).value,value1,value2,value3,value4);
+	}
+	,setFloats: function(location,values) {
+		var webglLocation = js_Boot.__cast(location , kha_js_graphics4_ConstantLocation);
+		var _g = webglLocation.type;
+		switch(_g) {
+		case 35664:
+			kha_SystemImpl.gl.uniform2fv(webglLocation.value,values);
+			break;
+		case 35665:
+			kha_SystemImpl.gl.uniform3fv(webglLocation.value,values);
+			break;
+		case 35666:
+			kha_SystemImpl.gl.uniform4fv(webglLocation.value,values);
+			break;
+		default:
+			kha_SystemImpl.gl.uniform1fv(webglLocation.value,values);
+		}
+	}
 	,setMatrix: function(location,matrix) {
 		this.matrixCache[0] = matrix._00;
 		this.matrixCache[1] = matrix._01;
@@ -21390,6 +24130,18 @@ kha_js_graphics4_Graphics.prototype = {
 		this.matrixCache[14] = matrix._32;
 		this.matrixCache[15] = matrix._33;
 		kha_SystemImpl.gl.uniformMatrix4fv((js_Boot.__cast(location , kha_js_graphics4_ConstantLocation)).value,false,this.matrixCache);
+	}
+	,setMatrix3: function(location,matrix) {
+		this.matrix3Cache[0] = matrix._00;
+		this.matrix3Cache[1] = matrix._01;
+		this.matrix3Cache[2] = matrix._02;
+		this.matrix3Cache[3] = matrix._10;
+		this.matrix3Cache[4] = matrix._11;
+		this.matrix3Cache[5] = matrix._12;
+		this.matrix3Cache[6] = matrix._20;
+		this.matrix3Cache[7] = matrix._21;
+		this.matrix3Cache[8] = matrix._22;
+		kha_SystemImpl.gl.uniformMatrix3fv((js_Boot.__cast(location , kha_js_graphics4_ConstantLocation)).value,false,this.matrix3Cache);
 	}
 	,drawIndexedVertices: function(start,count) {
 		if(count == null) {
@@ -21465,8 +24217,39 @@ kha_js_graphics4_Graphics.prototype = {
 			kha_SystemImpl.gl.stencilFunc(stencilFunc,referenceValue,readMask);
 		}
 	}
+	,scissor: function(x,y,width,height) {
+		kha_SystemImpl.gl.enable(3089);
+		if(this.renderTarget == null) {
+			kha_SystemImpl.gl.scissor(x,kha_System.windowHeight(0) - y - height,width,height);
+		} else {
+			kha_SystemImpl.gl.scissor(x,y,width,height);
+		}
+	}
+	,disableScissor: function() {
+		kha_SystemImpl.gl.disable(3089);
+	}
 	,renderTargetsInvertedY: function() {
 		return true;
+	}
+	,drawIndexedVerticesInstanced: function(instanceCount,start,count) {
+		if(count == null) {
+			count = -1;
+		}
+		if(start == null) {
+			start = 0;
+		}
+		if(this.instancedRenderingAvailable()) {
+			var type = kha_SystemImpl.elementIndexUint == null ? 5123 : 5125;
+			var typeSize = kha_SystemImpl.elementIndexUint == null ? 2 : 4;
+			if(kha_SystemImpl.gl2) {
+				kha_SystemImpl.gl.drawElementsInstanced(4,count == -1 ? this.indicesCount : count,type,start * typeSize,instanceCount);
+			} else {
+				this.instancedExtension.drawElementsInstancedANGLE(4,count == -1 ? this.indicesCount : count,type,start * typeSize,instanceCount);
+			}
+		}
+	}
+	,instancedRenderingAvailable: function() {
+		return this.instancedExtension;
 	}
 	,__class__: kha_js_graphics4_Graphics
 };
@@ -21651,6 +24434,11 @@ iron_data_Data.assetsLoaded = 0;
 iron_data_Data.loadingBlobs = new haxe_ds_StringMap();
 iron_data_Data.loadingImages = new haxe_ds_StringMap();
 iron_data_Data.loadingSounds = new haxe_ds_StringMap();
+iron_data_ConstData.skydomeIndices = [0,1,2,0,3,4,3,5,6,5,7,8,7,9,10,9,11,12,13,14,15,11,16,17,13,18,2,14,2,19,2,1,20,1,4,21,4,6,22,6,8,23,8,10,24,10,12,25,14,26,15,17,27,25,22,23,28,24,29,28,24,25,30,26,31,15,25,27,32,26,19,33,19,20,34,20,21,35,21,22,36,33,34,37,34,35,38,35,36,39,36,28,40,28,29,41,30,42,41,31,43,15,30,32,44,31,33,45,40,41,46,42,47,46,43,48,15,42,44,49,43,45,50,45,37,51,37,38,52,39,53,52,39,40,54,50,51,55,51,52,56,53,57,56,53,54,58,46,59,58,46,47,60,48,61,15,47,49,62,48,50,63,59,64,65,59,60,66,61,67,15,60,62,68,61,63,69,63,55,70,56,71,70,56,57,72,57,58,65,70,71,73,71,72,74,72,65,75,64,76,75,64,66,77,67,78,15,68,79,77,67,69,80,69,70,81,76,77,82,78,83,15,77,79,84,80,85,83,80,81,86,81,73,87,74,88,87,74,75,89,76,90,89,87,88,91,88,89,92,90,93,92,90,82,94,83,95,15,82,84,96,83,85,97,86,98,97,86,87,99,95,100,15,96,101,102,95,97,103,97,98,104,98,99,105,91,106,105,91,92,107,93,108,107,93,94,102,105,106,109,106,107,110,108,111,110,108,102,112,100,113,15,102,101,114,100,103,115,103,104,116,104,105,117,114,118,119,113,115,120,115,116,121,117,122,121,109,123,122,109,110,124,111,125,124,111,112,119,113,126,15,123,124,127,125,128,127,125,119,129,126,130,15,119,118,131,126,120,132,121,133,132,121,122,134,122,123,135,130,132,136,132,133,137,133,134,138,134,135,139,135,127,140,128,141,140,128,129,142,130,143,15,129,131,144,139,140,145,141,146,145,141,142,147,143,148,15,142,144,149,143,136,150,137,151,150,138,152,151,138,139,153,150,151,154,152,155,154,153,156,155,153,145,157,146,158,157,146,147,159,148,160,15,147,149,161,148,150,162,158,163,164,158,159,165,160,166,15,161,167,165,160,162,168,162,154,169,155,170,169,156,171,170,156,157,164,169,170,172,171,173,172,171,164,174,163,175,174,163,165,176,166,177,15,165,167,178,166,168,179,168,169,180,176,181,182,177,183,15,176,178,184,177,179,185,179,180,186,172,187,186,173,188,187,173,174,189,175,182,189,187,190,191,188,192,190,188,189,193,182,194,193,182,181,195,183,196,15,181,184,197,183,185,198,185,186,191,194,195,199,196,200,15,195,197,201,196,198,202,198,191,203,190,204,203,192,205,204,192,193,206,194,207,206,205,208,209,205,206,210,207,211,210,207,199,212,200,213,15,199,201,214,202,215,213,202,203,216,204,209,216,213,217,15,214,218,219,215,220,217,215,216,221,209,222,221,209,208,223,208,210,224,211,225,224,211,212,219,223,226,227,223,224,228,225,229,228,225,219,230,217,231,15,218,232,230,220,233,231,220,221,234,222,227,234,230,232,235,231,233,236,233,234,237,227,238,237,227,226,239,226,228,240,229,241,240,229,230,242,231,243,15,239,240,244,241,245,244,241,242,246,243,247,15,235,248,246,243,236,249,237,250,249,238,251,250,239,252,251,249,250,253,250,251,254,252,255,254,252,244,256,245,257,256,245,246,258,247,259,15,248,260,258,247,249,261,257,262,263,258,264,262,259,265,15,258,260,266,259,261,267,261,253,268,253,254,269,255,270,269,255,256,263,268,271,272,269,273,271,270,274,273,270,263,275,262,276,275,262,264,277,265,278,15,264,266,279,267,272,278,276,280,281,276,277,282,278,283,15,277,279,284,278,272,285,272,271,286,271,273,287,274,288,287,274,275,281,287,3,0,288,5,3,281,7,5,280,9,7,282,11,9,283,13,15,282,284,16,285,18,13,286,0,18,0,2,18,0,4,1,3,6,4,5,8,6,7,10,8,9,12,10,11,17,12,13,2,14,14,19,26,2,20,19,1,21,20,4,22,21,6,23,22,8,24,23,10,25,24,17,25,12,22,28,36,24,28,23,24,30,29,25,32,30,26,33,31,19,34,33,20,35,34,21,36,35,33,37,45,34,38,37,35,39,38,36,40,39,28,41,40,30,41,29,30,44,42,31,45,43,40,46,54,42,46,41,42,49,47,43,50,48,45,51,50,37,52,51,39,52,38,39,54,53,50,55,63,51,56,55,53,56,52,53,58,57,46,58,54,46,60,59,47,62,60,48,63,61,59,65,58,59,66,64,60,68,66,61,69,67,63,70,69,56,70,55,56,72,71,57,65,72,70,73,81,71,74,73,72,75,74,64,75,65,64,77,76,68,77,66,67,80,78,69,81,80,76,82,90,77,84,82,80,83,78,80,86,85,81,87,86,74,87,73,74,89,88,76,89,75,87,91,99,88,92,91,90,92,89,90,94,93,82,96,94,83,97,95,86,97,85,86,99,98,96,102,94,95,103,100,97,104,103,98,105,104,91,105,99,91,107,106,93,107,92,93,102,108,105,109,117,106,110,109,108,110,107,108,112,111,102,114,112,100,115,113,103,116,115,104,117,116,114,119,112,113,120,126,115,121,120,117,121,116,109,122,117,109,124,123,111,124,110,111,119,125,123,127,135,125,127,124,125,129,128,119,131,129,126,132,130,121,132,120,121,134,133,122,135,134,130,136,143,132,137,136,133,138,137,134,139,138,135,140,139,128,140,127,128,142,141,129,144,142,139,145,153,141,145,140,141,147,146,142,149,147,143,150,148,137,150,136,138,151,137,138,153,152,150,154,162,152,154,151,153,155,152,153,157,156,146,157,145,146,159,158,147,161,159,148,162,160,158,164,157,158,165,163,161,165,159,160,168,166,162,169,168,155,169,154,156,170,155,156,164,171,169,172,180,171,172,170,171,174,173,163,174,164,163,176,175,165,178,176,166,179,177,168,180,179,176,182,175,176,184,181,177,185,183,179,186,185,172,186,180,173,187,172,173,189,188,175,189,174,187,191,186,188,190,187,188,193,192,182,193,189,182,195,194,181,197,195,183,198,196,185,191,198,194,199,207,195,201,199,196,202,200,198,203,202,190,203,191,192,204,190,192,206,205,194,206,193,205,209,204,205,210,208,207,210,206,207,212,211,199,214,212,202,213,200,202,216,215,204,216,203,214,219,212,215,217,213,215,221,220,209,221,216,209,223,222,208,224,223,211,224,210,211,219,225,223,227,222,223,228,226,225,228,224,225,230,229,218,230,219,220,231,217,220,234,233,222,234,221,230,235,242,231,236,243,233,237,236,227,237,234,227,239,238,226,240,239,229,240,228,229,242,241,239,244,252,241,244,240,241,246,245,235,246,242,243,249,247,237,249,236,238,250,237,239,251,238,249,253,261,250,254,253,252,254,251,252,256,255,245,256,244,245,258,257,248,258,246,247,261,259,257,263,256,258,262,257,258,266,264,259,267,265,261,268,267,253,269,268,255,269,254,255,263,270,268,272,267,269,271,268,270,273,269,270,275,274,262,275,263,262,277,276,264,279,277,267,278,265,276,281,275,276,282,280,277,284,282,278,285,283,272,286,285,271,287,286,274,287,273,274,281,288,287,0,286,288,3,287,281,5,288,280,7,281,282,9,280,282,16,11,285,13,283,286,18,285,84,289,96,96,289,101,101,289,114,114,289,118,118,289,131,144,131,289,149,144,289,149,289,161,161,289,167,167,289,178,178,289,184,184,289,197,197,289,201,201,289,214,214,289,218,218,289,232,232,289,235,235,289,248,260,248,289,260,289,266,266,289,279,279,289,284,284,289,16,16,289,17,27,17,289,27,289,32,44,32,289,44,289,49,49,289,62,62,289,68,68,289,79,79,289,84];
+iron_data_ConstData.skydomePos = [-0.5555702447891235,0.0,0.8314695954322815,-0.5448951125144958,0.10838644951581955,0.8314695954322815,-0.3753302991390228,0.07465790957212448,0.9238795042037964,-0.7071067690849304,0.0,0.7071067690849304,-0.6935198903083801,0.13794974982738495,0.7071067690849304,-0.8314696550369263,0.0,0.5555701851844788,-0.8154931664466858,0.16221174597740173,0.5555701851844788,-0.9238795042037964,0.0,0.3826834261417389,-0.906127393245697,0.18024000525474548,0.3826834261417389,-0.9807852506637573,0.0,0.19509035348892212,-0.9619396924972534,0.19134177267551422,0.19509035348892212,-1.0,0.0,7.549790126404332e-08,-0.9807852506637573,0.1950903832912445,7.549790126404332e-08,-0.19509032368659973,0.0,0.9807852506637573,-0.19134171307086945,0.03806029632687569,0.9807852506637573,2.4803494369507462e-08,-1.246939973498229e-07,1.0,-0.9807853102684021,0.0,-0.282339870929718,-0.9619397521018982,0.19134178757667542,-0.282339870929718,-0.3826834559440613,0.0,0.9238795042037964,-0.3535534143447876,0.14644673466682434,0.9238795042037964,-0.513279914855957,0.21260765194892883,0.8314695954322815,-0.6532813906669617,0.2705981731414795,0.7071067690849304,-0.7681776881217957,0.3181897699832916,0.5555701851844788,-0.853553295135498,0.3535534739494324,0.3826834261417389,-0.9061273336410522,0.37533038854599,0.19509035348892212,-0.9238794445991516,0.38268354535102844,7.549790126404332e-08,-0.1802399456501007,0.07465796172618866,0.9807852506637573,-0.9061273336410522,0.37533038854599,-0.282339870929718,-0.7681776285171509,0.5132800936698914,0.3826834261417389,-0.8154929876327515,0.5448952317237854,0.19509035348892212,-0.8314694762229919,0.5555704236030579,7.549790126404332e-08,-0.16221162676811218,0.1083865687251091,0.9807852506637573,-0.8154929876327515,0.5448952317237854,-0.282339870929718,-0.3181896209716797,0.2126077115535736,0.9238795042037964,-0.4619396924972534,0.3086584508419037,0.8314695954322815,-0.5879377126693726,0.3928476572036743,0.7071067690849304,-0.6913416385650635,0.4619399309158325,0.5555701851844788,-0.39284735918045044,0.3928476870059967,0.8314695954322815,-0.49999988079071045,0.5000001788139343,0.7071067690849304,-0.5879376530647278,0.5879380106925964,0.5555701851844788,-0.6532813310623169,0.6532816290855408,0.3826834261417389,-0.6935197114944458,0.6935200691223145,0.19509035348892212,-0.7071065902709961,0.7071070075035095,7.549790126404332e-08,-0.137949600815773,0.13794992864131927,0.9807852506637573,-0.6935197114944458,0.6935200691223145,-0.282339870929718,-0.2705979645252228,0.27059829235076904,0.9238795042037964,-0.544894814491272,0.8154932856559753,0.19509035348892212,-0.5555700063705444,0.8314698338508606,7.549790126404332e-08,-0.10838623344898224,0.16221193969249725,0.9807852506637573,-0.544894814491272,0.8154932856559753,-0.282339870929718,-0.21260739862918854,0.31818991899490356,0.9238795042037964,-0.3086581230163574,0.4619399905204773,0.8314695954322815,-0.39284729957580566,0.5879380106925964,0.7071067690849304,-0.46193957328796387,0.6913419365882874,0.5555701851844788,-0.5132797956466675,0.7681779265403748,0.3826834261417389,-0.21260732412338257,0.5132802128791809,0.8314695954322815,-0.27059781551361084,0.6532816886901855,0.7071067690849304,-0.3181893825531006,0.7681779861450195,0.5555701851844788,-0.3535531759262085,0.8535535335540771,0.3826834261417389,-0.3753299117088318,0.9061275124549866,0.19509035348892212,-0.3826831579208374,0.9238797426223755,7.549790126404332e-08,-0.0746576264500618,0.18024024367332458,0.9807852506637573,-0.3753299117088318,0.9061275124549866,-0.282339870929718,-0.14644642174243927,0.3535536825656891,0.9238795042037964,-0.1913413405418396,0.961939811706543,0.19509035348892212,-0.1802397072315216,0.9061275720596313,0.3826834261417389,-0.19508999586105347,0.9807854890823364,7.549790126404332e-08,-0.038059964776039124,0.19134201109409332,0.9807852506637573,-0.1913413405418396,0.961939811706543,-0.282339870929718,-0.07465757429599762,0.3753305673599243,0.9238795042037964,-0.10838611423969269,0.544895350933075,0.8314695954322815,-0.13794942200183868,0.6935201287269592,0.7071067690849304,-0.1622113734483719,0.8154933452606201,0.5555701851844788,3.191853465978056e-07,0.7071069478988647,0.7071067690849304,3.340865077916533e-07,0.8314697742462158,0.5555701851844788,2.7448186301626265e-07,0.9238796830177307,0.3826834261417389,3.936911525670439e-07,0.9807852506637573,0.19509035348892212,3.7878999137319624e-07,1.000000238418579,7.549790126404332e-08,3.2663592719472945e-07,0.19509060680866241,0.9807852506637573,3.936911525670439e-07,0.9807852506637573,-0.282339870929718,3.191853465978056e-07,0.3826836943626404,0.9238795042037964,3.117347660008818e-07,0.5555704832077026,0.8314695954322815,0.19509074091911316,0.9807854890823364,7.549790126404332e-08,0.038060616701841354,0.19134199619293213,0.9807852506637573,0.19134210050106049,0.9619396924972534,-0.282339870929718,0.07465820759534836,0.37533053755760193,0.9238795042037964,0.10838674008846283,0.544895350933075,0.8314695954322815,0.13795003294944763,0.6935200691223145,0.7071067690849304,0.16221202909946442,0.8154932856559753,0.5555701851844788,0.18024025857448578,0.9061275720596313,0.3826834261417389,0.19134210050106049,0.9619396924972534,0.19509035348892212,0.3181900382041931,0.7681778073310852,0.5555701851844788,0.3535537123680115,0.8535535335540771,0.3826834261417389,0.3753306269645691,0.9061273336410522,0.19509035348892212,0.3826838731765747,0.9238796830177307,7.549790126404332e-08,0.07465826719999313,0.180240198969841,0.9807852506637573,0.3753306269645691,0.9061273336410522,-0.282339870929718,0.14644701778888702,0.3535536229610443,0.9238795042037964,0.21260792016983032,0.5132801532745361,0.8314695954322815,0.2705984115600586,0.6532816290855408,0.7071067690849304,0.10838685184717178,0.16221188008785248,0.9807852506637573,0.5448954105377197,0.8154930472373962,-0.282339870929718,0.555570662021637,0.831469714641571,7.549790126404332e-08,0.2126079499721527,0.3181898593902588,0.9238795042037964,0.3086586892604828,0.4619399309158325,0.8314695954322815,0.39284783601760864,0.5879379510879517,0.7071067690849304,0.4619401693344116,0.691341757774353,0.5555701851844788,0.5132802724838257,0.76817786693573,0.3826834261417389,0.5448954105377197,0.8154930472373962,0.19509035348892212,0.5879381895065308,0.5879377722740173,0.5555701851844788,0.6532818078994751,0.6532816290855408,0.3826834261417389,0.693520188331604,0.6935198307037354,0.19509035348892212,0.7071072459220886,0.7071068286895752,7.549790126404332e-08,0.13795019686222076,0.1379498541355133,0.9807852506637573,0.693520188331604,0.6935198307037354,-0.282339870929718,0.27059850096702576,0.27059823274612427,0.9238795042037964,0.3928478956222534,0.39284759759902954,0.8314695954322815,0.5000003576278687,0.5000000596046448,0.7071067690849304,0.8154934048652649,0.5448949933052063,-0.282339870929718,0.8314700722694397,0.5555702447891235,7.549790126404332e-08,0.3181900978088379,0.21260765194892883,0.9238795042037964,0.4619401693344116,0.3086583614349365,0.8314695954322815,0.5879381895065308,0.3928475081920624,0.7071067690849304,0.6913420557975769,0.4619397222995758,0.5555701851844788,0.7681781053543091,0.5132800936698914,0.3826834261417389,0.8154934048652649,0.5448949933052063,0.19509035348892212,0.16221219301223755,0.10838649421930313,0.9807852506637573,0.8535537123680115,0.3535534739494324,0.3826834261417389,0.9061276316642761,0.3753301501274109,0.19509035348892212,0.9238799810409546,0.3826833963394165,7.549790126404332e-08,0.1802404820919037,0.07465791702270508,0.9807852506637573,0.9061276316642761,0.3753301501274109,-0.282339870929718,0.353553831577301,0.14644670486450195,0.9238795042037964,0.5132803916931152,0.21260759234428406,0.8314695954322815,0.6532818078994751,0.27059802412986755,0.7071067690849304,0.7681780457496643,0.3181895613670349,0.5555701851844788,0.37533071637153625,0.07465790212154388,0.9238795042037964,0.5448955297470093,0.10838642716407776,0.8314695954322815,0.6935202479362488,0.13794966042041779,0.7071067690849304,0.8154933452606201,0.1622115671634674,0.5555701851844788,0.9061277508735657,0.18024002015590668,0.3826834261417389,0.9619399309158325,0.1913416087627411,0.19509035348892212,0.9807857275009155,0.19509024918079376,7.549790126404332e-08,0.19134224951267242,0.0380602702498436,0.9807852506637573,0.9619399309158325,0.1913416087627411,-0.282339870929718,0.923879861831665,6.356849979738399e-08,0.3826834261417389,0.9807853698730469,-8.544311214109257e-08,0.19509035348892212,1.0000003576278687,-1.0034427333494023e-07,7.549790126404332e-08,0.19509084522724152,-7.2120158733923745e-09,0.9807852506637573,0.9807853698730469,-8.544311214109257e-08,-0.282339870929718,0.3826838433742523,4.121675800661251e-08,0.9238795042037964,0.555570662021637,2.6315596812764852e-08,0.8314695954322815,0.7071070671081543,-2.5838467365701945e-08,0.7071067690849304,0.831469714641571,-8.544311214109257e-08,0.5555701851844788,0.5448955297470093,-0.10838636755943298,0.8314695954322815,0.693520188331604,-0.13794972002506256,0.7071067690849304,0.8154932260513306,-0.16221173107624054,0.5555701851844788,0.9061277508735657,-0.18023990094661713,0.3826834261417389,0.961939811706543,-0.19134175777435303,0.19509035348892212,0.980785608291626,-0.19509044289588928,7.549790126404332e-08,0.19134221971035004,-0.03806028142571449,0.9807852506637573,0.961939811706543,-0.19134175777435303,-0.282339870929718,0.3753306567668915,-0.07465781271457672,0.9238795042037964,0.9061274528503418,-0.37533026933670044,0.19509035348892212,0.8535537123680115,-0.35355332493782043,0.3826834261417389,0.9238798022270203,-0.38268357515335083,7.549790126404332e-08,0.1802404373884201,-0.07465790957212448,0.9807852506637573,0.9061274528503418,-0.37533026933670044,-0.282339870929718,0.35355374217033386,-0.1464466005563736,0.9238795042037964,0.5132803916931152,-0.21260753273963928,0.8314695954322815,0.6532817482948303,-0.27059805393218994,0.7071067690849304,0.7681777477264404,-0.3181896507740021,0.5555701851844788,0.5879380702972412,-0.39284747838974,0.7071067690849304,0.6913416981697083,-0.4619396924972534,0.5555701851844788,0.7681780457496643,-0.513279914855957,0.3826834261417389,0.8154931664466858,-0.5448950529098511,0.19509035348892212,0.8314698338508606,-0.5555703639984131,7.549790126404332e-08,0.16221213340759277,-0.10838647186756134,0.9807852506637573,0.8154931664466858,-0.5448950529098511,-0.282339870929718,0.31818997859954834,-0.2126075178384781,0.9238795042037964,0.4619401693344116,-0.30865830183029175,0.8314695954322815,0.7071069478988647,-0.70710688829422,7.549790126404332e-08,0.6935198903083801,-0.6935197710990906,0.19509035348892212,0.1379501223564148,-0.13794980943202972,0.9807852506637573,0.6935198903083801,-0.6935197710990906,-0.282339870929718,0.2705983519554138,-0.27059805393218994,0.9238795042037964,0.39284786581993103,-0.3928475081920624,0.8314695954322815,0.5000002384185791,-0.5,0.7071067690849304,0.5879377722740173,-0.5879376530647278,0.5555701851844788,0.6532817482948303,-0.6532813906669617,0.3826834261417389,0.3928477168083191,-0.5879377722740173,0.7071067690849304,0.308658629655838,-0.4619397819042206,0.8314695954322815,0.4619397819042206,-0.6913415193557739,0.5555701851844788,0.5132802724838257,-0.7681776881217957,0.3826834261417389,0.5448950529098511,-0.8154929280281067,0.19509035348892212,0.5555703639984131,-0.8314696550369263,7.549790126404332e-08,0.10838677734136581,-0.1622118055820465,0.9807852506637573,0.5448950529098511,-0.8154929280281067,-0.282339870929718,0.21260780096054077,-0.3181896507740021,0.9238795042037964,0.38268354535102844,-0.9238795042037964,7.549790126404332e-08,0.07465820759534836,-0.18024009466171265,0.9807852506637573,0.37533023953437805,-0.9061271548271179,-0.282339870929718,0.14644686877727509,-0.3535533547401428,0.9238795042037964,0.21260783076286316,-0.5132799744606018,0.8314695954322815,0.27059826254844666,-0.6532814502716064,0.7071067690849304,0.31818968057632446,-0.7681774497032166,0.5555701851844788,0.3535537123680115,-0.8535533547401428,0.3826834261417389,0.37533023953437805,-0.9061271548271179,0.19509035348892212,0.16221174597740173,-0.8154928088188171,0.5555701851844788,0.1379498839378357,-0.6935198903083801,0.7071067690849304,0.18024027347564697,-0.906127393245697,0.3826834261417389,0.19134174287319183,-0.9619393944740295,0.19509035348892212,0.19509044289588928,-0.9807851910591125,7.549790126404332e-08,0.03806057572364807,-0.19134186208248138,0.9807852506637573,0.19134174287319183,-0.9619393944740295,-0.282339870929718,0.07465810328722,-0.37533020973205566,0.9238795042037964,0.10838666558265686,-0.5448951125144958,0.8314695954322815,3.117347660008818e-07,-0.19509045779705048,0.9807852506637573,9.566792869009078e-08,-0.9807848334312439,-0.282339870929718,1.4037141227163374e-07,-0.9999998211860657,7.549790126404332e-08,2.819324436131865e-07,-0.3826833665370941,0.9238795042037964,2.819324436131865e-07,-0.5555701851844788,0.8314695954322815,1.850748958531767e-07,-0.7071067094802856,0.7071067690849304,1.4037141227163374e-07,-0.8314692378044128,0.5555701851844788,3.191853465978056e-07,-0.9238794445991516,0.3826834261417389,9.566792869009078e-08,-0.9807848334312439,0.19509035348892212,-0.16221146285533905,-0.8154926896095276,0.5555701851844788,-0.13794949650764465,-0.6935198307037354,0.7071067690849304,-0.18023963272571564,-0.9061273336410522,0.3826834261417389,-0.19134153425693512,-0.9619392156600952,0.19509035348892212,-0.1950901597738266,-0.9807850122451782,7.549790126404332e-08,-0.03805994614958763,-0.1913418471813202,0.9807852506637573,-0.19134153425693512,-0.9619392156600952,-0.282339870929718,-0.07465753704309464,-0.37533020973205566,0.9238795042037964,-0.1083860844373703,-0.5448950529098511,0.8314695954322815,-0.37532997131347656,-0.906126856803894,-0.282339870929718,-0.14644630253314972,-0.35355332493782043,0.9238795042037964,-0.2126072347164154,-0.5132798552513123,0.8314695954322815,-0.2705978453159332,-0.6532813310623169,0.7071067690849304,-0.3181893527507782,-0.7681772708892822,0.5555701851844788,-0.35355305671691895,-0.853553295135498,0.3826834261417389,-0.37532997131347656,-0.906126856803894,0.19509035348892212,-0.3826832175254822,-0.9238792061805725,7.549790126404332e-08,-0.07465756684541702,-0.18024007976055145,0.9807852506637573,-0.5132796168327332,-0.7681776285171509,0.3826834261417389,-0.5448946952819824,-0.815492570400238,0.19509035348892212,-0.5555699467658997,-0.8314692378044128,7.549790126404332e-08,-0.10838612914085388,-0.16221177577972412,0.9807852506637573,-0.5448946952819824,-0.815492570400238,-0.282339870929718,-0.21260720491409302,-0.3181895613670349,0.9238795042037964,-0.3086579740047455,-0.46193963289260864,0.8314695954322815,-0.3928472399711609,-0.5879376530647278,0.7071067690849304,-0.46193939447402954,-0.69134122133255,0.5555701851844788,-0.3928471505641937,-0.39284732937812805,0.8314695954322815,-0.4999997317790985,-0.49999985098838806,0.7071067690849304,-0.5879373550415039,-0.5879372954368591,0.5555701851844788,-0.6532810926437378,-0.6532813906669617,0.3826834261417389,-0.6935193538665771,-0.6935193538665771,0.19509035348892212,-0.7071064114570618,-0.707106351852417,7.549790126404332e-08,-0.13794946670532227,-0.13794976472854614,0.9807852506637573,-0.6935193538665771,-0.6935193538665771,-0.282339870929718,-0.2705976963043213,-0.2705979347229004,0.9238795042037964,-0.8154924511909485,-0.5448945760726929,0.19509035348892212,-0.768177330493927,-0.5132798552513123,0.3826834261417389,-0.8314691185951233,-0.5555698275566101,7.549790126404332e-08,-0.16221146285533905,-0.10838642716407776,0.9807852506637573,-0.8154924511909485,-0.5448945760726929,-0.282339870929718,-0.31818926334381104,-0.21260741353034973,0.9238795042037964,-0.46193939447402954,-0.3086581230163574,0.8314695954322815,-0.5879374742507935,-0.39284729957580566,0.7071067690849304,-0.6913411617279053,-0.4619393050670624,0.5555701851844788,-0.5132795572280884,-0.21260738372802734,0.8314695954322815,-0.35355299711227417,-0.14644651114940643,0.9238795042037964,-0.6532811522483826,-0.2705978751182556,0.7071067690849304,-0.7681770920753479,-0.31818920373916626,0.5555701851844788,-0.8535529375076294,-0.35355329513549805,0.3826834261417389,-0.9061266183853149,-0.37532979249954224,0.19509035348892212,-0.9238789081573486,-0.38268303871154785,7.549790126404332e-08,-0.18023976683616638,-0.0746578574180603,0.9807852506637573,-0.9061266183853149,-0.37532979249954224,-0.282339870929718,-0.9619388580322266,-0.1913413405418396,0.19509035348892212,-0.9061269760131836,-0.18023987114429474,0.3826834261417389,-0.98078453540802,-0.19508998095989227,7.549790126404332e-08,-0.19134151935577393,-0.038060225546360016,0.9807852506637573,-0.9619388580322266,-0.1913413405418396,-0.282339870929718,-0.375329852104187,-0.07465773820877075,0.9238795042037964,-0.5448946356773376,-0.10838624089956284,0.8314695954322815,-0.6935195326805115,-0.13794952630996704,0.7071067690849304,-0.8154923915863037,-0.1622113138437271,0.5555701851844788,5.960464477539063e-08,-4.2721556070546285e-08,-0.8600426912307739];
+iron_data_ConstData.skydomeNor = [0.5597705245018005,0.0,-0.8286385536193848,0.5489974617958069,-0.10919522494077682,-0.8286385536193848,0.3804132342338562,-0.07565538585186005,-0.921689510345459,0.7101352214813232,0.0,-0.7040314674377441,0.6964934468269348,-0.13852351903915405,-0.7040314674377441,0.8333384394645691,0.0,-0.5527512431144714,0.8173161745071411,-0.16257210075855255,-0.5527512431144714,0.9247413277626038,0.0,-0.3805353045463562,0.9069795608520508,-0.18039490282535553,-0.3805353045463562,0.9809869527816772,0.0,-0.19391460716724396,0.9621570706367493,-0.191381573677063,-0.19391460716724396,0.9998779296875,0.0,-0.01501510664820671,0.9806512594223022,-0.19504378736019135,-0.01501510664820671,0.20096439123153687,0.0,-0.9795831441879272,0.19708853960037231,-0.039185766130685806,-0.9795831441879272,0.0,0.0,-1.0,0.8584856986999512,0.0,0.5128025412559509,0.8419751524925232,-0.1674550622701645,0.5128025412559509,0.3878597319126129,0.0,-0.921689510345459,0.3583483397960663,-0.14841151237487793,-0.921689510345459,0.5171361565589905,-0.2142094224691391,-0.8286385536193848,0.6560564041137695,-0.2717368006706238,-0.7040314674377441,0.7698904275894165,-0.3188879191875458,-0.5527512431144714,0.8543656468391418,-0.35386210680007935,-0.3805353045463562,0.9063386917114258,-0.3754081726074219,-0.19391460716724396,0.9237647652626038,-0.382610559463501,-0.01501510664820671,0.18564409017562866,-0.07690664380788803,-0.9795831441879272,0.7931455373764038,-0.32853174209594727,0.5128025412559509,0.7689138650894165,-0.5137485861778259,-0.3805353045463562,0.8156682252883911,-0.5449995398521423,-0.19391460716724396,0.8313547372817993,-0.5554978847503662,-0.01501510664820671,0.1670888364315033,-0.1116367056965828,-0.9795831441879272,0.713797390460968,-0.4769432544708252,0.5128025412559509,0.32248908281326294,-0.2154911905527115,-0.921689510345459,0.46540728211402893,-0.3109835982322693,-0.8286385536193848,0.5904415845870972,-0.39451277256011963,-0.7040314674377441,0.6928922533988953,-0.46296578645706177,-0.5527512431144714,0.395794540643692,-0.395794540643692,-0.8286385536193848,0.5021210312843323,-0.5021210312843323,-0.7040314674377441,0.5892513990402222,-0.5892513990402222,-0.5527512431144714,0.6538895964622498,-0.6538895964622498,-0.3805353045463562,0.6936551928520203,-0.6936551928520203,-0.19391460716724396,0.7070223093032837,-0.7070223093032837,-0.01501510664820671,0.1420941799879074,-0.1420941799879074,-0.9795831441879272,0.6070436835289001,-0.6070436835289001,0.5128025412559509,0.27426984906196594,-0.27426984906196594,-0.921689510345459,0.5449995398521423,-0.8156682252883911,-0.19391460716724396,0.5554978847503662,-0.8313547372817993,-0.01501510664820671,0.1116367056965828,-0.1670888364315033,-0.9795831441879272,0.4769432544708252,-0.713797390460968,0.5128025412559509,0.2154911905527115,-0.32248908281326294,-0.921689510345459,0.3109835982322693,-0.46540728211402893,-0.8286385536193848,0.39451277256011963,-0.5904415845870972,-0.7040314674377441,0.46296578645706177,-0.6928922533988953,-0.5527512431144714,0.5137485861778259,-0.7689138650894165,-0.3805353045463562,0.2142094224691391,-0.5171361565589905,-0.8286385536193848,0.2717368006706238,-0.6560564041137695,-0.7040314674377441,0.3188879191875458,-0.7698904275894165,-0.5527512431144714,0.35386210680007935,-0.8543656468391418,-0.3805353045463562,0.3754081726074219,-0.9063386917114258,-0.19391460716724396,0.382610559463501,-0.9237647652626038,-0.01501510664820671,0.07690664380788803,-0.18564409017562866,-0.9795831441879272,0.32853174209594727,-0.7931455373764038,0.5128025412559509,0.14841151237487793,-0.3583483397960663,-0.921689510345459,0.191381573677063,-0.9621570706367493,-0.19391460716724396,0.18039490282535553,-0.9069795608520508,-0.3805353045463562,0.19504378736019135,-0.9806512594223022,-0.01501510664820671,0.039185766130685806,-0.19708853960037231,-0.9795831441879272,0.1674550622701645,-0.8419751524925232,0.5128025412559509,0.07565538585186005,-0.3804132342338562,-0.921689510345459,0.10919522494077682,-0.5489974617958069,-0.8286385536193848,0.13852351903915405,-0.6964934468269348,-0.7040314674377441,0.16257210075855255,-0.8173161745071411,-0.5527512431144714,0.0,-0.7101352214813232,-0.7040314674377441,0.0,-0.8333384394645691,-0.5527512431144714,0.0,-0.9247413277626038,-0.3805353045463562,0.0,-0.9809869527816772,-0.19391460716724396,0.0,-0.9998779296875,-0.01501510664820671,0.0,-0.20096439123153687,-0.9795831441879272,0.0,-0.8584856986999512,0.5128025412559509,0.0,-0.3878597319126129,-0.921689510345459,0.0,-0.5597705245018005,-0.8286385536193848,-0.19504378736019135,-0.9806512594223022,-0.01501510664820671,-0.039185766130685806,-0.19708853960037231,-0.9795831441879272,-0.1674550622701645,-0.8419751524925232,0.5128025412559509,-0.07565538585186005,-0.3804132342338562,-0.921689510345459,-0.10919522494077682,-0.5489974617958069,-0.8286385536193848,-0.13852351903915405,-0.6964934468269348,-0.7040314674377441,-0.16257210075855255,-0.8173161745071411,-0.5527512431144714,-0.18039490282535553,-0.9069795608520508,-0.3805353045463562,-0.191381573677063,-0.9621570706367493,-0.19391460716724396,-0.3188879191875458,-0.7698904275894165,-0.5527512431144714,-0.35386210680007935,-0.8543656468391418,-0.3805353045463562,-0.3754081726074219,-0.9063386917114258,-0.19391460716724396,-0.382610559463501,-0.9237647652626038,-0.01501510664820671,-0.07690664380788803,-0.18564409017562866,-0.9795831441879272,-0.32853174209594727,-0.7931455373764038,0.5128025412559509,-0.14841151237487793,-0.3583483397960663,-0.921689510345459,-0.2142094224691391,-0.5171361565589905,-0.8286385536193848,-0.2717368006706238,-0.6560564041137695,-0.7040314674377441,-0.1116367056965828,-0.1670888364315033,-0.9795831441879272,-0.4769432544708252,-0.713797390460968,0.5128025412559509,-0.5554978847503662,-0.8313547372817993,-0.01501510664820671,-0.2154911905527115,-0.32248908281326294,-0.921689510345459,-0.3109835982322693,-0.46540728211402893,-0.8286385536193848,-0.39451277256011963,-0.5904415845870972,-0.7040314674377441,-0.46296578645706177,-0.6928922533988953,-0.5527512431144714,-0.5137485861778259,-0.7689138650894165,-0.3805353045463562,-0.5449995398521423,-0.8156682252883911,-0.19391460716724396,-0.5892513990402222,-0.5892513990402222,-0.5527512431144714,-0.6538895964622498,-0.6538895964622498,-0.3805353045463562,-0.6936551928520203,-0.6936551928520203,-0.19391460716724396,-0.7070223093032837,-0.7070223093032837,-0.01501510664820671,-0.1420941799879074,-0.1420941799879074,-0.9795831441879272,-0.6070436835289001,-0.6070436835289001,0.5128025412559509,-0.27426984906196594,-0.27426984906196594,-0.921689510345459,-0.395794540643692,-0.395794540643692,-0.8286385536193848,-0.5021210312843323,-0.5021210312843323,-0.7040314674377441,-0.713797390460968,-0.4769432544708252,0.5128025412559509,-0.8313547372817993,-0.5554978847503662,-0.01501510664820671,-0.32248908281326294,-0.2154911905527115,-0.921689510345459,-0.46540728211402893,-0.3109835982322693,-0.8286385536193848,-0.5904415845870972,-0.39451277256011963,-0.7040314674377441,-0.6928922533988953,-0.46296578645706177,-0.5527512431144714,-0.7689138650894165,-0.5137485861778259,-0.3805353045463562,-0.8156682252883911,-0.5449995398521423,-0.19391460716724396,-0.1670888364315033,-0.1116367056965828,-0.9795831441879272,-0.8543656468391418,-0.35386210680007935,-0.3805353045463562,-0.9063386917114258,-0.3754081726074219,-0.19391460716724396,-0.9237647652626038,-0.382610559463501,-0.01501510664820671,-0.18564409017562866,-0.07690664380788803,-0.9795831441879272,-0.7931455373764038,-0.32853174209594727,0.5128025412559509,-0.3583483397960663,-0.14841151237487793,-0.921689510345459,-0.5171361565589905,-0.2142094224691391,-0.8286385536193848,-0.6560564041137695,-0.2717368006706238,-0.7040314674377441,-0.7698904275894165,-0.3188879191875458,-0.5527512431144714,-0.3804132342338562,-0.07565538585186005,-0.921689510345459,-0.5489974617958069,-0.10919522494077682,-0.8286385536193848,-0.6964934468269348,-0.13852351903915405,-0.7040314674377441,-0.8173161745071411,-0.16257210075855255,-0.5527512431144714,-0.9069795608520508,-0.18039490282535553,-0.3805353045463562,-0.9621570706367493,-0.191381573677063,-0.19391460716724396,-0.9806512594223022,-0.19504378736019135,-0.01501510664820671,-0.19708853960037231,-0.039185766130685806,-0.9795831441879272,-0.8419751524925232,-0.1674550622701645,0.5128025412559509,-0.9247413277626038,0.0,-0.3805353045463562,-0.9809869527816772,0.0,-0.19391460716724396,-0.9998779296875,0.0,-0.01501510664820671,-0.20096439123153687,0.0,-0.9795831441879272,-0.8584856986999512,0.0,0.5128025412559509,-0.3878597319126129,0.0,-0.921689510345459,-0.5597705245018005,0.0,-0.8286385536193848,-0.7101352214813232,0.0,-0.7040314674377441,-0.8333384394645691,0.0,-0.5527512431144714,-0.5489974617958069,0.10919522494077682,-0.8286385536193848,-0.6964934468269348,0.13852351903915405,-0.7040314674377441,-0.8173161745071411,0.16257210075855255,-0.5527512431144714,-0.9069795608520508,0.18039490282535553,-0.3805353045463562,-0.9621570706367493,0.191381573677063,-0.19391460716724396,-0.9806512594223022,0.19504378736019135,-0.01501510664820671,-0.19708853960037231,0.039185766130685806,-0.9795831441879272,-0.8419751524925232,0.1674550622701645,0.5128025412559509,-0.3804132342338562,0.07565538585186005,-0.921689510345459,-0.9063386917114258,0.3754081726074219,-0.19391460716724396,-0.8543656468391418,0.35386210680007935,-0.3805353045463562,-0.9237647652626038,0.382610559463501,-0.01501510664820671,-0.18564409017562866,0.07690664380788803,-0.9795831441879272,-0.7931455373764038,0.32853174209594727,0.5128025412559509,-0.3583483397960663,0.14841151237487793,-0.921689510345459,-0.5171361565589905,0.2142094224691391,-0.8286385536193848,-0.6560564041137695,0.2717368006706238,-0.7040314674377441,-0.7698904275894165,0.3188879191875458,-0.5527512431144714,-0.5904415845870972,0.39451277256011963,-0.7040314674377441,-0.6928922533988953,0.46296578645706177,-0.5527512431144714,-0.7689138650894165,0.5137485861778259,-0.3805353045463562,-0.8156682252883911,0.5449995398521423,-0.19391460716724396,-0.8313547372817993,0.5554978847503662,-0.01501510664820671,-0.1670888364315033,0.1116367056965828,-0.9795831441879272,-0.713797390460968,0.4769432544708252,0.5128025412559509,-0.32248908281326294,0.2154911905527115,-0.921689510345459,-0.46540728211402893,0.3109835982322693,-0.8286385536193848,-0.7070223093032837,0.7070223093032837,-0.01501510664820671,-0.6936551928520203,0.6936551928520203,-0.19391460716724396,-0.1420941799879074,0.1420941799879074,-0.9795831441879272,-0.6070436835289001,0.6070436835289001,0.5128025412559509,-0.27426984906196594,0.27426984906196594,-0.921689510345459,-0.395794540643692,0.395794540643692,-0.8286385536193848,-0.5021210312843323,0.5021210312843323,-0.7040314674377441,-0.5892513990402222,0.5892513990402222,-0.5527512431144714,-0.6538895964622498,0.6538895964622498,-0.3805353045463562,-0.39451277256011963,0.5904415845870972,-0.7040314674377441,-0.3109835982322693,0.46540728211402893,-0.8286385536193848,-0.46296578645706177,0.6928922533988953,-0.5527512431144714,-0.5137485861778259,0.7689138650894165,-0.3805353045463562,-0.5449995398521423,0.8156682252883911,-0.19391460716724396,-0.5554978847503662,0.8313547372817993,-0.01501510664820671,-0.1116367056965828,0.1670888364315033,-0.9795831441879272,-0.4769432544708252,0.713797390460968,0.5128025412559509,-0.2154911905527115,0.32248908281326294,-0.921689510345459,-0.382610559463501,0.9237647652626038,-0.01501510664820671,-0.07690664380788803,0.18564409017562866,-0.9795831441879272,-0.32853174209594727,0.7931455373764038,0.5128025412559509,-0.14841151237487793,0.3583483397960663,-0.921689510345459,-0.2142094224691391,0.5171361565589905,-0.8286385536193848,-0.2717368006706238,0.6560564041137695,-0.7040314674377441,-0.3188879191875458,0.7698904275894165,-0.5527512431144714,-0.35386210680007935,0.8543656468391418,-0.3805353045463562,-0.3754081726074219,0.9063386917114258,-0.19391460716724396,-0.16257210075855255,0.8173161745071411,-0.5527512431144714,-0.13852351903915405,0.6964934468269348,-0.7040314674377441,-0.18039490282535553,0.9069795608520508,-0.3805353045463562,-0.191381573677063,0.9621570706367493,-0.19391460716724396,-0.19504378736019135,0.9806512594223022,-0.01501510664820671,-0.039185766130685806,0.19708853960037231,-0.9795831441879272,-0.1674550622701645,0.8419751524925232,0.5128025412559509,-0.07565538585186005,0.3804132342338562,-0.921689510345459,-0.10919522494077682,0.5489974617958069,-0.8286385536193848,0.0,0.20096439123153687,-0.9795831441879272,0.0,0.8584856986999512,0.5128025412559509,0.0,0.9998779296875,-0.01501510664820671,0.0,0.3878597319126129,-0.921689510345459,0.0,0.5597705245018005,-0.8286385536193848,0.0,0.7101352214813232,-0.7040314674377441,0.0,0.8333384394645691,-0.5527512431144714,0.0,0.9247413277626038,-0.3805353045463562,0.0,0.9809869527816772,-0.19391460716724396,0.16257210075855255,0.8173161745071411,-0.5527512431144714,0.13852351903915405,0.6964934468269348,-0.7040314674377441,0.18039490282535553,0.9069795608520508,-0.3805353045463562,0.191381573677063,0.9621570706367493,-0.19391460716724396,0.19504378736019135,0.9806512594223022,-0.01501510664820671,0.039185766130685806,0.19708853960037231,-0.9795831441879272,0.1674550622701645,0.8419751524925232,0.5128025412559509,0.07565538585186005,0.3804132342338562,-0.921689510345459,0.10919522494077682,0.5489974617958069,-0.8286385536193848,0.32853174209594727,0.7931455373764038,0.5128025412559509,0.14841151237487793,0.3583483397960663,-0.921689510345459,0.2142094224691391,0.5171361565589905,-0.8286385536193848,0.2717368006706238,0.6560564041137695,-0.7040314674377441,0.3188879191875458,0.7698904275894165,-0.5527512431144714,0.35386210680007935,0.8543656468391418,-0.3805353045463562,0.3754081726074219,0.9063386917114258,-0.19391460716724396,0.382610559463501,0.9237647652626038,-0.01501510664820671,0.07690664380788803,0.18564409017562866,-0.9795831441879272,0.5137485861778259,0.7689138650894165,-0.3805353045463562,0.5449995398521423,0.8156682252883911,-0.19391460716724396,0.5554978847503662,0.8313547372817993,-0.01501510664820671,0.1116367056965828,0.1670888364315033,-0.9795831441879272,0.4769432544708252,0.713797390460968,0.5128025412559509,0.2154911905527115,0.32248908281326294,-0.921689510345459,0.3109835982322693,0.46540728211402893,-0.8286385536193848,0.39451277256011963,0.5904415845870972,-0.7040314674377441,0.46296578645706177,0.6928922533988953,-0.5527512431144714,0.395794540643692,0.395794540643692,-0.8286385536193848,0.5021210312843323,0.5021210312843323,-0.7040314674377441,0.5892513990402222,0.5892513990402222,-0.5527512431144714,0.6538895964622498,0.6538895964622498,-0.3805353045463562,0.6936551928520203,0.6936551928520203,-0.19391460716724396,0.7070223093032837,0.7070223093032837,-0.01501510664820671,0.1420941799879074,0.1420941799879074,-0.9795831441879272,0.6070436835289001,0.6070436835289001,0.5128025412559509,0.27426984906196594,0.27426984906196594,-0.921689510345459,0.8156682252883911,0.5449995398521423,-0.19391460716724396,0.7689138650894165,0.5137485861778259,-0.3805353045463562,0.8313547372817993,0.5554978847503662,-0.01501510664820671,0.1670888364315033,0.1116367056965828,-0.9795831441879272,0.713797390460968,0.4769432544708252,0.5128025412559509,0.32248908281326294,0.2154911905527115,-0.921689510345459,0.46540728211402893,0.3109835982322693,-0.8286385536193848,0.5904415845870972,0.39451277256011963,-0.7040314674377441,0.6928922533988953,0.46296578645706177,-0.5527512431144714,0.5171361565589905,0.2142094224691391,-0.8286385536193848,0.3583483397960663,0.14841151237487793,-0.921689510345459,0.6560564041137695,0.2717368006706238,-0.7040314674377441,0.7698904275894165,0.3188879191875458,-0.5527512431144714,0.8543656468391418,0.35386210680007935,-0.3805353045463562,0.9063386917114258,0.3754081726074219,-0.19391460716724396,0.9237647652626038,0.382610559463501,-0.01501510664820671,0.18564409017562866,0.07690664380788803,-0.9795831441879272,0.7931455373764038,0.32853174209594727,0.5128025412559509,0.9621570706367493,0.191381573677063,-0.19391460716724396,0.9069795608520508,0.18039490282535553,-0.3805353045463562,0.9806512594223022,0.19504378736019135,-0.01501510664820671,0.19708853960037231,0.039185766130685806,-0.9795831441879272,0.8419751524925232,0.1674855798482895,0.5128025412559509,0.3804132342338562,0.07565538585186005,-0.921689510345459,0.5489974617958069,0.10919522494077682,-0.8286385536193848,0.6964934468269348,0.13852351903915405,-0.7040314674377441,0.8173161745071411,0.16257210075855255,-0.5527512431144714,0.0,0.0,0.999969482421875];
+iron_data_ConstData.sphereIndices = [0,1,2,0,2,3,4,5,6,4,6,7,8,9,10,11,12,13,14,15,16,14,16,17,18,19,20,18,20,21,22,23,24,22,24,25,26,27,28,26,28,29,30,31,32,33,34,35,33,35,36,37,38,39,37,39,40,41,42,43,41,43,44,45,46,47,45,47,48,49,50,51,49,51,52,53,54,55,53,55,56,57,58,59,60,61,62,60,62,63,64,65,66,64,66,67,68,69,70,68,70,71,72,73,74,72,74,75,76,77,78,79,80,81,82,83,84,82,84,85,86,87,88,86,88,89,90,91,92,90,92,93,94,95,96,94,96,97,98,99,100,98,100,101,102,103,104,105,106,107,108,109,110,108,110,111,112,113,114,112,114,115,116,117,118,116,118,119,120,121,122,123,124,125,126,127,128,126,128,129,130,131,132,130,132,133,134,135,136,134,136,137,138,139,140,138,140,141,142,143,144,142,144,145,146,147,148,146,148,149,150,151,152,150,152,153,154,155,156,154,156,157,158,159,160,158,160,161,162,163,164,162,164,165,166,167,168,166,168,169,170,171,172,170,172,173,174,175,176,177,178,179,180,181,182,180,182,183,184,185,186,184,186,187,188,189,190,188,190,191,192,193,194,195,196,197,198,199,200,198,200,201,202,203,204,202,204,205,206,207,208,206,208,209,210,211,212,210,212,213,214,215,216,214,216,217,218,219,220,221,222,223,224,225,226,224,226,227,228,229,230,228,230,231,232,233,234,232,234,235,236,237,238,236,238,239,240,241,242,243,244,245,243,245,246,247,248,249,247,249,250,251,252,253,251,253,254,255,256,257,255,257,258,259,260,261,259,261,262,263,264,265,263,265,266,267,268,269,270,271,272,270,272,273,274,275,276,274,276,277,278,279,280,278,280,281,282,283,284,282,284,285,286,287,288,286,288,289,290,291,292,293,294,295,296,297,298,296,298,299,300,301,302,300,302,303,304,305,306,304,306,307,308,309,310,308,310,311,312,313,314,315,316,317,318,319,320,318,320,321,322,323,324,322,324,325,326,327,328,326,328,329,330,331,332,330,332,333,334,335,336,337,338,339,340,341,342,340,342,343,344,345,346,344,346,347,348,349,350,348,350,351,352,353,354,352,354,355,356,357,358,356,358,359,360,361,362,363,364,365,363,365,366,367,368,369,367,369,370,371,372,373,371,373,374,375,376,377,375,377,378,379,380,381,379,381,382,383,384,385,383,385,386,387,388,389,390,391,392,390,392,393,394,395,396,394,396,397,398,399,400,398,400,401,402,403,404,402,404,405,406,407,408,409,410,411,412,413,414,412,414,415,416,417,418,416,418,419,420,421,422,420,422,423,424,425,426,424,426,427,428,429,430,428,430,431,432,433,434,435,436,437,438,439,440,438,440,441,442,443,444,442,444,445,446,447,448,446,448,449,450,451,452,453,454,455,456,457,458,456,458,459,460,461,462,460,462,463,464,465,466,464,466,467,468,469,470,468,470,471,472,473,474,472,474,475,476,477,478,476,478,479];
+iron_data_ConstData.spherePos = [0.0,0.4619397521018982,-0.19134175777435303,0.0,0.5,-2.1855694143368964e-08,0.19134169816970825,0.4619397521018982,-2.1855694143368964e-08,0.1767766773700714,0.4267766773700714,-0.19134175777435303,0.0,0.4619397521018982,0.19134171307086945,0.0,0.3535533845424652,0.3535533845424652,0.13529899716377258,0.3266407251358032,0.3535533845424652,0.1767766773700714,0.4267766773700714,0.19134171307086945,0.0,0.19134172797203064,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,0.0732232853770256,0.1767767071723938,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,0.0,0.19134174287319183,-0.4619397521018982,0.0732232928276062,0.1767767071723938,-0.4619397521018982,0.0,0.3535533845424652,-0.3535533845424652,0.0,0.4619397521018982,-0.19134175777435303,0.1767766773700714,0.4267766773700714,-0.19134175777435303,0.13529899716377258,0.3266407251358032,-0.3535533845424652,0.0,0.5,-2.1855694143368964e-08,0.0,0.4619397521018982,0.19134171307086945,0.1767766773700714,0.4267766773700714,0.19134171307086945,0.19134169816970825,0.4619397521018982,-2.1855694143368964e-08,0.0,0.3535533845424652,0.3535533845424652,0.0,0.19134172797203064,0.4619397521018982,0.0732232853770256,0.1767767071723938,0.4619397521018982,0.13529899716377258,0.3266407251358032,0.3535533845424652,0.0,0.19134174287319183,-0.4619397521018982,0.0,0.3535533845424652,-0.3535533845424652,0.13529899716377258,0.3266407251358032,-0.3535533845424652,0.0732232928276062,0.1767767071723938,-0.4619397521018982,0.0,7.549790126404332e-08,-0.5,0.0732232928276062,0.1767767071723938,-0.4619397521018982,0.13529899716377258,0.13529902696609497,-0.4619397521018982,0.13529899716377258,0.3266407251358032,-0.3535533845424652,0.1767766773700714,0.4267766773700714,-0.19134175777435303,0.32664069533348083,0.3266407251358032,-0.19134175777435303,0.24999994039535522,0.2499999850988388,-0.3535533845424652,0.19134169816970825,0.4619397521018982,-2.1855694143368964e-08,0.1767766773700714,0.4267766773700714,0.19134171307086945,0.32664069533348083,0.3266407251358032,0.19134171307086945,0.3535533547401428,0.3535533845424652,-2.1855694143368964e-08,0.13529899716377258,0.3266407251358032,0.3535533845424652,0.0732232853770256,0.1767767071723938,0.4619397521018982,0.1352989822626114,0.13529904186725616,0.4619397521018982,0.24999994039535522,0.2499999850988388,0.3535533845424652,0.0732232928276062,0.1767767071723938,-0.4619397521018982,0.13529899716377258,0.3266407251358032,-0.3535533845424652,0.24999994039535522,0.2499999850988388,-0.3535533845424652,0.13529899716377258,0.13529902696609497,-0.4619397521018982,0.1767766773700714,0.4267766773700714,-0.19134175777435303,0.19134169816970825,0.4619397521018982,-2.1855694143368964e-08,0.3535533547401428,0.3535533845424652,-2.1855694143368964e-08,0.32664069533348083,0.3266407251358032,-0.19134175777435303,0.1767766773700714,0.4267766773700714,0.19134171307086945,0.13529899716377258,0.3266407251358032,0.3535533845424652,0.24999994039535522,0.2499999850988388,0.3535533845424652,0.32664069533348083,0.3266407251358032,0.19134171307086945,0.0732232853770256,0.1767767071723938,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,0.1352989822626114,0.13529904186725616,0.4619397521018982,0.24999994039535522,0.2499999850988388,0.3535533845424652,0.1352989822626114,0.13529904186725616,0.4619397521018982,0.17677663266658783,0.07322334498167038,0.4619397521018982,0.32664063572883606,0.13529902696609497,0.3535533845424652,0.13529899716377258,0.13529902696609497,-0.4619397521018982,0.24999994039535522,0.2499999850988388,-0.3535533845424652,0.32664063572883606,0.13529902696609497,-0.3535533845424652,0.17677664756774902,0.07322331517934799,-0.4619397521018982,0.32664069533348083,0.3266407251358032,-0.19134175777435303,0.3535533547401428,0.3535533845424652,-2.1855694143368964e-08,0.4619396924972534,0.19134169816970825,-2.1855694143368964e-08,0.42677661776542664,0.1767766773700714,-0.19134175777435303,0.32664069533348083,0.3266407251358032,0.19134171307086945,0.24999994039535522,0.2499999850988388,0.3535533845424652,0.32664063572883606,0.13529902696609497,0.3535533845424652,0.42677661776542664,0.1767766773700714,0.19134171307086945,0.1352989822626114,0.13529904186725616,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,0.17677663266658783,0.07322334498167038,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,0.13529899716377258,0.13529902696609497,-0.4619397521018982,0.17677664756774902,0.07322331517934799,-0.4619397521018982,0.24999994039535522,0.2499999850988388,-0.3535533845424652,0.32664069533348083,0.3266407251358032,-0.19134175777435303,0.42677661776542664,0.1767766773700714,-0.19134175777435303,0.32664063572883606,0.13529902696609497,-0.3535533845424652,0.3535533547401428,0.3535533845424652,-2.1855694143368964e-08,0.32664069533348083,0.3266407251358032,0.19134171307086945,0.42677661776542664,0.1767766773700714,0.19134171307086945,0.4619396924972534,0.19134169816970825,-2.1855694143368964e-08,0.17677664756774902,0.07322331517934799,-0.4619397521018982,0.32664063572883606,0.13529902696609497,-0.3535533845424652,0.35355326533317566,3.554926308879658e-08,-0.3535533845424652,0.19134163856506348,2.809868249187275e-08,-0.4619397521018982,0.42677661776542664,0.1767766773700714,-0.19134175777435303,0.4619396924972534,0.19134169816970825,-2.1855694143368964e-08,0.49999988079071045,5.746940701101266e-09,-2.1855694143368964e-08,0.46193966269493103,5.746940701101266e-09,-0.19134175777435303,0.42677661776542664,0.1767766773700714,0.19134171307086945,0.32664063572883606,0.13529902696609497,0.3535533845424652,0.35355326533317566,3.554926308879658e-08,0.3535533845424652,0.46193966269493103,5.746940701101266e-09,0.19134171307086945,0.17677663266658783,0.07322334498167038,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,0.19134163856506348,6.535158547649189e-08,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,0.17677664756774902,0.07322331517934799,-0.4619397521018982,0.19134163856506348,2.809868249187275e-08,-0.4619397521018982,0.32664063572883606,0.13529902696609497,-0.3535533845424652,0.42677661776542664,0.1767766773700714,-0.19134175777435303,0.46193966269493103,5.746940701101266e-09,-0.19134175777435303,0.35355326533317566,3.554926308879658e-08,-0.3535533845424652,0.4619396924972534,0.19134169816970825,-2.1855694143368964e-08,0.42677661776542664,0.1767766773700714,0.19134171307086945,0.46193966269493103,5.746940701101266e-09,0.19134171307086945,0.49999988079071045,5.746940701101266e-09,-2.1855694143368964e-08,0.32664063572883606,0.13529902696609497,0.3535533845424652,0.17677663266658783,0.07322334498167038,0.4619397521018982,0.19134163856506348,6.535158547649189e-08,0.4619397521018982,0.35355326533317566,3.554926308879658e-08,0.3535533845424652,0.19134163856506348,6.535158547649189e-08,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,0.17677661776542664,-0.07322321087121964,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,0.19134163856506348,2.809868249187275e-08,-0.4619397521018982,0.17677660286426544,-0.07322324812412262,-0.4619397521018982,0.35355326533317566,3.554926308879658e-08,-0.3535533845424652,0.46193966269493103,5.746940701101266e-09,-0.19134175777435303,0.42677655816078186,-0.17677666246891022,-0.19134175777435303,0.3266405761241913,-0.135298952460289,-0.3535533845424652,0.49999988079071045,5.746940701101266e-09,-2.1855694143368964e-08,0.46193966269493103,5.746940701101266e-09,0.19134171307086945,0.42677655816078186,-0.17677666246891022,0.19134171307086945,0.46193960309028625,-0.19134168326854706,-2.1855694143368964e-08,0.35355326533317566,3.554926308879658e-08,0.3535533845424652,0.19134163856506348,6.535158547649189e-08,0.4619397521018982,0.17677661776542664,-0.07322321087121964,0.4619397521018982,0.3266405761241913,-0.135298952460289,0.3535533845424652,0.19134163856506348,2.809868249187275e-08,-0.4619397521018982,0.35355326533317566,3.554926308879658e-08,-0.3535533845424652,0.3266405761241913,-0.135298952460289,-0.3535533845424652,0.17677660286426544,-0.07322324812412262,-0.4619397521018982,0.46193966269493103,5.746940701101266e-09,-0.19134175777435303,0.49999988079071045,5.746940701101266e-09,-2.1855694143368964e-08,0.46193960309028625,-0.19134168326854706,-2.1855694143368964e-08,0.42677655816078186,-0.17677666246891022,-0.19134175777435303,0.46193966269493103,5.746940701101266e-09,0.19134171307086945,0.35355326533317566,3.554926308879658e-08,0.3535533845424652,0.3266405761241913,-0.135298952460289,0.3535533845424652,0.42677655816078186,-0.17677666246891022,0.19134171307086945,0.3266405761241913,-0.135298952460289,-0.3535533845424652,0.42677655816078186,-0.17677666246891022,-0.19134175777435303,0.3266405761241913,-0.32664066553115845,-0.19134175777435303,0.24999982118606567,-0.24999988079071045,-0.3535533845424652,0.46193960309028625,-0.19134168326854706,-2.1855694143368964e-08,0.42677655816078186,-0.17677666246891022,0.19134171307086945,0.3266405761241913,-0.32664066553115845,0.19134171307086945,0.3535532057285309,-0.35355329513549805,-2.1855694143368964e-08,0.3266405761241913,-0.135298952460289,0.3535533845424652,0.17677661776542664,-0.07322321087121964,0.4619397521018982,0.135298952460289,-0.13529890775680542,0.4619397521018982,0.24999982118606567,-0.24999988079071045,0.3535533845424652,0.17677660286426544,-0.07322324812412262,-0.4619397521018982,0.3266405761241913,-0.135298952460289,-0.3535533845424652,0.24999982118606567,-0.24999988079071045,-0.3535533845424652,0.1352989226579666,-0.1352989375591278,-0.4619397521018982,0.42677655816078186,-0.17677666246891022,-0.19134175777435303,0.46193960309028625,-0.19134168326854706,-2.1855694143368964e-08,0.3535532057285309,-0.35355329513549805,-2.1855694143368964e-08,0.3266405761241913,-0.32664066553115845,-0.19134175777435303,0.42677655816078186,-0.17677666246891022,0.19134171307086945,0.3266405761241913,-0.135298952460289,0.3535533845424652,0.24999982118606567,-0.24999988079071045,0.3535533845424652,0.3266405761241913,-0.32664066553115845,0.19134171307086945,0.17677661776542664,-0.07322321087121964,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,0.135298952460289,-0.13529890775680542,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,0.17677660286426544,-0.07322324812412262,-0.4619397521018982,0.1352989226579666,-0.1352989375591278,-0.4619397521018982,0.1352989226579666,-0.1352989375591278,-0.4619397521018982,0.24999982118606567,-0.24999988079071045,-0.3535533845424652,0.13529886305332184,-0.3266405761241913,-0.3535533845424652,0.07322320342063904,-0.17677657306194305,-0.4619397521018982,0.3266405761241913,-0.32664066553115845,-0.19134175777435303,0.3535532057285309,-0.35355329513549805,-2.1855694143368964e-08,0.19134151935577393,-0.46193960309028625,-2.1855694143368964e-08,0.17677652835845947,-0.42677655816078186,-0.19134175777435303,0.3266405761241913,-0.32664066553115845,0.19134171307086945,0.24999982118606567,-0.24999988079071045,0.3535533845424652,0.13529886305332184,-0.3266405761241913,0.3535533845424652,0.17677652835845947,-0.42677655816078186,0.19134171307086945,0.135298952460289,-0.13529890775680542,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,0.07322324067354202,-0.17677655816078186,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,0.1352989226579666,-0.1352989375591278,-0.4619397521018982,0.07322320342063904,-0.17677657306194305,-0.4619397521018982,0.24999982118606567,-0.24999988079071045,-0.3535533845424652,0.3266405761241913,-0.32664066553115845,-0.19134175777435303,0.17677652835845947,-0.42677655816078186,-0.19134175777435303,0.13529886305332184,-0.3266405761241913,-0.3535533845424652,0.3535532057285309,-0.35355329513549805,-2.1855694143368964e-08,0.3266405761241913,-0.32664066553115845,0.19134171307086945,0.17677652835845947,-0.42677655816078186,0.19134171307086945,0.19134151935577393,-0.46193960309028625,-2.1855694143368964e-08,0.24999982118606567,-0.24999988079071045,0.3535533845424652,0.135298952460289,-0.13529890775680542,0.4619397521018982,0.07322324067354202,-0.17677655816078186,0.4619397521018982,0.13529886305332184,-0.3266405761241913,0.3535533845424652,0.17677652835845947,-0.42677655816078186,-0.19134175777435303,0.19134151935577393,-0.46193960309028625,-2.1855694143368964e-08,-1.630022552490118e-07,-0.4999997615814209,-2.1855694143368964e-08,-1.4810109405516414e-07,-0.46193957328796387,-0.19134175777435303,0.17677652835845947,-0.42677655816078186,0.19134171307086945,0.13529886305332184,-0.3266405761241913,0.3535533845424652,-1.3319993286131648e-07,-0.3535531759262085,0.3535533845424652,-1.4810109405516414e-07,-0.46193957328796387,0.19134171307086945,0.07322324067354202,-0.17677655816078186,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,-3.634237799587936e-08,-0.1913415640592575,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,0.07322320342063904,-0.17677657306194305,-0.4619397521018982,-8.104586157742233e-08,-0.1913415640592575,-0.4619397521018982,0.13529886305332184,-0.3266405761241913,-0.3535533845424652,0.17677652835845947,-0.42677655816078186,-0.19134175777435303,-1.4810109405516414e-07,-0.46193957328796387,-0.19134175777435303,-1.3319993286131648e-07,-0.3535531759262085,-0.3535533845424652,0.19134151935577393,-0.46193960309028625,-2.1855694143368964e-08,0.17677652835845947,-0.42677655816078186,0.19134171307086945,-1.4810109405516414e-07,-0.46193957328796387,0.19134171307086945,-1.630022552490118e-07,-0.4999997615814209,-2.1855694143368964e-08,0.13529886305332184,-0.3266405761241913,0.3535533845424652,0.07322324067354202,-0.17677655816078186,0.4619397521018982,-3.634237799587936e-08,-0.1913415640592575,0.4619397521018982,-1.3319993286131648e-07,-0.3535531759262085,0.3535533845424652,0.07322320342063904,-0.17677657306194305,-0.4619397521018982,0.13529886305332184,-0.3266405761241913,-0.3535533845424652,-1.3319993286131648e-07,-0.3535531759262085,-0.3535533845424652,-8.104586157742233e-08,-0.1913415640592575,-0.4619397521018982,0.0,7.549790126404332e-08,-0.5,-8.104586157742233e-08,-0.1913415640592575,-0.4619397521018982,-0.07322335243225098,-0.17677651345729828,-0.4619397521018982,-1.3319993286131648e-07,-0.3535531759262085,-0.3535533845424652,-1.4810109405516414e-07,-0.46193957328796387,-0.19134175777435303,-0.17677679657936096,-0.4267764389514923,-0.19134175777435303,-0.13529910147190094,-0.3266404867172241,-0.3535533845424652,-1.630022552490118e-07,-0.4999997615814209,-2.1855694143368964e-08,-1.4810109405516414e-07,-0.46193957328796387,0.19134171307086945,-0.17677679657936096,-0.4267764389514923,0.19134171307086945,-0.1913418173789978,-0.4619394838809967,-2.1855694143368964e-08,-1.3319993286131648e-07,-0.3535531759262085,0.3535533845424652,-3.634237799587936e-08,-0.1913415640592575,0.4619397521018982,-0.07322331517934799,-0.17677652835845947,0.4619397521018982,-0.13529910147190094,-0.3266404867172241,0.3535533845424652,-8.104586157742233e-08,-0.1913415640592575,-0.4619397521018982,-1.3319993286131648e-07,-0.3535531759262085,-0.3535533845424652,-0.13529910147190094,-0.3266404867172241,-0.3535533845424652,-0.07322335243225098,-0.17677651345729828,-0.4619397521018982,-1.4810109405516414e-07,-0.46193957328796387,-0.19134175777435303,-1.630022552490118e-07,-0.4999997615814209,-2.1855694143368964e-08,-0.1913418173789978,-0.4619394838809967,-2.1855694143368964e-08,-0.17677679657936096,-0.4267764389514923,-0.19134175777435303,-1.4810109405516414e-07,-0.46193957328796387,0.19134171307086945,-1.3319993286131648e-07,-0.3535531759262085,0.3535533845424652,-0.13529910147190094,-0.3266404867172241,0.3535533845424652,-0.17677679657936096,-0.4267764389514923,0.19134171307086945,-3.634237799587936e-08,-0.1913415640592575,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,-0.07322331517934799,-0.17677652835845947,0.4619397521018982,-0.1913418173789978,-0.4619394838809967,-2.1855694143368964e-08,-0.17677679657936096,-0.4267764389514923,0.19134171307086945,-0.3266407549381256,-0.32664042711257935,0.19134171307086945,-0.3535534143447876,-0.35355305671691895,-2.1855694143368964e-08,-0.13529910147190094,-0.3266404867172241,0.3535533845424652,-0.07322331517934799,-0.17677652835845947,0.4619397521018982,-0.13529899716377258,-0.13529886305332184,0.4619397521018982,-0.25,-0.24999970197677612,0.3535533845424652,-0.07322335243225098,-0.17677651345729828,-0.4619397521018982,-0.13529910147190094,-0.3266404867172241,-0.3535533845424652,-0.25,-0.24999970197677612,-0.3535533845424652,-0.13529902696609497,-0.13529883325099945,-0.4619397521018982,-0.17677679657936096,-0.4267764389514923,-0.19134175777435303,-0.1913418173789978,-0.4619394838809967,-2.1855694143368964e-08,-0.3535534143447876,-0.35355305671691895,-2.1855694143368964e-08,-0.3266407549381256,-0.32664042711257935,-0.19134175777435303,-0.17677679657936096,-0.4267764389514923,0.19134171307086945,-0.13529910147190094,-0.3266404867172241,0.3535533845424652,-0.25,-0.24999970197677612,0.3535533845424652,-0.3266407549381256,-0.32664042711257935,0.19134171307086945,-0.07322331517934799,-0.17677652835845947,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,-0.13529899716377258,-0.13529886305332184,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,-0.07322335243225098,-0.17677651345729828,-0.4619397521018982,-0.13529902696609497,-0.13529883325099945,-0.4619397521018982,-0.13529910147190094,-0.3266404867172241,-0.3535533845424652,-0.17677679657936096,-0.4267764389514923,-0.19134175777435303,-0.3266407549381256,-0.32664042711257935,-0.19134175777435303,-0.25,-0.24999970197677612,-0.3535533845424652,-0.13529902696609497,-0.13529883325099945,-0.4619397521018982,-0.25,-0.24999970197677612,-0.3535533845424652,-0.32664066553115845,-0.1352987438440323,-0.3535533845424652,-0.17677664756774902,-0.07322311401367188,-0.4619397521018982,-0.3266407549381256,-0.32664042711257935,-0.19134175777435303,-0.3535534143447876,-0.35355305671691895,-2.1855694143368964e-08,-0.4619396924972534,-0.19134138524532318,-2.1855694143368964e-08,-0.42677661776542664,-0.17677639424800873,-0.19134175777435303,-0.3266407549381256,-0.32664042711257935,0.19134171307086945,-0.25,-0.24999970197677612,0.3535533845424652,-0.32664066553115845,-0.1352987438440323,0.3535533845424652,-0.42677661776542664,-0.17677639424800873,0.19134171307086945,-0.13529899716377258,-0.13529886305332184,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,-0.17677663266658783,-0.07322315126657486,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,-0.13529902696609497,-0.13529883325099945,-0.4619397521018982,-0.17677664756774902,-0.07322311401367188,-0.4619397521018982,-0.25,-0.24999970197677612,-0.3535533845424652,-0.3266407549381256,-0.32664042711257935,-0.19134175777435303,-0.42677661776542664,-0.17677639424800873,-0.19134175777435303,-0.32664066553115845,-0.1352987438440323,-0.3535533845424652,-0.3535534143447876,-0.35355305671691895,-2.1855694143368964e-08,-0.3266407549381256,-0.32664042711257935,0.19134171307086945,-0.42677661776542664,-0.17677639424800873,0.19134171307086945,-0.4619396924972534,-0.19134138524532318,-2.1855694143368964e-08,-0.25,-0.24999970197677612,0.3535533845424652,-0.13529899716377258,-0.13529886305332184,0.4619397521018982,-0.17677663266658783,-0.07322315126657486,0.4619397521018982,-0.32664066553115845,-0.1352987438440323,0.3535533845424652,-0.42677661776542664,-0.17677639424800873,0.19134171307086945,-0.32664066553115845,-0.1352987438440323,0.3535533845424652,-0.35355323553085327,2.4416550559180905e-07,0.3535533845424652,-0.46193960309028625,2.590666667856567e-07,0.19134171307086945,-0.17677663266658783,-0.07322315126657486,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,-0.19134162366390228,1.2495623025188252e-07,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,-0.17677664756774902,-0.07322311401367188,-0.4619397521018982,-0.19134162366390228,1.6965971383342549e-07,-0.4619397521018982,-0.32664066553115845,-0.1352987438440323,-0.3535533845424652,-0.42677661776542664,-0.17677639424800873,-0.19134175777435303,-0.46193960309028625,2.590666667856567e-07,-0.19134175777435303,-0.35355323553085327,2.4416550559180905e-07,-0.3535533845424652,-0.4619396924972534,-0.19134138524532318,-2.1855694143368964e-08,-0.42677661776542664,-0.17677639424800873,0.19134171307086945,-0.46193960309028625,2.590666667856567e-07,0.19134171307086945,-0.4999998211860657,3.037701503671997e-07,-2.1855694143368964e-08,-0.32664066553115845,-0.1352987438440323,0.3535533845424652,-0.17677663266658783,-0.07322315126657486,0.4619397521018982,-0.19134162366390228,1.2495623025188252e-07,0.4619397521018982,-0.35355323553085327,2.4416550559180905e-07,0.3535533845424652,-0.17677664756774902,-0.07322311401367188,-0.4619397521018982,-0.32664066553115845,-0.1352987438440323,-0.3535533845424652,-0.35355323553085327,2.4416550559180905e-07,-0.3535533845424652,-0.19134162366390228,1.6965971383342549e-07,-0.4619397521018982,-0.42677661776542664,-0.17677639424800873,-0.19134175777435303,-0.4619396924972534,-0.19134138524532318,-2.1855694143368964e-08,-0.4999998211860657,3.037701503671997e-07,-2.1855694143368964e-08,-0.46193960309028625,2.590666667856567e-07,-0.19134175777435303,0.0,7.549790126404332e-08,-0.5,-0.19134162366390228,1.6965971383342549e-07,-0.4619397521018982,-0.17677657306194305,0.07322343438863754,-0.4619397521018982,-0.35355323553085327,2.4416550559180905e-07,-0.3535533845424652,-0.46193960309028625,2.590666667856567e-07,-0.19134175777435303,-0.4267764687538147,0.17677688598632812,-0.19134175777435303,-0.3266405165195465,0.1352991908788681,-0.3535533845424652,-0.4999998211860657,3.037701503671997e-07,-2.1855694143368964e-08,-0.46193960309028625,2.590666667856567e-07,0.19134171307086945,-0.4267764687538147,0.17677688598632812,0.19134171307086945,-0.4619394838809967,0.19134193658828735,-2.1855694143368964e-08,-0.35355323553085327,2.4416550559180905e-07,0.3535533845424652,-0.19134162366390228,1.2495623025188252e-07,0.4619397521018982,-0.17677658796310425,0.07322338968515396,0.4619397521018982,-0.3266405165195465,0.1352991908788681,0.3535533845424652,-0.19134162366390228,1.6965971383342549e-07,-0.4619397521018982,-0.35355323553085327,2.4416550559180905e-07,-0.3535533845424652,-0.3266405165195465,0.1352991908788681,-0.3535533845424652,-0.17677657306194305,0.07322343438863754,-0.4619397521018982,-0.46193960309028625,2.590666667856567e-07,-0.19134175777435303,-0.4999998211860657,3.037701503671997e-07,-2.1855694143368964e-08,-0.4619394838809967,0.19134193658828735,-2.1855694143368964e-08,-0.4267764687538147,0.17677688598632812,-0.19134175777435303,-0.46193960309028625,2.590666667856567e-07,0.19134171307086945,-0.35355323553085327,2.4416550559180905e-07,0.3535533845424652,-0.3266405165195465,0.1352991908788681,0.3535533845424652,-0.4267764687538147,0.17677688598632812,0.19134171307086945,-0.19134162366390228,1.2495623025188252e-07,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,-0.17677658796310425,0.07322338968515396,0.4619397521018982,-0.3266405165195465,0.1352991908788681,0.3535533845424652,-0.17677658796310425,0.07322338968515396,0.4619397521018982,-0.1352989226579666,0.13529905676841736,0.4619397521018982,-0.2499997317790985,0.2500000596046448,0.3535533845424652,-0.17677657306194305,0.07322343438863754,-0.4619397521018982,-0.3266405165195465,0.1352991908788681,-0.3535533845424652,-0.2499997317790985,0.2500000596046448,-0.3535533845424652,-0.13529889285564423,0.13529910147190094,-0.4619397521018982,-0.4267764687538147,0.17677688598632812,-0.19134175777435303,-0.4619394838809967,0.19134193658828735,-2.1855694143368964e-08,-0.35355302691459656,0.35355350375175476,-2.1855694143368964e-08,-0.32664045691490173,0.3266408443450928,-0.19134175777435303,-0.4267764687538147,0.17677688598632812,0.19134171307086945,-0.3266405165195465,0.1352991908788681,0.3535533845424652,-0.2499997317790985,0.2500000596046448,0.3535533845424652,-0.32664045691490173,0.3266408443450928,0.19134171307086945,-0.17677658796310425,0.07322338968515396,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,-0.1352989226579666,0.13529905676841736,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,-0.17677657306194305,0.07322343438863754,-0.4619397521018982,-0.13529889285564423,0.13529910147190094,-0.4619397521018982,-0.3266405165195465,0.1352991908788681,-0.3535533845424652,-0.4267764687538147,0.17677688598632812,-0.19134175777435303,-0.32664045691490173,0.3266408443450928,-0.19134175777435303,-0.2499997317790985,0.2500000596046448,-0.3535533845424652,-0.4619394838809967,0.19134193658828735,-2.1855694143368964e-08,-0.4267764687538147,0.17677688598632812,0.19134171307086945,-0.32664045691490173,0.3266408443450928,0.19134171307086945,-0.35355302691459656,0.35355350375175476,-2.1855694143368964e-08,-0.13529889285564423,0.13529910147190094,-0.4619397521018982,-0.2499997317790985,0.2500000596046448,-0.3535533845424652,-0.13529875874519348,0.32664069533348083,-0.3535533845424652,-0.07322317361831665,0.1767767071723938,-0.4619397521018982,-0.32664045691490173,0.3266408443450928,-0.19134175777435303,-0.35355302691459656,0.35355350375175476,-2.1855694143368964e-08,-0.1913413554430008,0.4619397521018982,-2.1855694143368964e-08,-0.17677639424800873,0.426776647567749,-0.19134175777435303,-0.32664045691490173,0.3266408443450928,0.19134171307086945,-0.2499997317790985,0.2500000596046448,0.3535533845424652,-0.13529875874519348,0.32664069533348083,0.3535533845424652,-0.17677639424800873,0.426776647567749,0.19134171307086945,-0.1352989226579666,0.13529905676841736,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,-0.07322321832180023,0.1767766922712326,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,-0.13529889285564423,0.13529910147190094,-0.4619397521018982,-0.07322317361831665,0.1767767071723938,-0.4619397521018982,-0.2499997317790985,0.2500000596046448,-0.3535533845424652,-0.32664045691490173,0.3266408443450928,-0.19134175777435303,-0.17677639424800873,0.426776647567749,-0.19134175777435303,-0.13529875874519348,0.32664069533348083,-0.3535533845424652,-0.35355302691459656,0.35355350375175476,-2.1855694143368964e-08,-0.32664045691490173,0.3266408443450928,0.19134171307086945,-0.17677639424800873,0.426776647567749,0.19134171307086945,-0.1913413554430008,0.4619397521018982,-2.1855694143368964e-08,-0.2499997317790985,0.2500000596046448,0.3535533845424652,-0.1352989226579666,0.13529905676841736,0.4619397521018982,-0.07322321832180023,0.1767766922712326,0.4619397521018982,-0.13529875874519348,0.32664069533348083,0.3535533845424652,-0.07322321832180023,0.1767766922712326,0.4619397521018982,-6.975096056294205e-08,4.660612162865618e-08,0.5,0.0,0.19134172797203064,0.4619397521018982,0.0,7.549790126404332e-08,-0.5,-0.07322317361831665,0.1767767071723938,-0.4619397521018982,0.0,0.19134174287319183,-0.4619397521018982,-0.13529875874519348,0.32664069533348083,-0.3535533845424652,-0.17677639424800873,0.426776647567749,-0.19134175777435303,0.0,0.4619397521018982,-0.19134175777435303,0.0,0.3535533845424652,-0.3535533845424652,-0.1913413554430008,0.4619397521018982,-2.1855694143368964e-08,-0.17677639424800873,0.426776647567749,0.19134171307086945,0.0,0.4619397521018982,0.19134171307086945,0.0,0.5,-2.1855694143368964e-08,0.0,0.19134172797203064,0.4619397521018982,0.0,0.3535533845424652,0.3535533845424652,-0.13529875874519348,0.32664069533348083,0.3535533845424652,-0.07322321832180023,0.1767766922712326,0.4619397521018982,-0.07322317361831665,0.1767767071723938,-0.4619397521018982,-0.13529875874519348,0.32664069533348083,-0.3535533845424652,0.0,0.3535533845424652,-0.3535533845424652,0.0,0.19134174287319183,-0.4619397521018982,-0.17677639424800873,0.426776647567749,-0.19134175777435303,-0.1913413554430008,0.4619397521018982,-2.1855694143368964e-08,0.0,0.5,-2.1855694143368964e-08,0.0,0.4619397521018982,-0.19134175777435303,-0.17677639424800873,0.426776647567749,0.19134171307086945,-0.13529875874519348,0.32664069533348083,0.3535533845424652,0.0,0.3535533845424652,0.3535533845424652,0.0,0.4619397521018982,0.19134171307086945];
 iron_data_MaterialData.uidCounter = 0;
 iron_data_MaterialContext.num = 0;
 iron_math_Quat.helpVec0 = new iron_math_Vec4();
@@ -21674,10 +24462,23 @@ iron_object_BoneAnimation.vscl2 = new iron_math_Vec4();
 iron_object_Object.uidCounter = 0;
 iron_object_Object.seed = 1;
 iron_object_CameraObject.temp = new iron_math_Vec4();
+iron_object_CameraObject.sphereCenter = new iron_math_Vec4();
 iron_object_LampObject.cascadeCount = 1;
 iron_object_LampObject.cascadeSplitFactor = 0.8;
+iron_object_LampObject.m = iron_math_Mat4.identity();
+iron_object_LampObject.p1 = new iron_math_Vec4();
+iron_object_LampObject.p2 = new iron_math_Vec4();
+iron_object_LampObject.p3 = new iron_math_Vec4();
 iron_object_Transform.temp = iron_math_Mat4.identity();
+iron_object_Uniforms.biasMat = new iron_math_Mat4(0.5,0.0,0.0,0.5,0.0,0.5,0.0,0.5,0.0,0.0,0.5,0.5,0.0,0.0,0.0,1.0);
+iron_object_Uniforms.helpMat = iron_math_Mat4.identity();
+iron_object_Uniforms.helpMat2 = iron_math_Mat4.identity();
+iron_object_Uniforms.helpMat3 = iron_math_Mat3.identity();
+iron_object_Uniforms.helpVec = new iron_math_Vec4();
+iron_object_Uniforms.helpVec2 = new iron_math_Vec4();
+iron_object_Uniforms.helpQuat = new iron_math_Quat();
 iron_system_Input.gamepads = [];
+iron_system_Mouse.buttons = ["left","right","middle"];
 iron_system_Time.scale = 1.0;
 iron_system_Time.last = 0.0;
 iron_system_Time.realDelta = 0.0;
@@ -21765,18 +24566,18 @@ kha_Shaders.world_vertData2 = "s311:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1lZGl1bXAg
 kha_Shaders.painter_colored_fragData0 = "s198:I3ZlcnNpb24gMTAwCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gaGlnaHAgaW50OwoKdmFyeWluZyBoaWdocCB2ZWM0IGZyYWdtZW50Q29sb3I7Cgp2b2lkIG1haW4oKQp7CiAgICBnbF9GcmFnRGF0YVswXSA9IGZyYWdtZW50Q29sb3I7Cn0KCg";
 kha_Shaders.painter_colored_fragData1 = "s192:I3ZlcnNpb24gMTAwCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gbWVkaXVtcCBpbnQ7Cgp2YXJ5aW5nIHZlYzQgZnJhZ21lbnRDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIGdsX0ZyYWdEYXRhWzBdID0gZnJhZ21lbnRDb2xvcjsKfQoK";
 kha_Shaders.painter_colored_fragData2 = "s210:I3ZlcnNpb24gMzAwIGVzCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gbWVkaXVtcCBpbnQ7CgpvdXQgdmVjNCBGcmFnQ29sb3I7CmluIHZlYzQgZnJhZ21lbnRDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIEZyYWdDb2xvciA9IGZyYWdtZW50Q29sb3I7Cn0KCg";
-kha_Shaders.painter_colored_vertData0 = "s331:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1hdDQgcHJvamVjdGlvbk1hdHJpeDsKCmF0dHJpYnV0ZSB2ZWMzIHZlcnRleFBvc2l0aW9uOwp2YXJ5aW5nIHZlYzQgZnJhZ21lbnRDb2xvcjsKYXR0cmlidXRlIHZlYzQgdmVydGV4Q29sb3I7Cgp2b2lkIG1haW4oKQp7CiAgICBnbF9Qb3NpdGlvbiA9IHByb2plY3Rpb25NYXRyaXggKiB2ZWM0KHZlcnRleFBvc2l0aW9uLCAxLjApOwogICAgZnJhZ21lbnRDb2xvciA9IHZlcnRleENvbG9yOwp9Cgo";
-kha_Shaders.painter_colored_vertData1 = "s374:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKYXR0cmlidXRlIG1lZGl1bXAgdmVjMyB2ZXJ0ZXhQb3NpdGlvbjsKdmFyeWluZyBtZWRpdW1wIHZlYzQgZnJhZ21lbnRDb2xvcjsKYXR0cmlidXRlIG1lZGl1bXAgdmVjNCB2ZXJ0ZXhDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbk1hdHJpeCAqIHZlYzQodmVydGV4UG9zaXRpb24sIDEuMCk7CiAgICBmcmFnbWVudENvbG9yID0gdmVydGV4Q29sb3I7Cn0KCg";
-kha_Shaders.painter_colored_vertData2 = "s354:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKaW4gbWVkaXVtcCB2ZWMzIHZlcnRleFBvc2l0aW9uOwpvdXQgbWVkaXVtcCB2ZWM0IGZyYWdtZW50Q29sb3I7CmluIG1lZGl1bXAgdmVjNCB2ZXJ0ZXhDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbk1hdHJpeCAqIHZlYzQodmVydGV4UG9zaXRpb24sIDEuMCk7CiAgICBmcmFnbWVudENvbG9yID0gdmVydGV4Q29sb3I7Cn0KCg";
 kha_Shaders.painter_image_fragData0 = "s471:I3ZlcnNpb24gMTAwCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gaGlnaHAgaW50OwoKdW5pZm9ybSBoaWdocCBzYW1wbGVyMkQgdGV4OwoKdmFyeWluZyBoaWdocCB2ZWMyIHRleENvb3JkOwp2YXJ5aW5nIGhpZ2hwIHZlYzQgY29sb3I7Cgp2b2lkIG1haW4oKQp7CiAgICBoaWdocCB2ZWM0IHRleGNvbG9yID0gdGV4dHVyZTJEKHRleCwgdGV4Q29vcmQpICogY29sb3I7CiAgICBoaWdocCB2ZWMzIF8zMiA9IHRleGNvbG9yLnh5eiAqIGNvbG9yLnc7CiAgICB0ZXhjb2xvciA9IHZlYzQoXzMyLngsIF8zMi55LCBfMzIueiwgdGV4Y29sb3Iudyk7CiAgICBnbF9GcmFnRGF0YVswXSA9IHRleGNvbG9yOwp9Cgo";
 kha_Shaders.painter_image_fragData1 = "s444:I3ZlcnNpb24gMTAwCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gbWVkaXVtcCBpbnQ7Cgp1bmlmb3JtIG1lZGl1bXAgc2FtcGxlcjJEIHRleDsKCnZhcnlpbmcgdmVjMiB0ZXhDb29yZDsKdmFyeWluZyB2ZWM0IGNvbG9yOwoKdm9pZCBtYWluKCkKewogICAgdmVjNCB0ZXhjb2xvciA9IHRleHR1cmUyRCh0ZXgsIHRleENvb3JkKSAqIGNvbG9yOwogICAgdmVjMyBfMzIgPSB0ZXhjb2xvci54eXogKiBjb2xvci53OwogICAgdGV4Y29sb3IgPSB2ZWM0KF8zMi54LCBfMzIueSwgXzMyLnosIHRleGNvbG9yLncpOwogICAgZ2xfRnJhZ0RhdGFbMF0gPSB0ZXhjb2xvcjsKfQoK";
 kha_Shaders.painter_image_fragData2 = "s452:I3ZlcnNpb24gMzAwIGVzCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gbWVkaXVtcCBpbnQ7Cgp1bmlmb3JtIG1lZGl1bXAgc2FtcGxlcjJEIHRleDsKCmluIHZlYzIgdGV4Q29vcmQ7CmluIHZlYzQgY29sb3I7Cm91dCB2ZWM0IEZyYWdDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIHZlYzQgdGV4Y29sb3IgPSB0ZXh0dXJlKHRleCwgdGV4Q29vcmQpICogY29sb3I7CiAgICB2ZWMzIF8zMiA9IHRleGNvbG9yLnh5eiAqIGNvbG9yLnc7CiAgICB0ZXhjb2xvciA9IHZlYzQoXzMyLngsIF8zMi55LCBfMzIueiwgdGV4Y29sb3Iudyk7CiAgICBGcmFnQ29sb3IgPSB0ZXhjb2xvcjsKfQoK";
-kha_Shaders.painter_image_vertData0 = "s415:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1hdDQgcHJvamVjdGlvbk1hdHJpeDsKCmF0dHJpYnV0ZSB2ZWMzIHZlcnRleFBvc2l0aW9uOwp2YXJ5aW5nIHZlYzIgdGV4Q29vcmQ7CmF0dHJpYnV0ZSB2ZWMyIHRleFBvc2l0aW9uOwp2YXJ5aW5nIHZlYzQgY29sb3I7CmF0dHJpYnV0ZSB2ZWM0IHZlcnRleENvbG9yOwoKdm9pZCBtYWluKCkKewogICAgZ2xfUG9zaXRpb24gPSBwcm9qZWN0aW9uTWF0cml4ICogdmVjNCh2ZXJ0ZXhQb3NpdGlvbiwgMS4wKTsKICAgIHRleENvb3JkID0gdGV4UG9zaXRpb247CiAgICBjb2xvciA9IHZlcnRleENvbG9yOwp9Cgo";
-kha_Shaders.painter_image_vertData1 = "s479:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKYXR0cmlidXRlIG1lZGl1bXAgdmVjMyB2ZXJ0ZXhQb3NpdGlvbjsKdmFyeWluZyBtZWRpdW1wIHZlYzIgdGV4Q29vcmQ7CmF0dHJpYnV0ZSBtZWRpdW1wIHZlYzIgdGV4UG9zaXRpb247CnZhcnlpbmcgbWVkaXVtcCB2ZWM0IGNvbG9yOwphdHRyaWJ1dGUgbWVkaXVtcCB2ZWM0IHZlcnRleENvbG9yOwoKdm9pZCBtYWluKCkKewogICAgZ2xfUG9zaXRpb24gPSBwcm9qZWN0aW9uTWF0cml4ICogdmVjNCh2ZXJ0ZXhQb3NpdGlvbiwgMS4wKTsKICAgIHRleENvb3JkID0gdGV4UG9zaXRpb247CiAgICBjb2xvciA9IHZlcnRleENvbG9yOwp9Cgo";
-kha_Shaders.painter_image_vertData2 = "s444:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKaW4gbWVkaXVtcCB2ZWMzIHZlcnRleFBvc2l0aW9uOwpvdXQgbWVkaXVtcCB2ZWMyIHRleENvb3JkOwppbiBtZWRpdW1wIHZlYzIgdGV4UG9zaXRpb247Cm91dCBtZWRpdW1wIHZlYzQgY29sb3I7CmluIG1lZGl1bXAgdmVjNCB2ZXJ0ZXhDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbk1hdHJpeCAqIHZlYzQodmVydGV4UG9zaXRpb24sIDEuMCk7CiAgICB0ZXhDb29yZCA9IHRleFBvc2l0aW9uOwogICAgY29sb3IgPSB2ZXJ0ZXhDb2xvcjsKfQoK";
+kha_Shaders.painter_colored_vertData0 = "s331:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1hdDQgcHJvamVjdGlvbk1hdHJpeDsKCmF0dHJpYnV0ZSB2ZWMzIHZlcnRleFBvc2l0aW9uOwp2YXJ5aW5nIHZlYzQgZnJhZ21lbnRDb2xvcjsKYXR0cmlidXRlIHZlYzQgdmVydGV4Q29sb3I7Cgp2b2lkIG1haW4oKQp7CiAgICBnbF9Qb3NpdGlvbiA9IHByb2plY3Rpb25NYXRyaXggKiB2ZWM0KHZlcnRleFBvc2l0aW9uLCAxLjApOwogICAgZnJhZ21lbnRDb2xvciA9IHZlcnRleENvbG9yOwp9Cgo";
+kha_Shaders.painter_colored_vertData1 = "s374:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKYXR0cmlidXRlIG1lZGl1bXAgdmVjMyB2ZXJ0ZXhQb3NpdGlvbjsKdmFyeWluZyBtZWRpdW1wIHZlYzQgZnJhZ21lbnRDb2xvcjsKYXR0cmlidXRlIG1lZGl1bXAgdmVjNCB2ZXJ0ZXhDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbk1hdHJpeCAqIHZlYzQodmVydGV4UG9zaXRpb24sIDEuMCk7CiAgICBmcmFnbWVudENvbG9yID0gdmVydGV4Q29sb3I7Cn0KCg";
+kha_Shaders.painter_colored_vertData2 = "s354:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKaW4gbWVkaXVtcCB2ZWMzIHZlcnRleFBvc2l0aW9uOwpvdXQgbWVkaXVtcCB2ZWM0IGZyYWdtZW50Q29sb3I7CmluIG1lZGl1bXAgdmVjNCB2ZXJ0ZXhDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbk1hdHJpeCAqIHZlYzQodmVydGV4UG9zaXRpb24sIDEuMCk7CiAgICBmcmFnbWVudENvbG9yID0gdmVydGV4Q29sb3I7Cn0KCg";
 kha_Shaders.painter_text_fragData0 = "s351:I3ZlcnNpb24gMTAwCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gaGlnaHAgaW50OwoKdW5pZm9ybSBoaWdocCBzYW1wbGVyMkQgdGV4OwoKdmFyeWluZyBoaWdocCB2ZWM0IGZyYWdtZW50Q29sb3I7CnZhcnlpbmcgaGlnaHAgdmVjMiB0ZXhDb29yZDsKCnZvaWQgbWFpbigpCnsKICAgIGdsX0ZyYWdEYXRhWzBdID0gdmVjNChmcmFnbWVudENvbG9yLnh5eiwgdGV4dHVyZTJEKHRleCwgdGV4Q29vcmQpLnggKiBmcmFnbWVudENvbG9yLncpOwp9Cgo";
 kha_Shaders.painter_text_fragData1 = "s340:I3ZlcnNpb24gMTAwCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gbWVkaXVtcCBpbnQ7Cgp1bmlmb3JtIG1lZGl1bXAgc2FtcGxlcjJEIHRleDsKCnZhcnlpbmcgdmVjNCBmcmFnbWVudENvbG9yOwp2YXJ5aW5nIHZlYzIgdGV4Q29vcmQ7Cgp2b2lkIG1haW4oKQp7CiAgICBnbF9GcmFnRGF0YVswXSA9IHZlYzQoZnJhZ21lbnRDb2xvci54eXosIHRleHR1cmUyRCh0ZXgsIHRleENvb3JkKS54ICogZnJhZ21lbnRDb2xvci53KTsKfQoK";
 kha_Shaders.painter_text_fragData2 = "s348:I3ZlcnNpb24gMzAwIGVzCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gbWVkaXVtcCBpbnQ7Cgp1bmlmb3JtIG1lZGl1bXAgc2FtcGxlcjJEIHRleDsKCm91dCB2ZWM0IEZyYWdDb2xvcjsKaW4gdmVjNCBmcmFnbWVudENvbG9yOwppbiB2ZWMyIHRleENvb3JkOwoKdm9pZCBtYWluKCkKewogICAgRnJhZ0NvbG9yID0gdmVjNChmcmFnbWVudENvbG9yLnh5eiwgdGV4dHVyZSh0ZXgsIHRleENvb3JkKS54ICogZnJhZ21lbnRDb2xvci53KTsKfQoK";
+kha_Shaders.painter_image_vertData0 = "s415:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1hdDQgcHJvamVjdGlvbk1hdHJpeDsKCmF0dHJpYnV0ZSB2ZWMzIHZlcnRleFBvc2l0aW9uOwp2YXJ5aW5nIHZlYzIgdGV4Q29vcmQ7CmF0dHJpYnV0ZSB2ZWMyIHRleFBvc2l0aW9uOwp2YXJ5aW5nIHZlYzQgY29sb3I7CmF0dHJpYnV0ZSB2ZWM0IHZlcnRleENvbG9yOwoKdm9pZCBtYWluKCkKewogICAgZ2xfUG9zaXRpb24gPSBwcm9qZWN0aW9uTWF0cml4ICogdmVjNCh2ZXJ0ZXhQb3NpdGlvbiwgMS4wKTsKICAgIHRleENvb3JkID0gdGV4UG9zaXRpb247CiAgICBjb2xvciA9IHZlcnRleENvbG9yOwp9Cgo";
+kha_Shaders.painter_image_vertData1 = "s479:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKYXR0cmlidXRlIG1lZGl1bXAgdmVjMyB2ZXJ0ZXhQb3NpdGlvbjsKdmFyeWluZyBtZWRpdW1wIHZlYzIgdGV4Q29vcmQ7CmF0dHJpYnV0ZSBtZWRpdW1wIHZlYzIgdGV4UG9zaXRpb247CnZhcnlpbmcgbWVkaXVtcCB2ZWM0IGNvbG9yOwphdHRyaWJ1dGUgbWVkaXVtcCB2ZWM0IHZlcnRleENvbG9yOwoKdm9pZCBtYWluKCkKewogICAgZ2xfUG9zaXRpb24gPSBwcm9qZWN0aW9uTWF0cml4ICogdmVjNCh2ZXJ0ZXhQb3NpdGlvbiwgMS4wKTsKICAgIHRleENvb3JkID0gdGV4UG9zaXRpb247CiAgICBjb2xvciA9IHZlcnRleENvbG9yOwp9Cgo";
+kha_Shaders.painter_image_vertData2 = "s444:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKaW4gbWVkaXVtcCB2ZWMzIHZlcnRleFBvc2l0aW9uOwpvdXQgbWVkaXVtcCB2ZWMyIHRleENvb3JkOwppbiBtZWRpdW1wIHZlYzIgdGV4UG9zaXRpb247Cm91dCBtZWRpdW1wIHZlYzQgY29sb3I7CmluIG1lZGl1bXAgdmVjNCB2ZXJ0ZXhDb2xvcjsKCnZvaWQgbWFpbigpCnsKICAgIGdsX1Bvc2l0aW9uID0gcHJvamVjdGlvbk1hdHJpeCAqIHZlYzQodmVydGV4UG9zaXRpb24sIDEuMCk7CiAgICB0ZXhDb29yZCA9IHRleFBvc2l0aW9uOwogICAgY29sb3IgPSB2ZXJ0ZXhDb2xvcjsKfQoK";
 kha_Shaders.painter_text_vertData0 = "s436:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1hdDQgcHJvamVjdGlvbk1hdHJpeDsKCmF0dHJpYnV0ZSB2ZWMzIHZlcnRleFBvc2l0aW9uOwp2YXJ5aW5nIHZlYzIgdGV4Q29vcmQ7CmF0dHJpYnV0ZSB2ZWMyIHRleFBvc2l0aW9uOwp2YXJ5aW5nIHZlYzQgZnJhZ21lbnRDb2xvcjsKYXR0cmlidXRlIHZlYzQgdmVydGV4Q29sb3I7Cgp2b2lkIG1haW4oKQp7CiAgICBnbF9Qb3NpdGlvbiA9IHByb2plY3Rpb25NYXRyaXggKiB2ZWM0KHZlcnRleFBvc2l0aW9uLCAxLjApOwogICAgdGV4Q29vcmQgPSB0ZXhQb3NpdGlvbjsKICAgIGZyYWdtZW50Q29sb3IgPSB2ZXJ0ZXhDb2xvcjsKfQoK";
 kha_Shaders.painter_text_vertData1 = "s500:I3ZlcnNpb24gMTAwCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKYXR0cmlidXRlIG1lZGl1bXAgdmVjMyB2ZXJ0ZXhQb3NpdGlvbjsKdmFyeWluZyBtZWRpdW1wIHZlYzIgdGV4Q29vcmQ7CmF0dHJpYnV0ZSBtZWRpdW1wIHZlYzIgdGV4UG9zaXRpb247CnZhcnlpbmcgbWVkaXVtcCB2ZWM0IGZyYWdtZW50Q29sb3I7CmF0dHJpYnV0ZSBtZWRpdW1wIHZlYzQgdmVydGV4Q29sb3I7Cgp2b2lkIG1haW4oKQp7CiAgICBnbF9Qb3NpdGlvbiA9IHByb2plY3Rpb25NYXRyaXggKiB2ZWM0KHZlcnRleFBvc2l0aW9uLCAxLjApOwogICAgdGV4Q29vcmQgPSB0ZXhQb3NpdGlvbjsKICAgIGZyYWdtZW50Q29sb3IgPSB2ZXJ0ZXhDb2xvcjsKfQoK";
 kha_Shaders.painter_text_vertData2 = "s466:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1lZGl1bXAgbWF0NCBwcm9qZWN0aW9uTWF0cml4OwoKaW4gbWVkaXVtcCB2ZWMzIHZlcnRleFBvc2l0aW9uOwpvdXQgbWVkaXVtcCB2ZWMyIHRleENvb3JkOwppbiBtZWRpdW1wIHZlYzIgdGV4UG9zaXRpb247Cm91dCBtZWRpdW1wIHZlYzQgZnJhZ21lbnRDb2xvcjsKaW4gbWVkaXVtcCB2ZWM0IHZlcnRleENvbG9yOwoKdm9pZCBtYWluKCkKewogICAgZ2xfUG9zaXRpb24gPSBwcm9qZWN0aW9uTWF0cml4ICogdmVjNCh2ZXJ0ZXhQb3NpdGlvbiwgMS4wKTsKICAgIHRleENvb3JkID0gdGV4UG9zaXRpb247CiAgICBmcmFnbWVudENvbG9yID0gdmVydGV4Q29sb3I7Cn0KCg";
