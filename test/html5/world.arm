@@ -1,1 +1,0 @@
-¬shader_datas‘‚¤name¥world¨contexts‘‰­texture_units­vertex_shaderªworld.vert¯fragment_shaderªworld.frag°vertex_structure’‚¤name£pos¤size‚¤name£nor¤size©constants“ƒ¤name¤SMVP¤type¤mat4¤link®_skydomeMatrixƒ¤name­backgroundCol¤type¤vec3¤link®_backgroundCol‚¤name®envmapStrength¤type¥float¤name¥world«depth_writeÂ©cull_mode©clockwise¬compare_mode¤less
